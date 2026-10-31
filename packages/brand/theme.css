@@ -1,0 +1,60 @@
+/* TechX Systems: Tailwind CSS v4 theme (Direction B, light and premium).
+   Import after `@import "tailwindcss";`. Values come from DESIGN.md (the Figma file and Direction B HTML).
+   Class names read like the design: bg-page, text-ink-2, text-blue, shadow-raised, rounded-card, text-display.
+   Fonts load with next/font (Inter Tight, Inter, Geist Mono) in apps/web/app/layout.tsx. */
+
+@theme {
+  /* Colour. Neutrals carry the page; blue is for actions only; maroon marks the edited result. */
+  --color-page: #FFFFFF;
+  --color-surface: #FFFFFF;
+  --color-sunk: #F5F5F6;       /* trays, illustration canvas */
+  --color-line: #EAEAEC;
+  --color-line-2: #D4D4D8;
+  --color-ink: #0A0A0B;        /* primary text, 20:1 */
+  --color-ink-2: #525258;      /* secondary text, 7.6:1 */
+  --color-ink-3: #A1A1AA;      /* muted headline half and decoration only: 2.6:1, never body text */
+  --color-blue: #3074FE;       /* action colour (vibrant.design blue, owner 2026-10-30): buttons and links only */
+  --color-blue-2: #1E4FD6;     /* hover / pressed */
+  --color-blue-tint: #EBF1FF;
+  --color-maroon: #8E1F3F;     /* "After" labels, step numbers. Never on buttons */
+  --color-maroon-tint: #F9EEF2;
+  --color-green: #1F9D55;
+  --color-error: #D93636;
+  --color-warning: #D98A0B;
+
+  /* Type */
+  /* Owner, 2026-10-30: headings in Inter Tight at 575 (closest free match to glideapps.com's Booton), body in Inter. */
+  --font-display: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Type roles. Headings use Inter Tight at 500–520 (owner: lighter, same message), never bold. Fluid from 375px to 1280px. */
+  --text-display: clamp(36px, 4.4vw, 58px); --text-display--line-height: 1.02; --text-display--letter-spacing: -0.022em; --text-display--font-weight: 520;
+  --text-h1: clamp(36px, 5.2vw, 64px);      --text-h1--line-height: 1.04;      --text-h1--letter-spacing: -0.028em;      --text-h1--font-weight: 520;
+  --text-cta: clamp(34px, 4.6vw, 56px);     --text-cta--line-height: 1.08;     --text-cta--letter-spacing: -0.025em;     --text-cta--font-weight: 520;
+  --text-h2: clamp(30px, 4vw, 48px);        --text-h2--line-height: 1.08;      --text-h2--letter-spacing: -0.02em;      --text-h2--font-weight: 520;
+  --text-h3: clamp(21px, 2vw, 28px);        --text-h3--line-height: 1.25;      --text-h3--letter-spacing: -0.015em;      --text-h3--font-weight: 500;
+  --text-h4: 21px;                          --text-h4--line-height: 1.25;      --text-h4--letter-spacing: -0.012em;      --text-h4--font-weight: 500;
+  --text-lede: 19px;                        --text-lede--line-height: 1.6;
+  --text-body: 16px;                        --text-body--line-height: 1.6;
+  --text-small: 14px;                       --text-small--line-height: 1.5;
+  --text-label: 12px;                       --text-label--line-height: 1.33;   --text-label--letter-spacing: 0.04em;
+
+  /* Radius (DESIGN.md §4). Nested cards: outer frame with 8px padding, inner radius 8px smaller. */
+  --radius-input: 12px;
+  --radius-inner: 20px;
+  --radius-card: 28px;
+  --radius-tray: 32px;
+  --radius-panel: 40px;
+
+  /* Elevation */
+  --shadow-hair: 0 0 0 1px rgb(17 19 24 / 0.06), 0 1px 2px rgb(17 19 24 / 0.04);
+  --shadow-raised: 0 0 0 1px rgb(17 19 24 / 0.06), 0 12px 32px -12px rgb(17 19 24 / 0.16);
+  --shadow-overlay: 0 0 0 1px rgb(17 19 24 / 0.08), 0 24px 48px -12px rgb(17 19 24 / 0.16);
+  --shadow-cta: inset 0 1px 0 rgb(255 255 255 / 0.2), 0 6px 16px -6px rgb(48 116 254 / 0.55);
+
+  /* Motion (DESIGN.md §6): 150 hover/press, 220 tabs/chips/cards, 320 slider snap and reveals */
+  --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
+  --default-transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  --default-transition-duration: 150ms;
+}

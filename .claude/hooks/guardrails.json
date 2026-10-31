@@ -1,0 +1,188 @@
+{
+  "_about": "TechX website guardrails. guard.py checks every AI tool call against these rules before it runs. To add a guardrail, add an entry to 'rules' (see GUARDRAILS.md). decision: 'deny' blocks it, 'ask' makes the AI ask the owner first.",
+  "version": 1,
+  "git": {
+    "_about": "G1. AIs never change git state or the remote. Only these read-only subcommands are allowed.",
+    "readonly_subcommands": [
+      "status",
+      "log",
+      "diff",
+      "show",
+      "blame",
+      "ls-files",
+      "ls-tree",
+      "rev-parse",
+      "describe",
+      "shortlog",
+      "grep",
+      "cat-file",
+      "help",
+      "version"
+    ],
+    "listing_only_subcommands": {
+      "branch": [
+        "",
+        "--list",
+        "-l",
+        "-a",
+        "--all",
+        "-r",
+        "--remotes",
+        "--show-current",
+        "-v",
+        "-vv"
+      ],
+      "tag": [
+        "",
+        "--list",
+        "-l"
+      ],
+      "remote": [
+        "",
+        "-v",
+        "--verbose",
+        "show",
+        "get-url"
+      ],
+      "stash": [
+        "list",
+        "show"
+      ],
+      "config": [
+        "--get",
+        "--list",
+        "-l",
+        "--get-all",
+        "--get-regexp"
+      ],
+      "worktree": [
+        "list"
+      ]
+    },
+    "gh_readonly": [
+      "pr view",
+      "pr list",
+      "pr status",
+      "pr diff",
+      "pr checks",
+      "issue view",
+      "issue list",
+      "issue status",
+      "repo view",
+      "run list",
+      "run view",
+      "auth status",
+      "--version",
+      "help"
+    ]
+  },
+  "rules": [
+    {
+      "id": "G2-db-destructive-sql",
+      "description": "No deleting or destroying data in any database (DROP, TRUNCATE, DELETE, ALTER ... DROP).",
+      "applies_to": [
+        "bash",
+        "mcp"
+      ],
+      "patterns": [
+        "\\bdrop\\s+(table|database|schema|index|view|column|type|extension|role|user|owned|sequence|function|trigger|materialized)\\b",
+        "\\btruncate\\b",
+        "\\bdelete\\s+from\\b",
+        "\\balter\\s+table\\b[^;]*\\bdrop\\b",
+        "\\bdropdb\\b",
+        "\\bdropuser\\b",
+        "\\bflushall\\b",
+        "\\bflushdb\\b",
+        "\\bdb\\.dropDatabase\\b",
+        "\\.drop\\(\\s*\\)",
+        "\\bdeleteMany\\s*\\("
+      ],
+      "decision": "deny"
+    },
+    {
+      "id": "G2-db-schema-push-reset",
+      "description": "No pushing schema straight to a database or resetting it. Schema changes go through reviewed migration files that the owner runs.",
+      "applies_to": [
+        "bash"
+      ],
+      "patterns": [
+        "drizzle-kit\\s+(push|drop|migrate)",
+        "\\bprisma\\s+(migrate\\s+(reset|deploy|dev)|db\\s+(push|execute))",
+        "\\bsupabase\\s+db\\s+(reset|push)",
+        "\\bneonctl\\b.*\\b(delete|rm|reset)\\b",
+        "\\bpsql\\b.*(-c|--command|<)",
+        "\\bnpm\\s+run\\s+db:(push|reset|drop|migrate|seed)",
+        "\\b(pnpm|yarn|bun)\\s+(run\\s+)?db:(push|reset|drop|migrate|seed)",
+        "\\bturso\\s+db\\s+(destroy|delete)"
+      ],
+      "decision": "deny"
+    },
+    {
+      "id": "G3-production-and-hosting",
+      "description": "No production deploys and no deleting projects, env vars, domains or stored files on Vercel. The owner deploys to production.",
+      "applies_to": [
+        "bash"
+      ],
+      "patterns": [
+        "\\bvercel\\b.*(--prod|\\bprod\\b|--production)",
+        "\\bvercel\\s+(rm|remove)\\b",
+        "\\bvercel\\s+(env|domains|dns|project|projects|alias|certs|secrets|blob)\\s+(rm|remove|delete|del)\\b",
+        "\\bvercel\\s+promote\\b",
+        "\\bvercel\\s+rollback\\b"
+      ],
+      "decision": "deny"
+    },
+    {
+      "id": "G4-protect-repo-and-data-files",
+      "description": "No deleting the .git folder, migrations or database files.",
+      "applies_to": [
+        "bash"
+      ],
+      "patterns": [
+        "\\brm\\b[^;&|]*(\\.git(\\s|/|$)|\\.git$|/drizzle\\b|/migrations\\b|\\bmigrations/|\\.sqlite|\\.db(\\s|$))",
+        "\\bfind\\b[^;&|]*-delete\\b"
+      ],
+      "decision": "deny"
+    },
+    {
+      "id": "G5-mcp-destructive-tools",
+      "description": "No MCP tool that deletes, drops, resets or destroys anything (databases, repos, deployments, files).",
+      "applies_to": [
+        "mcp_name"
+      ],
+      "patterns": [
+        "(^|[-_])(delete|drop|truncate|destroy|purge|reset|wipe|erase|unpublish|archive)([-_]|$)",
+        "(^|[-_])remove[-_](file|files|branch|repo|repository|project|record|records|row|rows|document|documents|user|member|collaborator|database|table|domain|deployment)s?([-_]|$)",
+        "(^|[-_])(push|force[-_]push)([-_]|$)",
+        "merge[-_]pull[-_]request",
+        "create[-_](commit|branch|pull[-_]request|or[-_]update[-_]file|repository|tag|release)"
+      ],
+      "decision": "deny"
+    },
+    {
+      "id": "G6-guardrail-files",
+      "description": "Editing the guardrails themselves needs the owner's approval, so no AI can switch them off.",
+      "applies_to": [
+        "file_edit"
+      ],
+      "patterns": [
+        "(^|/)\\.claude/settings(\\.local)?\\.json$",
+        "(^|/)\\.claude/hooks/",
+        "(^|/)GUARDRAILS\\.md$"
+      ],
+      "decision": "ask"
+    },
+    {
+      "id": "G6-guardrail-files-shell",
+      "description": "No changing, moving or deleting the guardrail files from the shell. Ask the owner to edit them.",
+      "applies_to": [
+        "bash"
+      ],
+      "patterns": [
+        "(>|>>|\\btee\\b|\\bsed\\b[^|;&]*-i|\\bperl\\b[^|;&]*-i|\\bmv\\b|\\bcp\\b|\\brm\\b|\\bchmod\\b|\\bln\\b|\\btruncate\\b|\\bunlink\\b)[^\\n]*\\.claude/(hooks|settings)",
+        "(>|>>|\\btee\\b|\\bsed\\b[^|;&]*-i|\\bmv\\b|\\brm\\b)[^\\n]*GUARDRAILS\\.md"
+      ],
+      "decision": "deny"
+    }
+  ]
+}

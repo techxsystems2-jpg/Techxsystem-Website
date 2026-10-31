@@ -1,0 +1,7 @@
+{
+  "name": "@techx/brand",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TechX design tokens as a Tailwind v4 theme. Source of truth for colour, type, radius, shadow and motion.",
+  "exports": { "./theme.css": "./theme.css" }
+}

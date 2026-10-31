@@ -1,0 +1,91 @@
+/*
+  TechX Systems design tokens
+  Source of truth for the build. Values match the Figma variables (file WGW3zGaOx1NkmCCPomJTbV)
+  and the Direction B HTML (05-html/direction-b/styles.css). Light theme only.
+*/
+:root {
+  /* Neutrals (Figma ramp) */
+  --neutral-0: #FFFFFF;
+  --neutral-50: #F6F7F9;
+  --neutral-100: #EEF0F3;
+  --neutral-200: #E2E5EA;
+  --neutral-300: #C9CED6;
+  --neutral-400: #9AA1AD;
+  --neutral-500: #6B7280;
+  --neutral-600: #4B5260;
+  --neutral-800: #23262D;
+  --neutral-900: #121316;
+
+  /* Brand */
+  --blue-500: #2F5BEA;   /* action colour: buttons and links only */
+  --blue-600: #2349C8;   /* hover / pressed */
+  --blue-50: #EDF2FF;
+  --maroon-500: #8E1F3F; /* "after" / highlights, never on buttons */
+  --maroon-50: #F8ECF0;
+
+  /* Semantic */
+  --success: #1F9D55;
+  --error: #D93636;
+  --warning: #D98A0B;
+  --info: #2F5BEA;
+
+  /* Direction B surface set (current design) */
+  --page: #FBFBFC;
+  --surface: #FFFFFF;
+  --sunk: #F4F5F7;
+  --line: #E7E9EE;
+  --line-2: #D5D9E0;
+  --ink: #111318;
+  --ink-2: #5F6672;
+  --ink-3: #9AA1AD;
+  --blue: var(--blue-500);
+  --blue-2: var(--blue-600);
+  --blue-tint: #EEF2FF;
+  --maroon: var(--maroon-500);
+  --maroon-tint: #F9EEF2;
+
+  /* Type */
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+  --text-display: 72px;  --lh-display: 76px;  --ls-display: -0.03em;
+  --text-h1: 56px;       --lh-h1: 60px;       --ls-h1: -0.025em;
+  --text-h2: 40px;       --lh-h2: 46px;       --ls-h2: -0.02em;
+  --text-h3: 28px;       --lh-h3: 34px;       --ls-h3: -0.015em;
+  --text-h4: 22px;       --lh-h4: 28px;       --ls-h4: -0.01em;
+  --text-body-l: 19px;   --lh-body-l: 30px;
+  --text-body: 16px;     --lh-body: 26px;
+  --text-body-s: 14px;   --lh-body-s: 22px;
+  --text-label: 15px;    --text-label-s: 13px;
+  --text-meta: 12px;     --ls-meta: 0.04em;   /* mono, uppercase */
+  --weight-regular: 400; --weight-medium: 500; --weight-semibold: 600;
+
+  /* Spacing (8pt, 4pt half step) */
+  --space-4: 4px;  --space-8: 8px;  --space-12: 12px; --space-16: 16px; --space-24: 24px;
+  --space-32: 32px; --space-48: 48px; --space-64: 64px; --space-96: 96px; --space-128: 128px;
+
+  /* Radius */
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 20px; --radius-xl: 28px; --radius-pill: 999px;
+
+  /* Elevation */
+  --shadow-hairline: 0 0 0 1px rgba(17,19,24,.06), 0 1px 2px rgba(17,19,24,.04);
+  --shadow-raised: 0 0 0 1px rgba(17,19,24,.06), 0 12px 32px -12px rgba(17,19,24,.16);
+  --shadow-overlay: 0 0 0 1px rgba(17,19,24,.08), 0 24px 48px -12px rgba(17,19,24,.16);
+  --focus-ring: 0 0 0 4px rgba(47,91,234,.35);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 150ms; --dur-base: 220ms; --dur-slow: 320ms;
+
+  /* Layout */
+  --content-max: 1200px;
+  --gutter: 24px;
+  --margin-desktop: 120px;
+  --margin-mobile: 20px;
+}
+
+/* Raw-bracket look for stand-in photos */
+.is-raw { filter: saturate(.22) brightness(.82) contrast(.9); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
