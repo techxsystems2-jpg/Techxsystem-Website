@@ -1,52 +1,105 @@
 import Link from "next/link";
 import { buttonClass } from "@techx/ui/Button";
-import { ArrowIcon, CheckIcon } from "@techx/ui/Icons";
+import { ArrowIcon } from "@techx/ui/Icons";
 import { RevealGroup, RevealItem } from "@/features/motion/Reveal";
 import { SectionHead } from "./SectionHead";
 
-// Rates from Figma (open question in docs/OPEN_ITEMS.md: starting price "from $0.50" vs Essential $0.70).
-const plans = [
-  { name: "Essential", price: "$0.70", d: "HDR blend, colour, verticals and window pull. For everyday listings.", f: ["HDR blend and window pull", "Verticals and lens correction", "Free revisions"] },
-  { name: "Signature", price: "$1.00", d: "Everything in Essential, plus sky swaps, lawn, fire and TV screens.", f: ["Everything in Essential", "Sky, lawn, fire and TV fill", "Saved style guide"], featured: true },
-  { name: "Luxury", price: "$1.50", d: "Hand-masked blends and object removal, for high-end homes.", f: ["Everything in Signature", "Hand-masked blends", "Object removal"] },
+/* Pricing (owner, 2026-11-02): layout after the owner's reference. Each level is a soft tray holding a raised header
+   panel (name + who it's for), then the starting price, the trial button, a dotted rule, a mono "includes" label and the
+   list. Colours follow the rest of the site (owner): white cards with the hairline shadow, a faint sky header panel;
+   Signature is featured with the brand-blue moving edge and a blue-tint header. A full-width bulk-editing row sits underneath.
+   Copy rewritten from TechX's own site (techxsystems.com): the fixes in each level are the old site's photo-editing
+   list, split across the Figma levels; 12–24 h and 24/7 support are the old site's words. Every price is a starting
+   price ("From"); Essential from $0.50 (owner). */
+export const plans = [
+  {
+    name: "Essential",
+    who: "For everyday listings. Clean, bright and true to life.",
+    price: "$0.50",
+    label: "Essential includes",
+    f: ["HDR merging of your brackets", "Lens and perspective correction", "Colour, white balance and exposure", "Noise reduction", "Resizing for your listing", "Back in 12–24 hours", "Free revisions"],
+  },
+  {
+    name: "Signature",
+    who: "For listings that need to stand out. Skies, lawns and windows fixed.",
+    price: "$1.00",
+    label: "Everything in Essential, plus",
+    f: ["Window enhancement", "Sky replacement", "Grass replacement", "Fire in fireplaces", "TV screen fill", "Flash and reflection removal", "A saved style guide"],
+    featured: true,
+  },
+  {
+    name: "Luxury",
+    who: "For high-end homes that need hand-finished detail.",
+    price: "$1.50",
+    label: "Everything in Signature, plus",
+    f: ["Hand-masked blends", "Object removal"],
+  },
 ];
 
-const notes = [
-  { t: "Per image", d: "Pick a level per shoot; mix levels in one order." },
-  { t: "Monthly invoice", d: "Billed at month end, only for delivered photos." },
-  { t: "Studios, 500+ a month", d: "Dedicated editor and volume pricing.", link: true },
-];
+const bulk = ["Volume pricing", "A dedicated editor", "One monthly invoice, delivered photos only", "Photos, twilights, floor plans and video in one order", "Mix levels in one order", "24/7 support"];
 
-export function Pricing() {
+// Pikaicons (free pack) check-tick-circle, as used in HowItWorks
+const Tick = ({ className = "" }: { className?: string }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={`shrink-0 ${className}`}>
+    <path d="m8.5 12.513 2.341 2.338A15 15 0 0 1 15.4 9.915l.101-.069M21.15 12a9.15 9.15 0 1 1-18.3 0 9.15 9.15 0 0 1 18.3 0Z" />
+  </svg>
+);
+
+export function Pricing({ head = true }: { head?: boolean }) {
   return (
-    <section id="pricing" className="wrap pt-28 md:pt-40">
-      <SectionHead center label="Pricing" lead="Pay for what we deliver." rest="No contract, no minimum." />
+    <section id="pricing" className={`wrap ${head ? "pt-28 md:pt-40" : ""}`}>
+      {head && <SectionHead center label="Pricing" lead="Pay for what we deliver." rest="No contract, no minimum." />}
       <RevealGroup className="grid items-stretch gap-4 lg:grid-cols-3">
         {plans.map((p) => (
-          <RevealItem key={p.name} className={p.featured ? "edge-glow relative rounded-card p-[1.5px] shadow-[0_24px_60px_-24px_rgb(48_116_254/0.45)]" : ""}>
-            <div className={`group flex h-full flex-col rounded-[26.5px] bg-surface p-8 transition-[box-shadow,translate] duration-[320ms] ${p.featured ? "" : "shadow-hair hover:-translate-y-1 hover:shadow-raised"}`}>
-              <p className="flex items-center justify-between text-[17px] font-medium">
-                {p.name}
-                {p.featured && <span className="rounded-md bg-blue-tint px-2 py-[3px] font-mono text-[11px] uppercase tracking-[0.04em] text-blue">Most chosen</span>}
-              </p>
-              <p className="mt-6 flex items-baseline gap-2"><span className="text-[48px] font-medium tabular-nums tracking-[-0.03em]">{p.price}</span><span className="text-small text-ink-3">per image</span></p>
-              <p className="mt-3 text-small text-ink-2">{p.d}</p>
-              <Link href="/free-trial" className={buttonClass(p.featured ? "primary" : "secondary", "mt-6 w-full")}>Start free trial {p.featured && <ArrowIcon className="transition-transform duration-200 group-hover:translate-x-0.5" />}</Link>
-              <ul className="mt-6 space-y-3 border-t border-line pt-6">
-                {p.f.map((f) => <li key={f} className="flex items-center gap-2.5 text-small"><CheckIcon className="text-blue" />{f}</li>)}
-              </ul>
+          // Signature keeps the site's featured treatment: the moving brand-blue edge (edge-glow), no heavy shadow
+          <RevealItem key={p.name} className={`flex rounded-card ${p.featured ? "edge-glow p-[1.5px]" : ""}`}>
+            <div className={`flex w-full flex-col rounded-[14.5px] bg-surface p-2 ${p.featured ? "" : "shadow-hair"}`}>
+              <div className={`rounded-inner px-6 py-6 ${p.featured ? "bg-blue-tint" : "bg-[linear-gradient(180deg,#F6F9FF_0%,#FFFFFF_100%)] shadow-hair"}`}>
+                <p className="flex items-center justify-between gap-3">
+                  <span className="text-h4">{p.name}</span>
+                  {p.featured && <span className="rounded-md bg-surface px-2 py-[3px] font-mono text-[11px] uppercase tracking-[0.04em] text-blue">Most chosen</span>}
+                </p>
+                <p className="mt-2 text-small text-ink-2">{p.who}</p>
+              </div>
+              <div className="flex flex-1 flex-col px-6 pb-6 pt-7">
+                <p className="flex items-baseline gap-2">
+                  <span className="text-small text-ink-2">From</span>
+                  <span className="text-[48px] font-medium leading-none tabular-nums tracking-[-0.03em]">{p.price}</span>
+                  <span className="text-small text-ink-2">/ image</span>
+                </p>
+                <Link href="/free-trial" className={buttonClass(p.featured ? "primary" : "secondary", "mt-7 w-full")}>
+                  Start free trial {p.featured && <ArrowIcon className="transition-transform duration-200 group-hover:translate-x-0.5" />}
+                </Link>
+                <div className="mt-8 border-t border-dotted border-line-2" />
+                <p className="mt-7 font-mono text-[11px] uppercase tracking-[0.06em] text-ink-2">{p.label}:</p>
+                <ul className="mt-5 space-y-3.5">
+                  {p.f.map((f) => (
+                    <li key={f} className="flex items-center gap-3 text-small text-ink"><Tick className={p.featured ? "text-blue" : "text-ink-3"} />{f}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </RevealItem>
         ))}
       </RevealGroup>
-      <RevealGroup className="mt-4 grid gap-4 lg:grid-cols-3">
-        {notes.map((n) => (
-          <RevealItem key={n.t} className="rounded-[20px] bg-sunk px-6 py-5">
-            <p className="text-[15px] font-medium">{n.t}</p>
-            <p className="mt-1 text-small text-ink-2">{n.d} {n.link && <Link href="/contact" className="text-blue underline-offset-4 hover:underline">Talk to us</Link>}</p>
-          </RevealItem>
-        ))}
+
+      {/* Bulk editing: the enterprise row, full width under the levels, same card language */}
+      <RevealGroup className="mt-4">
+        <RevealItem className="grid gap-2 rounded-card bg-surface p-2 shadow-hair lg:grid-cols-[minmax(0,380px)_1fr]">
+          <div className="flex flex-col rounded-inner bg-[linear-gradient(180deg,#F6F9FF_0%,#FFFFFF_100%)] p-6 shadow-hair">
+            <h3 className="text-h4">Bulk editing</h3>
+            <p className="mt-2 text-small text-ink-2">For studios and teams sending 500+ photos a month. Pricing built around your volume.</p>
+            <Link href="/contact" className={buttonClass("secondary", "mt-6 w-full")}>Talk to the studio <ArrowIcon className="transition-transform duration-200 group-hover:translate-x-0.5" /></Link>
+          </div>
+          <ul className="grid content-center gap-x-10 gap-y-3.5 px-6 py-6 sm:grid-cols-2 md:px-10">
+            {bulk.map((f) => (
+              <li key={f} className="flex items-center gap-3 text-small text-ink"><Tick className="text-ink-3" />{f}</li>
+            ))}
+          </ul>
+        </RevealItem>
       </RevealGroup>
+
+      <p className="mt-6 text-center text-small text-ink-2">Prices are starting rates. Your final rate depends on the edit and volume, and you&rsquo;ll see it before we start.</p>
     </section>
   );
 }

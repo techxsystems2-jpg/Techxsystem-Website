@@ -55,6 +55,7 @@ Read this file, `DESIGN.md` §1–6, and the files listed under **Uses**. Nothin
 
 ### 7. Pricing (centred)
 - Label "Pricing" · H2 "Pay for what we deliver." / muted "No contract, no minimum."
+- **Rebuilt 2026-11-02 (owner), see STATUS.md log; copy below is the earlier Figma version.** Essential now **from $0.50**, all levels shown as "From", plus a Bulk editing row and the starting-rate note.
 - Essential **$0.70** per image: "HDR blend, colour, verticals and window pull. For everyday listings." · secondary "Start free trial" · ticks: HDR blend and window pull / Verticals and lens correction / Free revisions
 - Signature **$1.00** (featured: blue outline + glow, badge "Most chosen", primary button with arrow): "Everything in Essential, plus sky swaps, lawn, fire and TV screens." · ticks: Everything in Essential / Sky, lawn, fire and TV fill / Saved style guide
 - Luxury **$1.50**: "Hand-masked blends and object removal, for high-end homes." · ticks: Everything in Signature / Hand-masked blends / Object removal
@@ -69,7 +70,7 @@ Read this file, `DESIGN.md` §1–6, and the files listed under **Uses**. Nothin
 - Someone to message at 2 AM: WhatsApp · Help centre · You
 - Price per photo (last row): From $0.50 · $0.22–0.50 · Your hourly rate
 
-### 9. Testimonials (placeholders, real quotes only)
+### 9. Testimonials (real quotes from techxsystems.com since 2026-11-02; see docs/old-site-content.md; Figma placeholders below)
 - Label "Clients" · H2 "Photographers stay for years." / muted "Here's why, in their words."
 - Three cards: "[Real client quote about turnaround and quality.]" / "…consistency across shoots." / "…service and communication." · "Client name" · Studio · Austin, TX / Brisbane, QLD / Orlando, FL
 
@@ -81,7 +82,7 @@ Read this file, `DESIGN.md` §1–6, and the files listed under **Uses**. Nothin
 
 ## Open questions for this page (also in docs/OPEN_ITEMS.md)
 - **Turnaround differs across the page:** hero "10–16 hours", answer 04 "12 hours", steps and FAQ "12–24 hours". Pick one.
-- **Starting price vs levels:** the owner set "from $0.50", but the Essential level in Figma is $0.70. Is there a level at $0.50, or is $0.50 a volume rate?
+- ~~Starting price vs levels~~ Settled 2026-11-02 (owner): Essential from $0.50; every level is a starting price.
 - **WhatsApp number:** answer card shows +91 9653059304, final CTA shows +91 74176 20537.
 
 ## Build notes

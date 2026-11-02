@@ -24,6 +24,8 @@ Direction B uses `.wrap { max-width: 1200px; padding: 0 24px; margin: 0 auto }`.
 
 ## Corner radius
 
+> **Website build (2026-11-02, owner):** softer scale in code: input 8 · inner 10 · card 16 · tray 18 · panel 24 · pills 999. Nested surfaces stay concentric (inner ≈ card − padding). The table below is the original Figma set.
+
 | Token | Value | Use |
 |---|---|---|
 | radius/sm | 8 | Inputs (Direction B inputs use 12) |

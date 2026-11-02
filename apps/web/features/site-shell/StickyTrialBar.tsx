@@ -21,7 +21,7 @@ export function StickyTrialBar() {
 
   return (
     <div
-      className={`fixed inset-x-3 bottom-[max(12px,env(safe-area-inset-bottom))] z-30 flex items-center justify-between gap-3 rounded-full bg-surface py-2 pl-5 pr-2 shadow-overlay transition-[opacity,translate] duration-[320ms] md:hidden ${show ? "" : "pointer-events-none translate-y-4 opacity-0"}`}
+      className={`fixed inset-x-3 bottom-[max(12px,env(safe-area-inset-bottom))] z-30 flex items-center justify-between gap-3 rounded-card bg-surface py-2 pl-5 pr-2 shadow-overlay transition-[opacity,translate] duration-[320ms] md:hidden ${show ? "" : "pointer-events-none translate-y-4 opacity-0"}`}
       aria-hidden={!show}
     >
       <span className="text-small text-ink-2">10 photos free · no card</span>

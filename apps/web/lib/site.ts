@@ -17,7 +17,11 @@ export const site = {
     whatsapp: "+91 74176 20537",
     whatsappUrl: "https://wa.me/917417620537",
     email: "support@techxsystems.com",
-    studio: "Aligarh, India",
+    // Studio landline from the old site's head office (+91 0571 2976655). Figma writes it "0571 297 6655"; shown in the
+    // international form so callers in the US, UK and Australia can dial it as written.
+    phone: "+91 571 297 6655",
+    phoneUrl: "tel:+915712976655",
+    studio: "India",
     hours: "9 AM – 7 PM IST", // confirm
   },
 };
@@ -45,7 +49,7 @@ export const services = [
   { slug: "photo-editing", name: "Photo editing & HDR", short: "Photo editing", line: "Brackets blended, windows pulled, skies swapped, verticals straight.", from: "From $0.50 / image", scene: "int" },
   { slug: "virtual-twilight", name: "Virtual twilight", short: "Virtual twilight", line: "Daytime exteriors turned to dusk, with every light on.", from: "From $1.00 / image", scene: "twi" },
   { slug: "virtual-staging", name: "Virtual staging", short: "Virtual staging", line: "Empty rooms furnished in the style buyers expect.", from: "From $8 / room", scene: "int" }, // confirm price
-  { slug: "drone-editing", name: "Drone & aerial", short: "Drone & aerial", line: "Aerials colour-matched to the ground set, with sky swaps and lot lines.", from: "From $0.70 / image", scene: "aer" },
+  { slug: "drone-editing", name: "Drone & aerial", short: "Drone & aerial", line: "Aerials colour-matched to the ground set, with sky swaps and lot lines.", from: "From $0.50 / image", scene: "aer" },
   { slug: "floor-plans", name: "Floor plans", short: "Floor plans", line: "Your sketch or old plan redrawn as a clean 2D or 3D floor plan.", from: "From $5 / floor", scene: "plan" },
   { slug: "video-editing", name: "Video editing", short: "Video", line: "Two- to three-minute property tours with music and titles.", from: "From $25 / video", scene: "ext" },
 ] as const;
@@ -53,7 +57,7 @@ export const services = [
 /** Footer, as in Figma. Links without a route yet render as plain text until the page exists. */
 export const footer: { title: string; links: { label: string; href?: string }[] }[] = [
   { title: "Services", links: services.map((s) => ({ href: `/services/${s.slug}`, label: s.short })) },
-  { title: "Company", links: [{ href: "/about", label: "About" }, { href: "/work", label: "Work" }, { href: "/pricing", label: "Pricing" }, { label: "Reviews" }] },
+  { title: "Company", links: [{ href: "/about", label: "About" }, { href: "/work", label: "Work" }, { href: "/pricing", label: "Pricing" }, { href: "/about#reviews", label: "Reviews" }] },
   { title: "Resources", links: [{ label: "Blog" }, { label: "FAQ" }, { label: "TechX vs AI editors" }, { label: "Shoot guides" }] },
   { title: "Start", links: [{ href: "/free-trial", label: "Free trial" }, { label: "Client login" }, { href: "/contact", label: "Contact" }] },
 ];

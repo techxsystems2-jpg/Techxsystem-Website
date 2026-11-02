@@ -1,7 +1,7 @@
 /* TechX Systems: Tailwind CSS v4 theme (Direction B, light and premium).
    Import after `@import "tailwindcss";`. Values come from DESIGN.md (the Figma file and Direction B HTML).
    Class names read like the design: bg-page, text-ink-2, text-blue, shadow-raised, rounded-card, text-display.
-   Fonts load with next/font (Inter Tight, Inter, Geist Mono) in apps/web/app/layout.tsx. */
+   Fonts load with next/font (Geist and Geist Mono) in apps/web/app/layout.tsx. */
 
 @theme {
   /* Colour. Neutrals carry the page; blue is for actions only; maroon marks the edited result. */
@@ -23,12 +23,12 @@
   --color-warning: #D98A0B;
 
   /* Type */
-  /* Owner, 2026-10-30: headings in Inter Tight at 575 (closest free match to glideapps.com's Booton), body in Inter. */
-  --font-display: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* Owner, 2026-11-02: Geist for headings and body, Geist Mono for labels (one family; was Satoshi, before that Inter). */
+  --font-display: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  /* Type roles. Headings use Inter Tight at 500–520 (owner: lighter, same message), never bold. Fluid from 375px to 1280px. */
+  /* Type roles. Headings use Geist at 500–520 (owner: lighter, same message), never bold. Fluid from 375px to 1280px. */
   --text-display: clamp(36px, 4.4vw, 58px); --text-display--line-height: 1.02; --text-display--letter-spacing: -0.022em; --text-display--font-weight: 520;
   --text-h1: clamp(36px, 5.2vw, 64px);      --text-h1--line-height: 1.04;      --text-h1--letter-spacing: -0.028em;      --text-h1--font-weight: 520;
   --text-cta: clamp(34px, 4.6vw, 56px);     --text-cta--line-height: 1.08;     --text-cta--letter-spacing: -0.025em;     --text-cta--font-weight: 520;
@@ -41,11 +41,12 @@
   --text-label: 12px;                       --text-label--line-height: 1.33;   --text-label--letter-spacing: 0.04em;
 
   /* Radius (DESIGN.md §4). Nested cards: outer frame with 8px padding, inner radius 8px smaller. */
-  --radius-input: 12px;
-  --radius-inner: 20px;
-  --radius-card: 28px;
-  --radius-tray: 32px;
-  --radius-panel: 40px;
+  /* Softer scale (owner, 2026-11-02): "a bit curvy, not bold". Was 12 / 20 / 28 / 32 / 40. */
+  --radius-input: 8px;
+  --radius-inner: 10px;
+  --radius-card: 16px;
+  --radius-tray: 18px;
+  --radius-panel: 24px;
 
   /* Elevation */
   --shadow-hair: 0 0 0 1px rgb(17 19 24 / 0.06), 0 1px 2px rgb(17 19 24 / 0.04);

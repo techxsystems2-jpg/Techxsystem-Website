@@ -50,11 +50,21 @@
 
 ## Raised during the build (2026-10-30)
 
-- [ ] **Starting price:** the owner set "from $0.50 an image" (always a starting price). Figma levels are Essential $0.70, Signature $1.00, Luxury $1.50. Reconcile.
+- [x] **Starting price** (settled 2026-11-02: Essential from $0.50, every price "From"): the owner set "from $0.50 an image" (always a starting price). Figma levels are Essential $0.70, Signature $1.00, Luxury $1.50. Reconcile.
 - [ ] **Turnaround:** Figma says "10–16 hours" (hero), "12 hours" (answer card), "12–24 hours" (steps, FAQ).
 - [ ] **WhatsApp number:** +91 74176 20537 (final CTA) vs +91 96530 59304 (Home answer card).
-- [ ] **Drone & aerial** shows "From $0.70 / image" in Figma; confirm against the $0.50 starting price.
+- [x] **Drone & aerial** now "From $0.50 / image" (2026-11-02); was "From $0.70" in Figma; confirm against the $0.50 starting price.
 - [ ] **Hero trust badge:** "Serving 500+ clients" and "4.9 rating" are the owner's figures (2026-10-30). Confirm both with TechX before launch, and know where the 4.9 comes from in case a client asks (`lib/site.ts` → `site.trust`).
 
 ## Time zones in "Our process" (2026-10-31)
 - Figma labels "Quality check 5:42 AM IST", but next to "Editing 11:40 PM" (New York) it only works as New York time (5:42 AM IST would be 8:12 PM ET, before editing starts). The illustration now shows New York (ET) and India (IST) clocks side by side and treats 5:42 AM as ET (3:12 PM IST). Conversion uses EDT (IST = ET + 9:30); in winter (EST) it is + 10:30. Confirm the times with TechX.
+
+## Inner pages built (2026-11-02): Figma disagreements and claims to confirm
+- [ ] **Level prices:** Figma Pricing shows Essential $0.70 · Signature $0.75 · Luxury $1.50; Figma Services shows $0.50 · $1.00 · Luxury (Highend Editing, "Commercial & Architectural Buildings") $1.75. Built with the settled $0.50 / $1.00 / $1.50, all "From". Confirm Luxury and whether "Highend / commercial" is a separate level.
+- [ ] **Price list:** Figma shows ranges ($0.70–$1.50, $1.00–$2.00, $5–$8); built as "From". Turnarounds per service (Figma): staging and floor plans 24 h, video 24–48 h, the rest 12–24 h. Services hero said 12–16 hours.
+- [ ] **About dates:** Figma headline "Started by two people in 2013", timeline "2016 Founded in Aligarh · 2017 Studio in Delhi", story "2016 in Delhi, a year later moved to Aligarh". Built with the brief: 2016 in Delhi, 2017 own studio, place shown as "India".
+- [ ] **About team:** names and roles from Figma (Adnan Khan, Faraz Ahmad, Akash Kumar, SM Swaleh); portraits are visible placeholders. Confirm who to show; send portraits and a studio photo.
+- [ ] **Work:** Figma promises before/after pairs and credits studios by name (placeholders). Built with TechX's 87 finished edits only. Need raw/edited pairs and photographer permission to show these edits.
+- [ ] **Ways to send:** Figma lists Client portal and WeTransfer; the site takes uploads and Dropbox / Google Drive links only.
+- [ ] **Claims on the new pages:** payment methods "Card, PayPal or bank transfer"; "flash-ambient blends" (Figma question, not answered or built); twilight "costs less than a twilight shoot" (old site: "more cost-effective"); lot lines on aerials; 360° stitching (old site); staging styles and price.
+- [ ] **Unknown service slugs** (e.g. /services/xyz) show the 404 page with noindex but return HTTP 200 (streamed render under Cache Components).

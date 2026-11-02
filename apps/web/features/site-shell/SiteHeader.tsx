@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
 import { buttonClass } from "@techx/ui/Button";
+import { BgToggle } from "./BgToggle";
 import { Mark } from "@techx/ui/Icons";
 import { announcement, nav, services } from "@/lib/site";
 
@@ -79,7 +80,7 @@ export function SiteHeader() {
             </Link>
           )}
         </div>
-        <div className={`transition-[background-color,box-shadow] duration-300 ${menu ? "max-lg:bg-[rgb(251_251_253/0.96)]" : ""} ${solid ? "bg-[rgb(251_251_253/0.8)] shadow-[0_1px_0_rgb(10_10_11/0.06)] backdrop-blur-[20px] backdrop-saturate-[1.8]" : "bg-transparent"}`}>
+        <div className={`transition-[background-color,box-shadow] duration-300 ${menu ? "max-lg:bg-[rgb(251_251_253/0.96)]" : ""} ${solid ? "solid-bar bg-[rgb(251_251_253/0.8)] shadow-[0_1px_0_rgb(10_10_11/0.06)] backdrop-blur-[20px] backdrop-saturate-[1.8]" : "bg-transparent"}`}>
           <nav aria-label="Main" className="mx-auto flex h-12 max-w-[1024px] items-center justify-between px-5">
             <Link href="/" aria-label="TechX Systems, home" className="flex items-center gap-2 text-[14px] font-medium tracking-[-0.01em]" onMouseEnter={closeFly}>
               <Mark className="scale-[0.85]" /> <span>TechX <span className="text-ink-3">Systems</span></span>
@@ -111,8 +112,9 @@ export function SiteHeader() {
             )}
 
             <div className="flex items-center gap-1" onMouseEnter={closeFly}>
+              <BgToggle className="mr-2 max-lg:hidden" />
               <Link href="/free-trial" className={buttonClass("primary", "!h-8 !px-3.5 !text-[12.5px]", "sm")}>Start free trial</Link>
-              <button type="button" onClick={() => setMenu((o) => !o)} aria-expanded={menu} aria-controls="mobile-menu" aria-label={menu ? "Close menu" : "Open menu"} className="grid size-10 place-items-center rounded-full lg:hidden">
+              <button type="button" onClick={() => setMenu((o) => !o)} aria-expanded={menu} aria-controls="mobile-menu" aria-label={menu ? "Close menu" : "Open menu"} className="grid size-10 place-items-center rounded-[10px] lg:hidden">
                 <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
                   <motion.path animate={{ d: menu ? "M4 4L14 14" : "M3 6.5H15" }} transition={spring} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                   <motion.path animate={{ d: menu ? "M14 4L4 14" : "M3 11.5H15" }} transition={spring} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -167,6 +169,7 @@ export function SiteHeader() {
                       <Link href={l.href} onClick={() => setMenu(false)} className="flex min-h-12 items-center font-display text-[28px] font-semibold tracking-[-0.02em] text-ink">{l.label}</Link>
                     </motion.div>
                   ))}
+                  <div className="mt-8 flex items-center gap-3"><span className="text-small text-ink-2">Background</span><BgToggle /></div>
                 </div>
               </motion.nav>
             )}

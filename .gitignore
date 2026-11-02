@@ -11,3 +11,7 @@ next-env.d.ts
 .claude/settings.local.json
 .turbo/
 .vercel
+
+# Free-trial uploads: local settings and the development "This computer" destination
+apps/web/.data/
+apps/web/.uploads/

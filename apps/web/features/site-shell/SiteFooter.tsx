@@ -10,7 +10,7 @@ export function SiteFooter() {
         <div className="grid grid-cols-2 gap-8 md:grid-cols-[1.6fr_repeat(4,1fr)]">
           <div className="col-span-2 md:col-span-1">
             <Logo />
-            <p className="mt-3 max-w-[280px] text-small text-ink-2">Real estate photo editing, by people, since 2016. Studio in Aligarh, India.</p>
+            <p className="mt-3 max-w-[280px] text-small text-ink-2">Real estate photo editing, by people, since 2016. Studio in India.</p>
           </div>
           {footer.map((g) => (
             <div key={g.title}>
@@ -31,6 +31,13 @@ export function SiteFooter() {
         </div>
         <div className="mt-14 flex flex-wrap justify-between gap-3 font-mono text-label text-ink-3">
           <span>© 2026 TechX Systems</span>
+          {/* studio credit (owner, 2026-11-02) */}
+          <span>
+            Designed &amp; developed by{" "}
+            <a href="https://www.pixelcaption.com/" target="_blank" rel="noopener" className="text-ink-2 underline-offset-4 transition-colors duration-150 hover:text-ink hover:underline">
+              Pixel Caption<span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          </span>
           <span>Privacy · Terms · Refunds</span>
         </div>
       </div>

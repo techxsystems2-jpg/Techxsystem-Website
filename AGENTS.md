@@ -18,7 +18,7 @@ the rest of the codebase.
 | Illustrations / motion | `apps/web/features/illustrations/CONTEXT.md` + `DESIGN.md` §6 | `animate`, `animation-performance` |
 | Shared components (`@techx/ui`) | `DESIGN.md` §5 + `packages/ui/src/` | `make-interfaces-feel-better` |
 | Tokens / theme | `DESIGN.md` + `packages/brand/theme.css` | — |
-| Copy | the feature's `CONTEXT.md` + `DESIGN.md` §1 (voice) | `marketing-skills:copywriting`, `marketing-skills:copy-editing` |
+| Copy | the feature's `CONTEXT.md` + `DESIGN.md` §1 (voice) + `docs/old-site-content.md` (facts) | `marketing-skills:copywriting`, `marketing-skills:copy-editing` |
 | SEO | `docs/sitemap.md` + `app/sitemap.ts`, `app/robots.ts` | `claude-seo:seo-page`, `claude-seo:seo-schema` |
 | Next.js APIs | `apps/web/AGENTS.md`; `node_modules/next/dist/docs/` for the API you touch | `andrej-karpathy-skills:karpathy-guidelines` |
 | Background only (when a decision needs it) | `docs/company-brief.md`, `docs/competitors.md`, `docs/decisions-log.md`, `docs/information-map.md` | — |
@@ -33,6 +33,9 @@ Adding a feature: create `apps/web/features/<name>/` with a `CONTEXT.md` in the 
 | **Design system** (tokens, type, colour, spacing, radius, motion, component rules) | `DESIGN.md` → `docs/design-system/` |
 | **Starting price** | **From $0.50 an image.** Always phrased as a starting price ("from"), never a fixed one |
 | Other rates | Figma (see `features/home/CONTEXT.md` §7 and `lib/site.ts`) |
+| **Content facts** (services, what each edit includes, process, testimonials, contacts) | **TechX's current site**, techxsystems.com (owner, 2026-11-02), captured in `docs/old-site-content.md`. Rephrase, never contradict or invent |
+
+**This repo is self-contained.** `/Users/gauravrana/projects/TechX System` is a separate project (the October 2026 proposal archive and its HTML prototype). Don't read from it or edit it for website work, and keep all of this website's context in this repo (owner, 2026-11-02).
 
 Don't take UI from the markdown docs or the old Direction B HTML. When Figma and a doc disagree on UI or copy, Figma
 wins. Record the disagreement in `docs/OPEN_ITEMS.md`.

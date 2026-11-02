@@ -5,25 +5,31 @@ import Image from "next/image";
 import { useInView, useReducedMotion } from "motion/react";
 
 /* Hero collage behind the before/after tray (owner, 2026-10-31; reference: devin.ai's hero). TechX's own portfolio
-   work fills the band around the tray at once and slides slowly left to right, in two full-width layers: a back layer
-   blurred and faint (~180s per crossing) and a front layer sharp (~140s), each tile at its own pace. Square tiles, no border, radius or shadow,
-   multiplied into the page. Every tile runs the same CSS pan (`collage-pan`, globals.css) with a negative delay that
-   spreads the tiles evenly along the track, so the screen is full from the first frame and stays full.
-   CSS animation: transform only, off the main thread; paused off screen and under reduced motion.
+   work fills the band around the tray at once and slides slowly left to right. Reworked 2026-11-02 (owner: tiles
+   overlapped; wants devin-style depth, every image on a layer 1, 2, 3):
+   - Three depth layers: 1 far (small, heavy blur + grain, faint, slowest), 2 mid (medium, light blur + grain),
+     3 near (large, sharp, fastest). Nearer moves faster, so the field reads as depth (parallax).
+   - No overlaps inside a layer: every tile in a layer shares one speed and sits in a fixed lane, evenly spaced along the
+     track, so tiles can never catch up with each other. Lanes are set so tiles in neighbouring lanes don't touch either;
+     where a near tile passes over a far one it reads as depth, not a pile-up.
+   Every tile runs the same CSS pan (`collage-pan`, globals.css) from 420px off the left edge; a negative delay places it
+   along the track, so the band is full from the first frame. Transform only; paused off screen and under reduced motion.
+   Size scale --s: 1 phone · 1.25 tablet · 1.5 desktop (owner: photos big enough to see).
+   Owner, 2026-11-02: ~1.7× faster (140 / 110 / 80s per crossing); near tiles are solid (no multiply blend), so a
+   blurred tile behind never shows through a sharp one.
    Photos: public/photos/field (docs/PHOTO_CREDITS.md). */
 
 const PHOTOS = ["f01", "f13", "f07", "f16", "f02", "f10", "f14", "f05", "f11", "f17", "f03", "f08", "f15", "f06", "f12", "f18", "f04", "f09"];
-// [width, height] at full scale, devin.ai's rhythm: portrait, landscape, square, small and the odd large one
-const SIZES = [[143, 107], [83, 110], [195, 146], [110, 83], [107, 143], [66, 50], [143, 143], [120, 90], [90, 120], [260, 195], [110, 110], [150, 200]] as const;
-// band heights (0 top … 1 bottom), fixed so server and client render the same; alternate high/low so tiles don't stack
-const TOPS = [0.05, 0.55, 0.28, 0.86, 0.12, 0.7, 0.4, 0.95, 0.2, 0.62, 0.02, 0.78, 0.34, 0.9, 0.48, 0.16];
-// base seconds per crossing; each tile then runs at its own speed by size (bigger glides a bit faster, smaller drifts
-// slower), so the field reads as depth rather than one belt (owner, 2026-10-31: slower, and not all the same speed)
-const LAYERS = [
-  { n: 16, duration: 180, offset: 3, style: { filter: "blur(6px)", opacity: 0.6 } },
-  { n: 16, duration: 140, offset: 0, style: {} },
-] as const;
-const pace = (w: number, h: number) => 1.35 - Math.min(Math.sqrt(w * h) / 200, 1) * 0.55; // ~0.8 (large) … ~1.3 (small)
+// [width, height] before the layer and screen scale: landscape, portrait, square, the odd large one
+const SIZES = [[143, 107], [107, 143], [195, 146], [120, 90], [143, 143], [90, 120], [260, 195], [150, 112], [110, 146]] as const;
+
+type Layer = { scale: number; blur: number; opacity: number; duration: number; lanes: readonly number[]; perLane: number; phase: number };
+// lanes are band heights (0 top … 1 bottom); perLane tiles are spread evenly along the track; phase shifts the layer
+const LAYERS: readonly Layer[] = [
+  { scale: 0.55, blur: 10, opacity: 0.5, duration: 140, lanes: [0.15, 0.5, 0.85], perLane: 5, phase: 0.25 }, // 1 · far
+  { scale: 0.8, blur: 4, opacity: 0.8, duration: 110, lanes: [0.3, 0.7], perLane: 4, phase: 0.6 },          // 2 · mid
+  { scale: 1.1, blur: 0, opacity: 1, duration: 80, lanes: [0.03, 0.97], perLane: 3, phase: 0 },              // 3 · near
+];
 
 export function HeroCollage() {
   const ref = useRef<HTMLDivElement>(null);
@@ -31,29 +37,37 @@ export function HeroCollage() {
   const reduce = useReducedMotion();
   const state = inView && !reduce ? "running" : "paused";
   return (
-    <div ref={ref} aria-hidden="true" className="pointer-events-none absolute inset-x-0 -bottom-[110px] -top-[50px] [--s:0.7] md:[--s:0.85] lg:[--s:1]">
+    <div ref={ref} aria-hidden="true" className="pointer-events-none absolute inset-x-0 -bottom-[110px] -top-[50px] [--s:1] md:[--s:1.25] lg:[--s:1.5]">
+      {/* one shared noise definition for the grain on the soft tiles */}
+      <svg width="0" height="0" className="absolute"><filter id="hero-grain"><feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves={4} stitchTiles="stitch" /><feColorMatrix type="saturate" values="0" /></filter></svg>
       {LAYERS.map((layer, l) => (
         <div key={l} className="absolute inset-y-0 left-[calc(50%-50vw)] w-screen overflow-hidden"
-          style={{ ...layer.style, "--track": "calc(max(100vw, 1900px) + 260px)" } as CSSProperties}>
-          {Array.from({ length: layer.n }, (_, i) => {
-            const k = i + layer.offset;
-            const src = PHOTOS[(k * 7 + l * 5) % PHOTOS.length]!;
-            const [w, h] = SIZES[(k * 5 + l * 3) % SIZES.length]!;
-            const top = TOPS[(k + l * 7) % TOPS.length]!;
-            const d = layer.duration * pace(w, h);
-            return (
-              <div key={i} className="collage-tile absolute left-[-260px] overflow-hidden mix-blend-multiply"
-                style={{
-                  width: `calc(${w}px * var(--s))`, height: `calc(${h}px * var(--s))`,
-                  top: `calc(${top} * (100% - ${h}px * var(--s)))`,
-                  animationDuration: `${d}s`,
-                  animationDelay: `${-((i + l * 0.5) / layer.n) * d}s`,
-                  animationPlayState: state,
-                }}>
-                <Image src={`/photos/field/${src}.webp`} alt="" fill sizes={`${w * 2}px`} className="object-cover" />
-              </div>
-            );
-          })}
+          style={{ opacity: layer.opacity, "--track": "calc(max(100vw, 1900px) + 420px)" } as CSSProperties}>
+          {layer.lanes.flatMap((lane, li) =>
+            Array.from({ length: layer.perLane }, (_, j) => {
+              const k = l * 20 + li * layer.perLane + j; // tile number, so photos and sizes vary across the field
+              const src = PHOTOS[(k * 7 + l * 5) % PHOTOS.length]!;
+              const [bw, bh] = SIZES[(k * 4 + l) % SIZES.length]!;
+              const w = bw * layer.scale, h = bh * layer.scale;
+              // even spacing in the lane; neighbouring lanes sit half a gap apart so they never line up
+              const at = (j + li * 0.5 + layer.phase) / layer.perLane;
+              return (
+                <div key={`${li}-${j}`} className={`collage-tile absolute left-[-420px] overflow-hidden ${layer.blur ? "mix-blend-multiply" : ""}`}
+                  style={{
+                    width: `calc(${w}px * var(--s))`, height: `calc(${h}px * var(--s))`,
+                    top: `calc(${lane} * (100% - ${h}px * var(--s)))`,
+                    animationDuration: `${layer.duration}s`,
+                    animationDelay: `${-(at % 1) * layer.duration}s`,
+                    animationPlayState: state,
+                  }}>
+                  <Image src={`/photos/field/${src}.webp`} alt="" fill sizes={`${Math.round(w * 2)}px`}
+                    className="object-cover" style={layer.blur ? { filter: `blur(${layer.blur}px)`, transform: "scale(1.12)" } : undefined} />
+                  {/* film grain on the soft (blurred) layers only: static noise, overlay-blended inside the tile */}
+                  {layer.blur > 0 && <svg className="absolute inset-0 size-full mix-blend-overlay"><rect width="100%" height="100%" filter="url(#hero-grain)" /></svg>}
+                </div>
+              );
+            }),
+          )}
         </div>
       ))}
     </div>

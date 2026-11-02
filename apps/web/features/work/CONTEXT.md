@@ -7,12 +7,18 @@ Read this file, `DESIGN.md` §1–6, and the files under **Uses**. Nothing else 
 - **Uses:** `features/site-shell` (PageHead, FinalCta), `lib/site.ts`.
 - **Uses also:** `features/before-after` (hover-to-raw tiles), `@techx/ui` Chip + segmented toggle.
 
-## Copy
-**Not yet pulled from Figma.** The owner edited content in Figma and the layer names are stale, so don't trust `get_metadata` names or the old HTML.
-Before building: one `get_screenshot` of node 29:155 at `maxDimension` = the frame height, crop it into 1000px bands, and transcribe every
-string into this section (verified date + source). Figma reads are limited (Starter plan, View seat): one call per page, no more.
+## Copy (Figma 29:155)
+**Transcribed from Figma 2026-11-02** (one full-height `get_screenshot`, cropped into bands). Where the build departs from Figma, it says why; disagreements are logged in `docs/OPEN_ITEMS.md`.
+- Hero: label "WORK · 87 BEFORE/AFTER PAIRS" · H1 "The work." / "Every image shown before and after." · toggle Latest / Most viewed · chips All · 87, Interior · 33, Exterior · 18, Drone · 15, Yacht · 10, Twilight · 8, Floor plan · 3.
+- Grid: one large before/after per row with "AFTER" tag, studio name (Northlight Media, Coastline Media, Keyline Photo, Arcos Studio, Harbour & Co., Parcel & Pine, Westfield Visuals, Lumen Homes, Brightside Realty: placeholders) and category · "Show 24 more".
+- Final CTA: "Like what you see?" / "Send us ten photos and judge your own."
+
+**Built:** TechX's real 87 finished edits from the old site (same counts as Figma), filter chips, pages of 24, full-size viewer. No before/after (no raw files yet), no studio names (Figma's are placeholders), no Latest / Most viewed (no data). Hero: "The work." / "Real shoots, edited by our studio." with a visible "raw and edited pairs coming soon" note.
+
+## Files
+`app/work/page.tsx` · `Gallery.tsx` · `portfolio.ts` · photos in `public/photos/work/` (docs/PHOTO_CREDITS.md).
 
 ## Status
-- [ ] Copy transcribed from Figma
-- [ ] Built
-- [ ] Desktop + phone (390px) screenshot checked
+- [x] Copy transcribed from Figma (2026-11-02)
+- [x] Built (2026-11-02)
+- [x] Desktop + phone (390px) checked (2026-11-02)

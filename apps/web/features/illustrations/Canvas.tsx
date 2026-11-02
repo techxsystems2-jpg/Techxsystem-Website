@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "motion/react";
     With `story`, a narrated caption sits at the foot and the art centres in the space above it. */
 export function Canvas({ children, className = "h-[340px]", story }: { children: ReactNode; className?: string; story?: ReactNode }) {
   return (
-    <div className={`dots relative flex flex-col overflow-hidden rounded-[22px] ${className}`}>
+    <div className={`dots relative flex flex-col overflow-hidden rounded-inner ${className}`}>
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_45%,transparent,var(--color-sunk))]" />
       <div className="relative z-[1] grid w-full flex-1 place-items-center">{children}</div>
       {story && <div className="relative z-[1] flex justify-center px-4 pb-4">{story}</div>}

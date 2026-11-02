@@ -6,6 +6,8 @@ import { animate, motion, useInView, useMotionValue, useMotionValueEvent, useRed
 import { RevealGroup, RevealItem, Reveal } from "@/features/motion/Reveal";
 import { SectionHead } from "./SectionHead";
 import { ScrollFill } from "@/features/motion/ScrollFill";
+import { FlagIN, FlagUS } from "./Flags";
+import { StepArt } from "@/features/illustrations/StepArt";
 
 // Pikaicons free pack (pikaicons.com), fetched with `npx pikaicons show`: upload-up, pencil-edit-swoosh, shield-check, download-down
 const icon = (d: string, size = 22): ReactNode => (
@@ -62,13 +64,13 @@ const moments = [
   { at: 776, lane: "in", label: "Sent to you", time: "5:28 PM IST", icon: P.send },
   { at: 778, lane: "ny", label: "You download", time: "7:58 AM", icon: P.download },
 ] as const;
-const pos = (at: number) => 3 + (at / SPAN) * 94; // % along the lane, inset so end dots sit inside the rounded ends
+const pos = (at: number) => 5 + (at / SPAN) * 90; // % along the lane, inset so end dots sit inside the rounded ends (wider inset since the flags narrowed the lanes on phones)
 const clock = (m: number) => {
   const h = Math.floor(m / 60) % 24, mm = Math.floor(m % 60);
   return `${h % 12 || 12}:${String(mm).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
 };
 
-function Overnight() {
+export function Overnight() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.5 });
   const reduce = useReducedMotion();
@@ -83,7 +85,7 @@ function Overnight() {
   }, [play, p]);
   // the scrubber has no width of its own (so it never widens the page) and moves in container units across the inset
   // lane; its pill slides from left-anchored to right-anchored so the clocks stay inside the card at both ends
-  const x = useTransform(p, (v) => `translateX(${(3 + v * 94)}cqw)`);
+  const x = useTransform(p, (v) => `translateX(${(5 + v * 90)}cqw)`);
   const pill = useTransform(p, (v) => `translate(${-v * 100}%, -50%)`);
   const et = 19 * 60 + m, ist = et + 9 * 60 + 30;
   const state = m < moments[2].at ? "raw" : m < moments[4].at ? "editing" : "checked";
@@ -93,12 +95,12 @@ function Overnight() {
         <h3 className="text-h4">We edit while you sleep. <ScrollFill text="Our studio in India works through your night." /></h3>
         <span className="font-mono text-label uppercase text-ink-2">7 PM to 8 AM, New York</span>
       </div>
-      <div ref={ref} className="mx-auto mt-10 grid max-w-[1040px] grid-cols-[64px_1fr] gap-x-3 md:mt-16 md:grid-cols-[96px_1fr] md:gap-x-5">
+      <div ref={ref} className="mx-auto mt-10 grid max-w-[1040px] grid-cols-[84px_1fr] gap-x-3 md:mt-16 md:grid-cols-[128px_1fr] md:gap-x-5">
         {/* city column */}
         <div className="grid grid-rows-[36px_44px_36px] items-center md:pt-0">
-          <City name="New York" zone="ET" />
+          <City name="New York" zone="ET" flag={<FlagUS />} />
           <span />
-          <City name="India" zone="IST" />
+          <City name="India" zone="IST" flag={<FlagIN />} />
         </div>
         {/* lanes, hand-offs, moments, scrubber */}
         <div className="@container relative">
@@ -162,96 +164,56 @@ function Overnight() {
   );
 }
 
-function City({ name, zone }: { name: string; zone: string }) {
+/* Each city carries its country's flag (owner, 2026-11-02), so the two places read at a glance. */
+function City({ name, zone, flag }: { name: string; zone: string; flag: ReactNode }) {
   return (
-    <span className="leading-tight">
-      <span className="block text-[12px] font-semibold text-ink md:text-[13px]">{name}</span>
-      <span className="block font-mono text-[10px] text-ink-2">{zone}</span>
+    <span className="flex items-center gap-2 leading-tight">
+      <span className="shrink-0 max-md:[&_svg]:size-4">{flag}</span>
+      <span>
+        <span className="block text-[12px] font-semibold text-ink md:text-[13px]">{name}</span>
+        <span className="block font-mono text-[10px] text-ink-2">{zone}</span>
+      </span>
     </span>
   );
 }
 
-/* Step cards, reworked with the emil-design-eng framework (owner, 2026-10-31).
-   Purpose: explanation, seen once per visit, so it plays once instead of looping. When the row comes into view the
-   steps connect left to right: each icon acts out its step (upload arrow lifts, pencil writes, the tick draws in the
-   shield, download arrow drops) with a soft ring, then a dashed line draws to the next card's icon (desktop, where the
-   four sit in a row). Then everything rests on the normal tinted look; nothing keeps moving while people read.
-   Hovering a card with a mouse replays its icon. Transform/opacity/pathLength only; custom curves; reduced motion: no
-   sequence, lines shown drawn. */
-const STEP_MS = 750;
-const OUT = [0.23, 1, 0.32, 1] as const;
-const IN_OUT = [0.77, 0, 0.175, 1] as const;
-const TRAY = "M3 15a5 5 0 0 0 5 5h8a5 5 0 0 0 5-5";
+/* Step cards (owner, 2026-10-31; illustrations 2026-11-02). Purpose: explanation, seen once per visit, so it plays once
+   instead of looping. When the row comes into view the steps play left to right, one every STEP_MS: each card's
+   illustration (features/illustrations/StepArt.tsx) acts out its step, then rests on its finished frame; nothing keeps
+   moving while people read. Hovering a card with a mouse replays its illustration. No connector line between the cards
+   (owner). Reduced motion: no sequence, finished frames only. */
+const STEP_MS = 1400;
 
 function StepCards() {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.6 });
+  const inView = useInView(ref, { once: true, amount: 0.5 });
   const reduce = useReducedMotion();
-  const [tick, setTick] = useState(0);
-  const [hover, setHover] = useState(-1);
+  const [runs, setRuns] = useState<number[]>(() => steps.map(() => 0)); // plays per card; 0 = finished frame
+  const replay = (i: number) => setRuns((r) => r.map((v, j) => (j === i ? v + 1 : v)));
   useEffect(() => {
     if (!inView || reduce) return;
-    const t = setInterval(() => setTick((k) => (k > steps.length ? k : k + 1)), STEP_MS);
-    return () => clearInterval(t);
+    // card i plays at 150ms + i × STEP_MS (timers, not a synchronous setState in the effect)
+    const timers = steps.map((_, i) => setTimeout(() => replay(i), 150 + i * STEP_MS));
+    return () => timers.forEach(clearTimeout);
   }, [inView, reduce]);
-  // reached: how many steps have played (0 before the row is seen); reduce shows the finished state
-  const reached = reduce ? steps.length : inView ? Math.min(tick + 1, steps.length) : 0;
   return (
     <div ref={ref}>
       <RevealGroup className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {steps.map((s, i) => {
-          const arriving = !reduce && i === reached - 1 && tick <= steps.length;
-          const live = arriving || (i === hover && !reduce);
-          const linked = i < reached - 1;
-          return (
-            <RevealItem key={s.n} className="group relative rounded-card bg-surface p-6 shadow-hair transition-[box-shadow,translate] duration-[320ms] ease-[var(--ease-brand)] hover:-translate-y-1 hover:shadow-raised">
-              <div onPointerEnter={(e) => e.pointerType === "mouse" && setHover(i)} onPointerLeave={() => setHover(-1)}>
-                <span className="font-mono text-label text-ink-3 transition-colors duration-200 group-hover:text-maroon">{s.n}</span>
-                <span className="relative mt-5 grid size-11 place-items-center rounded-xl bg-blue-tint text-blue">
-                  {arriving && (
-                    <motion.span aria-hidden="true" className="absolute inset-0 rounded-xl border border-blue/40"
-                      initial={{ opacity: 0.8, transform: "scale(0.95)" }} animate={{ opacity: 0, transform: "scale(1.35)" }} transition={{ duration: 0.7, ease: OUT }} />
-                  )}
-                  <StepIcon n={i} live={live} />
-                </span>
+        {steps.map((s, i) => (
+          <RevealItem key={s.n} className="group relative flex flex-col rounded-card bg-surface p-2 shadow-hair transition-[box-shadow,translate] duration-[320ms] ease-[var(--ease-brand)] hover:-translate-y-1 hover:shadow-raised">
+            <div className="flex flex-1 flex-col" onPointerEnter={(e) => { if (e.pointerType === "mouse" && !reduce) replay(i); }}>
+              <span className="px-4 pb-3 pt-3 font-mono text-label text-ink-3 transition-colors duration-200 group-hover:text-maroon">{s.n}</span>
+              <StepArt n={i} run={runs[i]} />
+              <div className="flex flex-1 flex-col px-4 pb-4">
                 <h3 className="mt-5 text-h4">{s.t}</h3>
                 <p className="mt-2 text-small text-ink-2">{s.d}</p>
-                <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.04em] text-blue">{s.who}</p>
+                {/* pinned to the card foot so every tag sits on one line across the row */}
+                <p className="mt-auto pt-5 font-mono text-[11px] uppercase tracking-[0.04em] text-blue">{s.who}</p>
               </div>
-              {/* connector to the next card's icon: from this tile's right edge, across the 16px gap, to the next tile */}
-              {i < steps.length - 1 && (
-                <span aria-hidden="true" className="pointer-events-none absolute left-[68px] top-[84px] z-10 hidden h-px w-[calc(100%-28px)] lg:block">
-                  <motion.span className="block h-full origin-left border-t border-dashed border-blue/45"
-                    initial={false} animate={{ transform: `scaleX(${linked ? 1 : 0})` }} transition={{ duration: reduce ? 0 : 0.55, ease: IN_OUT, delay: 0.15 }} />
-                </span>
-              )}
-            </RevealItem>
-          );
-        })}
+            </div>
+          </RevealItem>
+        ))}
       </RevealGroup>
     </div>
   );
-}
-
-/** Each step's Pikaicon, split into parts so the part that tells the step can move. `live` plays it once. */
-function StepIcon({ n, live }: { n: number; live: boolean }) {
-  const svg = (children: ReactNode) => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="overflow-visible">{children}</svg>
-  );
-  const draw = (d: string) => (
-    <motion.path key={live ? "draw" : "rest"} d={d} initial={{ pathLength: live ? 0 : 1 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, ease: OUT, delay: 0.15 }} />
-  );
-  const bob = (dy: number) => ({ animate: { transform: live ? ["translateY(0px)", `translateY(${dy}px)`, "translateY(0px)"] : "translateY(0px)" }, transition: { duration: 0.6, ease: OUT } });
-  if (n === 0) return svg(<><path d={TRAY} /><motion.path d="M9 6.812a15 15 0 0 1 2.556-2.655A.7.7 0 0 1 12 4m3 2.812a15 15 0 0 0-2.556-2.655A.7.7 0 0 0 12 4m0 0v11" {...bob(-3)} /></>);
-  if (n === 1) return svg(<>
-    <motion.path d="M3 20.995 5.727 21c.39 0 .584 0 .767-.043q.246-.06.46-.191c.161-.1.299-.237.574-.514l12.973-13.03c.53-.533.662-1.356.258-2.006a6.3 6.3 0 0 0-1.932-1.965 1.57 1.57 0 0 0-1.964.212L3.81 16.573c-.266.267-.398.4-.495.555q-.128.208-.19.445c-.045.177-.05.365-.059.742z"
-      style={{ transformOrigin: "4px 20px" }} animate={{ transform: live ? ["rotate(0deg)", "rotate(-6deg)", "rotate(0deg)"] : "rotate(0deg)" }} transition={{ duration: 0.6, ease: OUT }} />
-    {draw("M12 21c4.018-3.274 4.09 3.357 9-2")}
-  </>);
-  if (n === 2) return svg(<>
-    <motion.path d="M10.883 2.368 5.497 4.314a3 3 0 0 0-1.98 2.706l-.127 3.309a11 11 0 0 0 5.543 9.978l1.521.867a3 3 0 0 0 2.915.032l1.489-.806a11 11 0 0 0 5.728-10.516l-.227-2.95a3 3 0 0 0-1.972-2.592l-5.465-1.974a3 3 0 0 0-2.038 0Z"
-      style={{ transformOrigin: "12px 12px" }} animate={{ transform: live ? ["scale(1)", "scale(1.06)", "scale(1)"] : "scale(1)" }} transition={{ duration: 0.4, ease: OUT, delay: 0.5 }} />
-    {draw("m9.133 12.02 2.007 2.004a13.06 13.06 0 0 1 3.993-4.29")}
-  </>);
-  return svg(<><path d={TRAY} /><motion.path d="M9 12.188a15 15 0 0 0 2.556 2.655A.7.7 0 0 0 12 15m3-2.812a15 15 0 0 1-2.556 2.655A.7.7 0 0 1 12 15m0 0V4" {...bob(3)} /></>);
 }

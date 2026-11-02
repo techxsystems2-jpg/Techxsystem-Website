@@ -9,6 +9,14 @@ import { ServicesGrid } from "@/features/home/ServicesGrid";
 import { Testimonials } from "@/features/home/Testimonials";
 import { FinalCta } from "@/features/site-shell/FinalCta";
 
+import type { Metadata } from "next";
+
+// Own description and canonical (seo-technical, 2026-11-02): site.description runs past 160 characters for a snippet.
+export const metadata: Metadata = {
+  description: "Real estate photo editing by hand. Send brackets tonight, get listing-ready photos by morning, checked twice. From $0.50 an image. Try 10 photos free.",
+  alternates: { canonical: "/" },
+};
+
 // Section order and copy: features/home/CONTEXT.md (Figma node 26:155).
 export default function Home() {
   return (

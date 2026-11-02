@@ -36,13 +36,13 @@ export function HeroStage() {
       <div className="wrap">
         <div className="relative mx-auto max-w-[1180px]">
         <div className={`transition-opacity duration-500 ${collage ? "opacity-100" : "opacity-0"}`}>{collage && <HeroCollage />}</div>
-        <div className="relative z-10 rounded-[28px] bg-surface p-1 shadow-[0_0_0_1px_rgb(10_10_11/0.05),0_1px_2px_rgb(10_10_11/0.04),0_-10px_30px_-14px_rgb(48_116_254/0.12),0_18px_40px_-26px_rgb(10_10_11/0.10)]">
-          <BeforeAfter scene={scenes[i]!.id} photo={scenes[i]!.photo} alt={scenes[i]!.alt} className="aspect-[16/10] rounded-[24px] md:aspect-[16/8.6]" />
+        <div className="relative z-10 rounded-tray bg-surface p-1 shadow-[0_0_0_1px_rgb(10_10_11/0.05),0_1px_2px_rgb(10_10_11/0.04),0_-10px_30px_-14px_rgb(48_116_254/0.12),0_18px_40px_-26px_rgb(10_10_11/0.10)]">
+          <BeforeAfter scene={scenes[i]!.id} photo={scenes[i]!.photo} alt={scenes[i]!.alt} className="aspect-[16/10] rounded-[14px] md:aspect-[16/8.6]" />
           <div className="flex flex-wrap items-center justify-between gap-3 px-2 pb-1.5 pt-3">
             <div role="tablist" aria-label="Scenes" className="flex flex-wrap gap-1">
               {scenes.map((sc, k) => (
                 <button key={sc.id} role="tab" aria-selected={k === i} onClick={() => setI(k)}
-                  className={`h-[34px] rounded-full px-4 text-[14px] transition-colors duration-200 ${k === i ? "bg-ink text-white" : "text-ink-2 hover:bg-sunk hover:text-ink"}`}>
+                  className={`h-[34px] rounded-[8px] px-4 text-[14px] transition-colors duration-200 ${k === i ? "bg-ink text-white" : "text-ink-2 hover:bg-sunk hover:text-ink"}`}>
                   {sc.label}
                 </button>
               ))}

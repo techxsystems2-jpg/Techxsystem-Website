@@ -15,7 +15,7 @@ const spring = { type: "spring", bounce: 0, duration: 0.5 } as const;
 const pop = { type: "spring", bounce: 0.35, duration: 0.5 } as const;
 
 /** Steps through 0..length-1 while `play`, waiting `ms[k]` after step k, then loops. Starts on the finished frame. */
-function useSequence(length: number, ms: readonly number[], play: boolean) {
+export function useSequence(length: number, ms: readonly number[], play: boolean) {
   const [step, setStep] = useState(length - 1);
   useEffect(() => {
     if (!play) return;
@@ -37,149 +37,13 @@ const Tick = ({ size = 18 }: { size?: number }) => (
     <svg width={size * 0.6} height={size * 0.6} viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
   </motion.span>
 );
-
-/* 01 · How we do it, the whole flow in one view (owner, 2026-10-31): four stations in a loop, all on screen at once.
-   01 Upload → 02 Editing team → 03 QC check → 04 Delivered, then back round for the next shoot.
-   The work moves through them in turn: the upload fills, a pulse runs down the wire, the editor's sweep turns raw into
-   finished, QC · Akash ticks each image, the delivery lands. Done stations keep their tick; waiting ones sit dimmed.
-   Off screen or under reduced motion it rests on the finished frame, every station done. */
-const HOW_MS = [1500, 2800, 650, 650, 650, 800, 2600] as const;
-const HOW_STORY = ["You upload RAWs and your notes", "Our editors merge and retouch", "Your QC checks every image", "Back to you, ready to list"];
+/* 01 · How we do it moved to EditorScreen.tsx (EditingArt, owner 2026-11-02); the stations version is in git history. */
 // TechX's own finished edits, from the portfolio on the old site (techxsystems.com, docs/PHOTO_CREDITS.md)
 const thumbs = ["tx-ext.jpg", "tx-int.jpg", "tx-twi.jpg", "tx-aer.jpg"] as const;
 const RAW = "brightness(.68) contrast(.78) saturate(.5) sepia(.08)";
 const Thumb = ({ name, raw = false, sizes = "140px" }: { name: string; raw?: boolean; sizes?: string }) => (
   <Image src={name.includes(".") ? `/photos/${name}` : `/photos/${name}.webp`} alt="" fill sizes={sizes} className="object-cover transition-[filter] duration-500" style={raw ? { filter: RAW } : undefined} />
 );
-type State = "todo" | "now" | "done";
-const sweep = { duration: 2.2, ease: [0.77, 0, 0.175, 1], delay: 0.45 } as const;
-const Cursor = ({ color, label, flip = false }: { color: string; label: string; flip?: boolean }) => (
-  <>
-    <svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 1l4.5 11 1.6-4.4L11.5 6z" fill={color} stroke="#fff" strokeWidth="1.2" strokeLinejoin="round" /></svg>
-    <span className={`absolute top-3 whitespace-nowrap rounded-full px-1.5 py-px font-mono text-[8.5px] uppercase tracking-[0.04em] text-white shadow-raised ${flip ? "right-1.5" : "left-1.5"}`} style={{ background: color }}>{label}</span>
-  </>
-);
-
-export function HowWeDoItArt() {
-  const { ref, play } = useLoop<HTMLDivElement>();
-  const s = useSequence(HOW_MS.length, HOW_MS, play);
-  const beat = s === 0 ? 0 : s === 1 ? 1 : s <= 5 ? 2 : 3;
-  const state = (i: number): State => (i < beat ? "done" : i === beat ? (i === 3 ? "done" : "now") : "todo");
-  const checked = beat < 2 ? 0 : beat > 2 ? 4 : s - 1;
-  return (
-    <div ref={ref}>
-      <Canvas story={<Story steps={HOW_STORY} at={beat} />}>
-        <div className="relative h-[256px] w-[348px] shrink-0 origin-center scale-[0.84] min-[400px]:scale-100">
-          {/* wires: upload → team → QC → delivered, and a faint dashed return for the next shoot */}
-          <Wire className="left-[154px] top-[59px] h-0.5 w-10" on={beat === 1} dir="right" />
-          <Wire className="left-[251px] top-[118px] h-5 w-0.5" on={beat === 2} dir="down" />
-          <Wire className="left-[154px] top-[197px] h-0.5 w-10" on={beat === 3} dir="left" maroon />
-          <span className="absolute left-[77px] top-[118px] h-5 border-l border-dashed border-line-2" />
-
-          <Station className="left-0 top-0" n="01" label="Upload" state={state(0)}>
-            <div className="relative h-[52px]">
-              <span className="absolute inset-x-2 -top-1 bottom-1 rounded-lg bg-line" />
-              <span className="absolute inset-x-1 -top-0.5 bottom-0.5 rounded-lg bg-line-2" />
-              <div className="absolute inset-0 overflow-hidden rounded-lg"><Thumb name="tx-ext.jpg" raw sizes="150px" /></div>
-            </div>
-            <p className="mt-1.5 truncate font-mono text-[9px] text-ink-2">DSC_0412–0414.ARW</p>
-            <span className="mt-1 block h-1 overflow-hidden rounded-full bg-sunk">
-              <motion.span key={beat === 0 ? `up${s}` : "up"} className="block h-full origin-left rounded-full bg-blue" initial={{ scaleX: beat === 0 ? 0.05 : 1 }} animate={{ scaleX: beat === 0 ? 1 : 1 }} transition={{ duration: 1.2, ease: [0.77, 0, 0.175, 1] }} />
-            </span>
-          </Station>
-
-          <Station className="right-0 top-0" n="02" label="Editing team" state={state(1)} dark>
-            <div className="relative h-[52px] overflow-hidden rounded-lg">
-              <Thumb name="tx-ext.jpg" raw={beat < 1} sizes="150px" />
-              {beat === 1 && (
-                <>
-                  <Thumb name="tx-ext.jpg" raw sizes="150px" />
-                  <motion.div className="absolute inset-0" initial={{ clipPath: "inset(0 100% 0 0)" }} animate={{ clipPath: "inset(0 0% 0 0)" }} transition={sweep}><Thumb name="tx-ext.jpg" sizes="150px" /></motion.div>
-                  <motion.span className="absolute inset-y-0 left-0 w-px bg-white shadow-[0_0_8px_rgb(255_255_255/0.9)]" initial={{ x: 0 }} animate={{ x: 132 }} transition={sweep} />
-                </>
-              )}
-            </div>
-            {beat === 1 && (
-              <motion.div className="absolute left-2.5 top-[44px] z-10" initial={{ x: 0 }} animate={{ x: 120 }} transition={sweep}><Cursor color="#3074FE" label="Editor" flip /></motion.div>
-            )}
-            <div className="mt-1.5 flex gap-1">
-              {["Merge", "Sky", "Windows"].map((f, i) => (
-                <motion.span key={f} className="rounded-full bg-white/12 px-1.5 py-px text-[9px] font-medium text-white/90"
-                  initial={false} animate={{ opacity: beat >= 1 ? 1 : 0.35 }} transition={{ duration: 0.3, delay: beat === 1 ? 0.9 + i * 0.5 : 0 }}>{f}</motion.span>
-              ))}
-            </div>
-          </Station>
-
-          <Station className="bottom-0 right-0" n="03" label="QC check" state={state(2)}>
-            <div className="relative grid grid-cols-2 gap-1">
-              {thumbs.map((t, i) => (
-                <div key={t} className="relative h-[27px] overflow-hidden rounded-md">
-                  <Thumb name={t} raw={i >= checked} sizes="80px" />
-                  {i < checked && <span className="absolute right-0.5 top-0.5"><Tick size={11} /></span>}
-                </div>
-              ))}
-              {beat === 2 && (
-                <motion.div className="absolute left-0 top-0 z-10" initial={{ x: 40, y: 16 }} animate={{ x: 40 + ((checked - 1) % 2) * 66, y: 16 + Math.floor(Math.max(checked - 1, 0) / 2) * 31 }} transition={spring}>
-                  <Cursor color="#8E1F3F" label="QC · Akash" flip={(checked - 1) % 2 === 1} />
-                </motion.div>
-              )}
-            </div>
-            <p className="mt-1.5 font-mono text-[9px] text-ink-2"><NumberFlow value={checked} locales="en-US" /> / 4 checked</p>
-          </Station>
-
-          <Station className="bottom-0 left-0" n="04" label="Delivered" state={state(3)}>
-            <div className="flex items-center gap-1.5">
-              <span className="grid size-5 shrink-0 place-items-center rounded-md bg-ink"><Mark className="scale-[0.45] brightness-0 invert" /></span>
-              <span className="truncate text-[10.5px] font-semibold text-ink">Your set is ready</span>
-            </div>
-            <div className="mt-1.5 grid grid-cols-4 gap-0.5">
-              {thumbs.map((t, i) => (
-                <motion.div key={t} className="relative h-[26px] overflow-hidden rounded" initial={false} animate={{ opacity: beat === 3 ? 1 : 0.35 }} transition={{ duration: 0.3, delay: beat === 3 ? 0.3 + i * 0.07 : 0 }}>
-                  <Thumb name={t} sizes="40px" />
-                </motion.div>
-              ))}
-            </div>
-            <p className="mt-1.5 font-mono text-[9px] text-ink-2">Edited, checked twice</p>
-          </Station>
-        </div>
-      </Canvas>
-    </div>
-  );
-}
-
-/** One stage of the flow. `now` lifts and rings it blue; `done` shows a tick; `todo` waits dimmed. */
-function Station({ n, label, state, dark = false, className, children }: { n: string; label: string; state: State; dark?: boolean; className: string; children: ReactNode }) {
-  return (
-    <motion.div
-      className={`absolute h-[118px] w-[154px] rounded-2xl p-2 ${dark ? "bg-ink text-white shadow-[0_12px_24px_-10px_rgb(17_19_24/0.5)]" : "bg-surface shadow-hair"} ${className}`}
-      initial={false}
-      animate={{ opacity: state === "todo" ? 0.5 : 1, scale: state === "now" ? 1.04 : 1 }}
-      transition={spring}
-    >
-      {state === "now" && <motion.span layoutId="how-ring" className="pointer-events-none absolute -inset-[3px] rounded-[19px] border-[1.5px] border-blue/60" transition={spring} />}
-      <div className="mb-1.5 flex items-center gap-1.5">
-        <span className={`font-mono text-[9px] ${dark ? "text-white/60" : "text-ink-3"}`}>{n}</span>
-        <span className={`text-[10.5px] font-semibold ${dark ? "text-white" : "text-ink"}`}>{label}</span>
-        <span className="ml-auto">
-          {state === "done" ? <Tick size={14} /> : state === "now" ? <span className="block size-3 animate-spin rounded-full border-[1.5px] border-dashed border-blue [animation-duration:3s]" /> : null}
-        </span>
-      </div>
-      {children}
-    </motion.div>
-  );
-}
-
-/** A connector with a light pulse that runs along it once while `on`. */
-function Wire({ className, on, dir, maroon = false }: { className: string; on: boolean; dir: "right" | "down" | "left"; maroon?: boolean }) {
-  const along = dir === "down" ? "bg-[linear-gradient(180deg,rgb(48_116_254/0.2),var(--color-blue))]" : maroon ? "bg-[linear-gradient(270deg,var(--color-maroon),rgb(142_31_63/0.2))]" : "bg-[linear-gradient(90deg,rgb(48_116_254/0.2),var(--color-blue))]";
-  const from = dir === "down" ? { y: -12 } : { x: dir === "right" ? -16 : 40 };
-  const to = dir === "down" ? { y: 24 } : { x: dir === "right" ? 40 : -16 };
-  return (
-    <span className={`absolute overflow-hidden ${along} ${className}`}>
-      {on && <motion.span className={`absolute ${dir === "down" ? "-left-[3px] h-3 w-2" : "-top-[3px] h-2 w-4"} rounded-full bg-[radial-gradient(closest-side,#fff,transparent)]`} initial={from} animate={to} transition={{ duration: 0.7, ease: [0.77, 0, 0.175, 1] }} />}
-    </span>
-  );
-}
 
 /* 02 · Our process, two places on one screen (owner, 2026-10-31): the photographer in New York, the studio in India.
    The shoot leaves New York in the evening and lands in the studio inbox while India sleeps; at 9 AM IST the team reads
@@ -208,8 +72,8 @@ export function ProcessArt() {
   const arc = "M78 40 Q174 -14 270 40";
   return (
     <div ref={ref}>
-      <Canvas story={<Story steps={PROCESS_STORY} at={s} />}>
-        <div className="relative h-[256px] w-[348px] shrink-0 origin-center scale-[0.84] min-[400px]:scale-100">
+      <Canvas className="h-[292px]" story={<Story steps={PROCESS_STORY} at={s} />}>
+        <div className="relative h-[256px] w-[348px] shrink-0 origin-center scale-[0.74] min-[400px]:scale-[0.78]">
           {/* the route between the two places, and the shoot travelling it: out at 0, back at 4 */}
           <svg viewBox="0 0 348 50" className="absolute inset-x-0 top-0 h-[50px] w-full overflow-visible" aria-hidden="true">
             <path d={arc} fill="none" stroke="#D5D9E0" strokeWidth="1.5" strokeDasharray="3 5" />
@@ -300,7 +164,7 @@ export function ProcessArt() {
 /** One side of the world: city, live clock, and the sky behind it (night fades to day by opacity). */
 function Place({ city, zone, time, night, className, children }: { city: string; zone: string; time: string; night: boolean; className: string; children: ReactNode }) {
   return (
-    <div className={`absolute top-[34px] h-[164px] w-[156px] overflow-hidden rounded-2xl bg-[linear-gradient(170deg,#EAF5FF,#FFFFFF_70%)] shadow-raised ${className}`}>
+    <div className={`absolute top-[34px] h-[164px] w-[156px] overflow-hidden rounded-xl bg-[linear-gradient(170deg,#EAF5FF,#FFFFFF_70%)] shadow-raised ${className}`}>
       <motion.div aria-hidden="true" className={`absolute inset-0 ${NIGHT}`} initial={false} animate={{ opacity: night ? 1 : 0 }} transition={{ duration: 0.8 }} />
       <div className={`relative p-2.5 transition-colors duration-700 ${night ? "text-white" : "text-ink"}`}>
         <div className="flex items-center gap-1.5">
@@ -333,7 +197,7 @@ const PRICE_MS = [1300, 1300, 1300, 1300, 2800] as const;
 const PRICE_STORY = ["Pick a level for each photo", "Mix levels in one order", "Twilight from $1.00 an image", "Luxury for hand-masked blends", "Billed only after delivery"];
 const lines = [
   { photo: "tx-ext.jpg", name: "Front exterior", level: "Signature", price: 1 },
-  { photo: "tx-int.jpg", name: "Main bathroom", level: "Essential", price: 0.7 },
+  { photo: "tx-int.jpg", name: "Main bathroom", level: "Essential", price: 0.5 },
   { photo: "tx-twi.jpg", name: "Pool deck", level: "Twilight", price: 1 },
   { photo: "tx-aer.jpg", name: "Aerial", level: "Luxury", price: 1.5 },
 ] as const;
@@ -346,8 +210,8 @@ export function PricesArt() {
   const total = lines.slice(0, priced).reduce((t, l) => t + l.price, 0);
   return (
     <div ref={ref}>
-      <Canvas story={<Story steps={PRICE_STORY} at={s} />}>
-        <div className="relative w-[300px] shrink-0 origin-center scale-[0.9] rounded-2xl bg-surface p-3 shadow-raised min-[400px]:scale-100">
+      <Canvas className="h-[292px]" story={<Story steps={PRICE_STORY} at={s} />}>
+        <div className="relative w-[300px] shrink-0 origin-center scale-[0.8] rounded-xl bg-surface p-3 shadow-raised min-[400px]:scale-[0.86]">
           <div className="mb-2 flex items-center justify-between px-0.5">
             <span className="font-mono text-[10px] uppercase tracking-[0.04em] text-ink-2">Your listing</span>
             <span className="font-mono text-[10px] text-ink-2">4 photos</span>
@@ -395,6 +259,8 @@ export function PricesArt() {
 
 /* 04 · How to start, as a round trip (owner, 2026-10-31): ten photos fly from your stack into the free-trial drop zone
    (no card, no contract), then the edited ten come back underneath, so the whole trial reads on one screen. */
+
+/* 04 · How to start (owner, 2026-11-02: restored into the bento, same animation, sized to the card). */
 const OPT_MS = [...Array.from({ length: 10 }, () => 300), 1200, 2800] as const;
 const OPT_STORY = ["Send 10 photos, free", "No card, no contract", "Edited and back by morning", "Judge us on your own shoot"];
 
@@ -407,8 +273,8 @@ export function OptInArt() {
   const beat = s < 5 ? 0 : s < 10 ? 1 : s === 10 ? 2 : 3;
   return (
     <div ref={ref}>
-      <Canvas story={<Story steps={OPT_STORY} at={beat} />}>
-        <div className="relative grid w-[320px] shrink-0 origin-center scale-[0.9] justify-items-center gap-4 min-[400px]:scale-100">
+      <Canvas className="h-[292px]" story={<Story steps={OPT_STORY} at={beat} />}>
+        <div className="relative grid w-[320px] shrink-0 origin-center scale-[0.84] justify-items-center gap-4 min-[400px]:scale-[0.9]">
           <div className="flex items-center gap-10">
             <div className="relative h-[92px] w-[120px]">
               {[0, 1, 2].map((i) => (
@@ -427,7 +293,7 @@ export function OptInArt() {
                 )}
               </AnimatePresence>
             </div>
-            <motion.div className="grid h-[92px] w-[120px] place-items-center rounded-2xl border-[1.5px] border-dashed text-center"
+            <motion.div className="grid h-[92px] w-[120px] place-items-center rounded-xl border-[1.5px] border-dashed text-center"
               animate={{ borderColor: sending ? "#3074FE" : "#D5D9E0", backgroundColor: sending ? "rgb(238 242 255 / 0.8)" : "rgb(255 255 255 / 0.6)", scale: sending && s % 2 ? 1.03 : 1 }} transition={{ duration: 0.25 }}>
               <span className="text-[12.5px] font-medium">Free trial
                 <span className="mt-1 block font-mono text-[9.5px] uppercase leading-snug tracking-[0.04em] text-blue">No card<br />No contract</span>
@@ -435,7 +301,7 @@ export function OptInArt() {
             </motion.div>
           </div>
           {/* the edited ten, back by morning */}
-          <motion.div className="w-full rounded-2xl bg-surface p-2.5 shadow-raised" initial={false} animate={{ opacity: s >= 10 ? 1 : 0.45, y: s >= 10 ? 0 : 6 }} transition={spring}>
+          <motion.div className="w-full rounded-xl bg-surface p-2.5 shadow-raised" initial={false} animate={{ opacity: s >= 10 ? 1 : 0.45, y: s >= 10 ? 0 : 6 }} transition={spring}>
             <div className="mb-2 flex items-center gap-1.5">
               {back ? <Tick size={14} /> : <span className="block size-3.5 animate-spin rounded-full border-[1.5px] border-dashed border-blue [animation-duration:3s]" />}
               <span className="text-[11.5px] font-semibold text-ink">{back ? "10 / 10 edited, free" : "Editing your ten"}</span>
@@ -473,8 +339,10 @@ export function ContactArt() {
   const shown = [0, 1, 1, 2, 3, 3][s]!;
   return (
     <div ref={ref}>
-      <Canvas className="h-[380px]" story={<Story steps={["Message the studio on WhatsApp", "An editor replies, not a bot", "Booked in. Upload when ready"]} at={s <= 1 ? 0 : s <= 3 ? 1 : 2} />}>
-        <div className="mx-auto w-[calc(100%-24px)] max-w-[380px] overflow-hidden rounded-2xl bg-surface/70 shadow-raised backdrop-blur">
+      <Canvas className="h-[292px]" story={<Story steps={["Message the studio on WhatsApp", "An editor replies, not a bot", "Booked in. Upload when ready"]} at={s <= 1 ? 0 : s <= 3 ? 1 : 2} />}>
+        {/* fixed-height box: the scaled window keeps its look but no longer pushes the caption out of the canvas */}
+        <div className="grid h-[214px] w-full place-items-center">
+        <div className="mx-auto w-[calc(100%-24px)] max-w-[380px] origin-center scale-[0.78] overflow-hidden rounded-xl bg-surface/70 shadow-raised backdrop-blur">
           <div className="flex items-center gap-2 border-b border-line bg-surface px-3 py-2">
             <span className="grid size-7 place-items-center rounded-full bg-ink"><Mark className="scale-[0.55] brightness-0 invert" /></span>
             <span className="grid leading-tight">
@@ -508,6 +376,7 @@ export function ContactArt() {
             ))}
             <span className="ml-auto self-center font-mono text-[9.5px] text-ink-2">An editor answers</span>
           </div>
+        </div>
         </div>
       </Canvas>
     </div>

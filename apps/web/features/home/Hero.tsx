@@ -20,7 +20,7 @@ export function Hero() {
     <section className="relative overflow-hidden pb-20 pt-24 text-center md:pb-24 md:pt-32">
       {/* Sky gradient (owner's reference: Billow on curated.design), from the top: soft sky blue under the header,
           two slow cloud shapes drifting, fading to white by the time the slider starts. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div aria-hidden="true" className="hero-sky pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute inset-x-0 top-0 h-[78%] bg-[radial-gradient(55%_50%_at_18%_10%,#D2ECFF,transparent_70%),radial-gradient(50%_50%_at_82%_14%,#D8EFFF,transparent_70%),radial-gradient(70%_45%_at_50%_0%,#E3F3FF,transparent_75%),linear-gradient(to_bottom,#EAF5FF,#F3F9FF_40%,#FFFFFF)]" />
         <div className="cloud absolute left-[4%] top-[6%] h-[240px] w-[520px] rounded-full bg-white/70 blur-[60px]" />
         <div className="cloud absolute right-[3%] top-[18%] h-[200px] w-[460px] rounded-full bg-white/60 blur-[60px] [animation-delay:-12s]" />
@@ -61,7 +61,7 @@ export function Hero() {
   );
 }
 
-function Words({ text, from, className = "" }: { text: string; from: number; className?: string }) {
+export function Words({ text, from, className = "" }: { text: string; from: number; className?: string }) {
   const words = text.split(" ");
   return words.map((w, i) => (
     <span key={i} className={`word ${className}`} style={{ "--i": from + i } as CSSProperties}>{w}{i < words.length - 1 ? " " : ""}</span>
@@ -73,8 +73,8 @@ function Words({ text, from, className = "" }: { text: string; from: number; cla
     Border (owner, 2026-10-31): a light gradient that travels round the edge (`edge-flow`, globals.css). */
 function PromptBox() {
   return (
-    <Link href="/free-trial" className="edge-flow group relative mx-auto block max-w-[560px] rounded-[21.5px] p-[1.5px] text-left shadow-[0_12px_32px_-12px_rgb(10_10_11/0.22)] transition-shadow duration-300 hover:shadow-[0_16px_40px_-12px_rgb(48_116_254/0.3)]" aria-label="Try 10 photos free: upload brackets or paste a Dropbox link">
-      <span className="block rounded-[20px] bg-white px-4 pb-3 pt-4">
+    <Link href="/free-trial" className="edge-flow group relative mx-auto block max-w-[560px] rounded-[13.5px] p-[1.5px] text-left shadow-[0_12px_32px_-12px_rgb(10_10_11/0.22)] transition-shadow duration-300 hover:shadow-[0_16px_40px_-12px_rgb(48_116_254/0.3)]" aria-label="Try 10 photos free: upload brackets or paste a Dropbox link">
+      <span className="block rounded-[12px] bg-white px-4 pb-3 pt-4">
         <span className="block h-11 truncate text-[16px] text-ink-3">Paste a Dropbox link<span className="max-sm:hidden"> or drop your brackets</span>…</span>
         <span className="flex items-center gap-3">
           <span className="flex items-center gap-1.5 text-[14px] font-medium text-ink">

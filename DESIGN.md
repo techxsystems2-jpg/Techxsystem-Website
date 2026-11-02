@@ -22,8 +22,9 @@ The design system's source of truth is `docs/design-system/` (carried over from 
 | Action (buttons and links only) | `bg-blue` / `text-blue`, hover `bg-blue-2`, tint `bg-blue-tint` |
 | "After" / step numbers | `text-maroon`, `bg-maroon-tint` |
 | Borders | `border-line` · `border-line-2` |
+| Typefaces | **Geist** (headings 500–520 and body; `next/font/google`, SIL OFL) · **Geist Mono** for labels, prices in lists, timestamps. Owner, 2026-11-02: one family across the site (replaces Satoshi, before that Inter Tight / Inter) |
 | Type roles | `text-display` (hero) · `text-h1` · `text-cta` · `text-h2` · `text-h3` · `text-h4` · `text-lede` · `text-body` · `text-small` · `text-label` + `font-mono uppercase` |
-| Radius | `rounded-input` 12 · `rounded-inner` 20 · `rounded-card` 28 · `rounded-tray` 32 · `rounded-panel` 40 · `rounded-full` pills |
+| Radius | `rounded-input` 8 · `rounded-inner` 10 · `rounded-card` 16 · `rounded-tray` 18 · `rounded-panel` 24 · buttons 8/10/12 by size (sm/md/lg), chips 8; `rounded-full` only for switches and round icon controls (softer scale, owner 2026-11-02; was 12/20/28/32/40). Objects drawn inside illustrations: 12 max |
 | Elevation | `shadow-hair` (rest) · `shadow-raised` (hover, sticky, form card) · `shadow-overlay` (menus, toasts) · `shadow-cta` (primary button) |
 | Motion | `ease-brand`; 150ms hover/press, 220ms chips/cards, 320ms slider snap and reveals |
 | Layout | `wrap` (max 1200, 20/24px gutters) · `dots` (illustration canvas) · `raw` (unedited photo look) · `rise` (hero entrance) |

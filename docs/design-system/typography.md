@@ -1,5 +1,7 @@
 # Typography
 
+> **Website build (2026-11-02, owner):** the site uses **Geist** for headings and body and **Geist Mono** for labels: one family across the whole site (owner; replaced Satoshi the same day). Sections below describe the original Figma set.
+
 ## Typefaces
 
 Two families, three weights, all free on Google Fonts:

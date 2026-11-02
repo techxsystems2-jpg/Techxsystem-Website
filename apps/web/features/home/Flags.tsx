@@ -63,3 +63,16 @@ export function FlagAU() {
     </Round>
   );
 }
+
+export function FlagIN() {
+  return (
+    <Round label="India">
+      <path d="M0 0h24v8H0z" fill="#FF9933" />
+      <path d="M0 8h24v8H0z" fill="#fff" />
+      <path d="M0 16h24v8H0z" fill="#138808" />
+      <circle cx="12" cy="12" r="3" fill="none" stroke="#000080" strokeWidth=".7" />
+      {Array.from({ length: 12 }, (_, i) => <path key={i} d="M12 12V9" stroke="#000080" strokeWidth=".35" transform={`rotate(${i * 30} 12 12)`} />)}
+      <circle cx="12" cy="12" r=".7" fill="#000080" />
+    </Round>
+  );
+}

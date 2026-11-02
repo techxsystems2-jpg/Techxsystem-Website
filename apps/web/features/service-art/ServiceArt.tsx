@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactElement, type ReactNode } from "react";
+import { useEffect, useRef, useState, type PointerEvent, type ReactElement, type ReactNode } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { useLoop } from "@/features/motion/useLoop";
@@ -10,7 +10,10 @@ import { useLoop } from "@/features/motion/useLoop";
    Photos are TechX's own finished edits from the old site's portfolio (docs/PHOTO_CREDITS.md); the "before" is a
    filter over the same frame until real pairs arrive. Staging keeps the stock pair (no TechX staging samples yet).
    Loops only while on screen; off screen or under reduced motion it rests on a 50/50 split with every fix ticked.
-   Transform, opacity and clip-path only. */
+   Transform, opacity and clip-path only.
+   Interactive (owner, 2026-11-02): with a mouse the divider follows the pointer while hovering the photo and the loop
+   resumes when it leaves; on touch a sideways drag moves it (vertical scrolling still works) and a tap opens the
+   service. Tags and the fixes bar ignore the pointer so the whole photo is the handle. */
 
 type Slug = "photo-editing" | "virtual-twilight" | "virtual-staging" | "drone-editing" | "floor-plans" | "video-editing";
 
@@ -51,7 +54,7 @@ function Photo({ src, style, className = "" }: { src: string; style?: React.CSSP
 
 /** Corner labels: the edited side (left) light, the raw side (right) dark. */
 const Tag = ({ children, side }: { children: ReactNode; side: "l" | "r" }) => (
-  <span className={`absolute top-3 z-10 rounded-md px-2 py-[3px] font-mono text-[10.5px] uppercase tracking-[0.04em] backdrop-blur ${side === "l" ? "left-3 bg-surface/90 text-ink" : "right-3 bg-ink/55 text-white"}`}>{children}</span>
+  <span className={`pointer-events-none absolute top-3 z-10 rounded-md px-2 py-[3px] font-mono text-[10.5px] uppercase tracking-[0.04em] backdrop-blur ${side === "l" ? "left-3 bg-surface/90 text-ink" : "right-3 bg-ink/55 text-white"}`}>{children}</span>
 );
 
 const Tick = () => (
@@ -63,7 +66,7 @@ const Tick = () => (
 /** The fixes along the bottom, ticked as they land; the one in progress spins. */
 function Steps({ items, done }: { items: readonly string[]; done: number }) {
   return (
-    <div className="glass absolute inset-x-3 bottom-3 z-10 flex items-center justify-center gap-3 rounded-full px-3 py-1.5">
+    <div className="glass pointer-events-none absolute inset-x-3 bottom-3 z-10 flex items-center justify-center gap-3 rounded-full px-3 py-1.5">
       {items.map((s, i) => (
         <span key={s} className={`flex items-center gap-1 whitespace-nowrap text-[11px] font-medium transition-colors duration-300 ${i < done ? "text-ink" : "text-ink-2/70"}`}>
           {i < done ? <Tick /> : i === done ? <span className="size-3.5 animate-spin rounded-full border-[1.5px] border-dashed border-blue [animation-duration:3s]" /> : <span className="size-3.5 rounded-full border-[1.5px] border-line-2" />}
@@ -77,15 +80,35 @@ function Steps({ items, done }: { items: readonly string[]; done: number }) {
 /** After | before with a divider. `done` of `n` fixes sets where the divider sits: it walks right from 22% to 78% while
     playing, so the after grows left to right; at rest it sits in the middle so both halves read equally. */
 function Split({ before, after, done, n, play, overlay }: { before: ReactNode; after: ReactNode; done: number; n: number; play: boolean; overlay?: ReactNode }) {
-  const at = play ? 22 + (done / n) * 56 : 50; // % from the left where "after" ends
+  const [manual, setManual] = useState<number | null>(null); // set while the visitor is moving the divider
+  const drag = useRef<{ x: number; moved: boolean } | null>(null);
+  const dragged = useRef(false);
+  const at = manual ?? (play ? 22 + (done / n) * 56 : 50); // % from the left where "after" ends
+  const move = manual === null ? spring : { duration: 0 };
+  const follow = (e: PointerEvent<HTMLDivElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    setManual(Math.min(97, Math.max(3, ((e.clientX - r.left) / r.width) * 100)));
+  };
   return (
     <>
+      <div aria-hidden="true" className="absolute inset-0 z-[5] cursor-ew-resize touch-pan-y"
+        onPointerDown={(e) => { if (e.pointerType === "mouse") return; drag.current = { x: e.clientX, moved: false }; e.currentTarget.setPointerCapture(e.pointerId); }}
+        onPointerMove={(e) => {
+          if (e.pointerType === "mouse") return follow(e);
+          if (!drag.current) return;
+          if (Math.abs(e.clientX - drag.current.x) > 6) drag.current.moved = true;
+          if (drag.current.moved) follow(e);
+        }}
+        onPointerUp={() => { dragged.current = !!drag.current?.moved; drag.current = null; }}
+        onPointerCancel={() => { drag.current = null; }}
+        onPointerLeave={(e) => { if (e.pointerType === "mouse") setManual(null); }}
+        onClick={(e) => { if (dragged.current) { e.preventDefault(); dragged.current = false; } }} />
       <div className="absolute inset-0">{before}</div>
-      <motion.div className="absolute inset-0" initial={false} animate={{ clipPath: `inset(0 ${100 - at}% 0 0)` }} transition={spring}>
+      <motion.div className="absolute inset-0" initial={false} animate={{ clipPath: `inset(0 ${100 - at}% 0 0)` }} transition={move}>
         {after}
         {overlay}
       </motion.div>
-      <motion.div className="pointer-events-none absolute inset-0" initial={false} animate={{ transform: `translateX(${at}%)` }} transition={spring}>
+      <motion.div className="pointer-events-none absolute inset-0" initial={false} animate={{ transform: `translateX(${at}%)` }} transition={move}>
         <span className="absolute inset-y-0 left-0 w-0.5 -translate-x-1/2 bg-white shadow-[0_0_10px_rgb(0_0_0/0.25)]" />
         <span className="absolute left-0 top-1/2 grid size-7 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white text-ink shadow-raised">
           <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4L2 8l4 4M10 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
