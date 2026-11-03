@@ -3,6 +3,7 @@ import { pageMetadata } from "@/lib/content/seo";
 import { Channels } from "@/features/contact/Channels";
 import { ContactHero } from "@/features/contact/ContactHero";
 import { MessageForm } from "@/features/contact/MessageForm";
+import { Offices } from "@/features/contact/Offices";
 import { StudioCard } from "@/features/contact/StudioCard";
 import { Faq } from "@/features/home/Faq";
 import { SectionHead } from "@/features/home/SectionHead";
@@ -24,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 
 export default async function Contact() {
-  const { contact } = await getContent("faqs");
+  const [{ contact }, site] = await Promise.all([getContent("faqs"), getSite()]);
   return (
     <>
       <ContactHero />
@@ -37,6 +38,8 @@ export default async function Contact() {
           <Reveal className="h-full" delay={0.08}><StudioCard /></Reveal>
         </div>
       </section>
+
+      <Offices offices={site.offices} />
 
       <Faq title="Before you write." lede="Still unsure? Message the studio on WhatsApp. An editor replies." faqs={contact} />
       <FinalCta />

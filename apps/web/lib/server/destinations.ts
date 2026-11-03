@@ -3,7 +3,7 @@ import path from "node:path";
 import type { UploadTarget } from "@/lib/trial";
 import { decrypt, seal } from "./crypto";
 import { dropboxAccess, dropboxCreateFolder, dropboxUploadLink, dropboxWriteText } from "./dropbox";
-import { gdriveAccess, gdriveCreateFolder, gdriveFolderAlive, gdriveUploadSession, gdriveWriteText } from "./gdrive";
+import { gdriveAccess, gdriveCreateFolder, gdriveFolderAlive, gdriveFolderIn, gdriveUploadSession, gdriveWriteText } from "./gdrive";
 import { cleanName, getSettings, saveSettings, type Destination } from "./upload-settings";
 
 /* One interface over the three places files can land (Dropbox, Google Drive, this computer in development), so the
@@ -49,7 +49,6 @@ export async function openStore(force?: Destination): Promise<Store> {
     if (!s.gdrive) throw new NotReady("Google Drive is selected but not connected.");
     const access = await gdriveAccess(decrypt(s.gdrive.token));
     let root = s.gdrive.rootName === top ? s.gdrive.rootId : undefined;
-    const subs = new Map<string, string>();
     const ensureRoot = async () => {
       if (root && (await gdriveFolderAlive(access, root))) return root;
       root = await gdriveCreateFolder(access, top);
@@ -60,7 +59,7 @@ export async function openStore(force?: Destination): Promise<Store> {
       dest,
       async folder(name, sub) {
         let parent = await ensureRoot();
-        if (sub) parent = subs.get(sub) ?? (await gdriveCreateFolder(access, cleanName(sub), parent));
+        if (sub) parent = await gdriveFolderIn(access, cleanName(sub), parent);
         return gdriveCreateFolder(access, cleanName(name, 120), parent);
       },
       writeText: (ref, name, text) => gdriveWriteText(access, name, text, ref),

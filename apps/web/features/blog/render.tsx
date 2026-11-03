@@ -1,3 +1,4 @@
+import { toBlocks } from "./blocks";
 import type { ReactNode } from "react";
 import Image from "next/image";
 import { allowedImage } from "@/lib/content/fields";
@@ -30,7 +31,7 @@ function inline(text: string, key = 0): ReactNode[] {
 }
 
 export function PostBody({ body }: { body: string }) {
-  const blocks = body.replace(/\r\n?/g, "\n").split(/\n{2,}/).map((b) => b.trim()).filter(Boolean);
+  const blocks = toBlocks(body);
   return (
     <div className="grid gap-6 text-[18px] leading-[1.7] text-ink-2">
       {blocks.map((b, i) => {

@@ -16,7 +16,7 @@
       ],
       "env": [
         "DATABASE_URL",
-        "BLOB_READ_WRITE_TOKEN",
+        "BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN",
         "UPSTASH_REDIS_REST_URL",
         "UPSTASH_REDIS_REST_TOKEN",
         "APP_SECRET",
@@ -53,7 +53,7 @@
       "persistent": true,
       "env": [
         "DATABASE_URL",
-        "BLOB_READ_WRITE_TOKEN",
+        "BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN",
         "UPSTASH_REDIS_REST_URL",
         "UPSTASH_REDIS_REST_TOKEN",
         "APP_SECRET",

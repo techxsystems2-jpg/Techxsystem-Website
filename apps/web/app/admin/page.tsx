@@ -44,7 +44,7 @@ export default async function AdminHome() {
           <CircleAlert className="mt-0.5 size-4 shrink-0" />
           <p>
             {store === "file" && <>Saves can&rsquo;t be stored on this host yet: add <Code>DATABASE_URL</Code> (your PostgreSQL link) and redeploy. </>}
-            {media === "local" && <>Photos can&rsquo;t be uploaded yet: add a Vercel Blob store (<Code>BLOB_READ_WRITE_TOKEN</Code>).</>}
+            {media === "local" && <>Photos can&rsquo;t be uploaded yet: add a Vercel Blob store (<Code>BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN</Code>).</>}
           </p>
         </div>
       )}

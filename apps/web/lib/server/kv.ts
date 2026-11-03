@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { db, hasDatabase } from "./db";
+import { redis } from "./rate-limit";
 
 /* Key-value store for admin-managed data (site content, free-trial upload settings). Values are JSON.
    Where it lives, first match wins:
@@ -8,11 +9,6 @@ import { db, hasDatabase } from "./db";
       created by db/migrations/0001_site_content.sql.
    2. Upstash Redis (REST) when UPSTASH_REDIS_REST_URL / _TOKEN are set.
    3. One JSON file per key in apps/web/.data/ (local development only; Vercel's disk is read-only). */
-
-const redis = () => {
-  const url = process.env.UPSTASH_REDIS_REST_URL, token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  return url && token ? { url, token } : null;
-};
 
 export type StoreKind = "postgres" | "redis" | "file";
 export const storeKind = (): StoreKind => (hasDatabase() ? "postgres" : redis() ? "redis" : "file");
@@ -69,12 +65,4 @@ export async function kvDel(key: string) {
     case "redis": await command(["DEL", key]); break;
     default: await writeFile(fileOf(key), "null").catch(() => {});
   }
-}
-
-/** When each saved key last changed (PostgreSQL only; other stores don't record it). */
-export async function kvUpdatedAt(prefix: string): Promise<Record<string, string>> {
-  if (storeKind() !== "postgres") return {};
-  const rows = await db()<{ key: string; at: string }[]>`select key, to_char(updated_at at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at
-    from site_content where key like ${prefix + "%"} and value <> 'null'::jsonb`;
-  return Object.fromEntries(rows.map((r) => [r.key, r.at]));
 }

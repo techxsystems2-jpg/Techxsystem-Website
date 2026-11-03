@@ -9,7 +9,7 @@ export function register() {
     !e.ADMIN_EMAIL || !e.ADMIN_PASSWORD ? "ADMIN_EMAIL / ADMIN_PASSWORD missing: admin sign-in is off" : "",
     e.ADMIN_PASSWORD && e.ADMIN_PASSWORD.length < 16 ? "ADMIN_PASSWORD is under 16 characters" : "",
     !e.DATABASE_URL ? "DATABASE_URL missing: admin edits can't be saved" : "",
-    e.VERCEL && !e.BLOB_READ_WRITE_TOKEN ? "BLOB_READ_WRITE_TOKEN missing: admin photo uploads are off" : "",
+    e.VERCEL && !e.BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN ? "BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN missing: admin photo uploads are off" : "",
     !e.UPSTASH_REDIS_REST_URL || !e.UPSTASH_REDIS_REST_TOKEN ? "UPSTASH_REDIS_REST_URL / _TOKEN missing: rate limits and email caps only count per server instance" : "",
     !e.RESEND_API_KEY || !e.MAIL_FROM ? "RESEND_API_KEY / MAIL_FROM missing: no email alerts for contact messages and trials" : "",
     e.VERCEL_ENV === "production" && !e.NEXT_PUBLIC_SITE_URL ? "NEXT_PUBLIC_SITE_URL missing: canonical links use https://www.techxsystems.com" : "",

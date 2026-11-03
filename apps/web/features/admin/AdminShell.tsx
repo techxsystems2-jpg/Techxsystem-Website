@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Dialog } from "radix-ui";
 import {
   ChevronsUpDown, ExternalLink, FileText, History, Images, Info, Layers, LayoutDashboard, LogOut, MessageCircleQuestion,
-  PanelLeft, PenLine, Quote, Search, Tag, Upload, Users, HeartHandshake, X, type LucideIcon,
+  Inbox, PanelLeft, PenLine, Quote, Search, Tag, Tags, Upload, Users, HeartHandshake, X, type LucideIcon,
 } from "lucide-react";
 import { SECTIONS } from "@/lib/content/fields";
 import { Mark } from "@techx/ui/Icons";
@@ -23,16 +23,17 @@ import { cn } from "./ui/utils";
    bar and breadcrumbs. */
 
 const ICONS: Record<string, LucideIcon> = {
-  services: Layers, pricing: Tag, work: Images, testimonials: Quote, faqs: MessageCircleQuestion, blog: PenLine,
-  timeline: History, values: HeartHandshake, team: Users, facts: Info, seo: Search, uploads: Upload,
+  services: Layers, pricing: Tag, work: Images, categories: Tags, testimonials: Quote, faqs: MessageCircleQuestion, blog: PenLine,
+  timeline: History, values: HeartHandshake, team: Users, facts: Info, seo: Search, uploads: Upload, contacts: Inbox,
 };
 const GROUPS: { label: string; keys: string[] }[] = [
+  { label: "Inbox", keys: ["contacts"] },
   { label: "Offer", keys: ["services", "pricing"] },
-  { label: "Proof and writing", keys: ["work", "testimonials", "faqs", "blog"] },
+  { label: "Proof and writing", keys: ["work", "categories", "testimonials", "faqs", "blog"] },
   { label: "About page", keys: ["timeline", "values", "team"] },
   { label: "Site-wide", keys: ["facts", "seo", "uploads"] },
 ];
-const titleOf = (key: string) => (key === "uploads" ? "Free-trial uploads" : SECTIONS.find((s) => s.key === key)?.title ?? key);
+const titleOf = (key: string) => (key === "uploads" ? "Free-trial uploads" : key === "contacts" ? "Contact list" : SECTIONS.find((s) => s.key === key)?.title ?? key);
 
 export function AdminShell({ defaultOpen, email, children }: { defaultOpen: boolean; email: string; children: ReactNode }) {
   const [open, setOpenState] = useState(defaultOpen);

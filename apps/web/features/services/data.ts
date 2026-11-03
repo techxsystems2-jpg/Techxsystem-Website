@@ -26,7 +26,7 @@ export const details: Record<Slug, Detail> = {
     lead: "Bright, straight, true to life.",
     rest: "Photo editing by hand.",
     lede: "Every bracket blended, every window pulled, every vertical straightened. Then a second editor checks the set before it reaches you.",
-    turnaround: "12–24 hours",
+    turnaround: "10–16 hours",
     fixes: {
       lead: "Eight fixes, done by hand.",
       rest: "Pick the level that covers what your shoot needs.",
@@ -53,7 +53,7 @@ export const details: Record<Slug, Detail> = {
     lead: "Dusk, without the dusk shoot.",
     rest: "Daytime exteriors turned to twilight.",
     lede: "Send a daytime exterior and get back the look of a twilight session: a dusk sky, every light on, warm windows. One shoot instead of two.",
-    turnaround: "12–24 hours",
+    turnaround: "10–16 hours",
     fixes: {
       lead: "What goes into a twilight.",
       rest: "Six changes, made by an editor, not a filter.",
@@ -98,7 +98,7 @@ export const details: Record<Slug, Detail> = {
     lead: "Aerials that match the ground set.",
     rest: "Sky, colour and lot lines.",
     lede: "Your drone shots edited by the same team as the rest of the shoot, so the aerials sit with the ground photos.",
-    turnaround: "12–24 hours",
+    turnaround: "10–16 hours",
     fixes: {
       lead: "What we fix in an aerial.",
       rest: "The same hands as your ground photos.",

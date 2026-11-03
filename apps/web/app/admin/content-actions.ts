@@ -2,7 +2,7 @@
 
 import { updateTag } from "next/cache";
 import { isAdmin } from "@/lib/server/admin";
-import { resetSection, seedMissing, tagsToRefresh, writeSection } from "@/lib/server/content-store";
+import { resetSection, seedMissing, tagsToRefresh, versionOf, writeSection } from "@/lib/server/content-store";
 import { DEFAULTS } from "@/lib/content/types";
 import { explainDbError } from "@/lib/server/db";
 import { storeImage } from "@/lib/server/media";
@@ -15,7 +15,7 @@ import type { ContentKey } from "@/lib/content/types";
    Input is shaped by the section's field description (lib/content/fields.ts) before it's stored, then the content's
    cache tag is updated so the live site shows the change on the next request. */
 
-type Result = { ok: true; url?: string } | { ok: false; error: string };
+type Result = { ok: true; url?: string; version?: string } | { ok: false; error: string; stale?: boolean };
 const SIGNED_OUT: Result = { ok: false, error: "Your session ended. Sign in again, then save." };
 
 // rows that would render as nothing are dropped, so a half-filled "Add" never shows an empty card on the site
@@ -39,20 +39,32 @@ function withSlugs(rows: Record<string, unknown>[], current: { slug: string; sce
   });
 }
 
-export async function saveContent(key: string, value: unknown): Promise<Result> {
+export async function saveContent(key: string, value: unknown, version?: string): Promise<Result> {
   if (!(await isAdmin())) return SIGNED_OUT;
   const section = sectionOf(key);
   if (!section) return { ok: false, error: "Unknown section." };
   const current = await getContent(section.key);
+  // the tab saves a whole section: refuse if someone (another tab, the blog API) changed it since this tab loaded it
+  if (version && versionOf(current) !== version) return { ok: false, stale: true, error: "This section changed somewhere else since you opened it. Reload to get the latest, then make your change again." };
   let clean = coerce(section.field, value, current) as unknown;
   const rule = keep[section.key];
   if (rule && Array.isArray(clean)) clean = (clean as Record<string, unknown>[]).filter(rule);
   if (section.key === "services") clean = withSlugs(clean as Record<string, unknown>[], current as { slug: string; scene: string }[]);
   if (section.key === "blog") clean = cleanPosts(clean as Record<string, unknown>[]);
+  if (section.key === "categories") {
+    const seen = new Set<string>();
+    clean = (clean as { key: string; label: string }[]).filter((c) => c.label).map((c) => {
+      const base = slugify(c.key || c.label).slice(0, 40).replace(/-+$/, "") || "category";
+      let key = base, n = 2;
+      while (seen.has(key)) key = `${base}-${n++}`;
+      seen.add(key);
+      return { key, label: c.label };
+    });
+  }
   if (section.key === "faqs") clean = Object.fromEntries(Object.entries(clean as Record<string, Record<string, unknown>[]>).map(([k, rows]) => [k, rows.filter(keepQA)]));
   // autosave often sends what's already stored: then nothing is written and no cached page is refreshed
   const tags = tagsToRefresh(section.key, current, clean);
-  if (!tags.length) return { ok: true };
+  if (!tags.length) return { ok: true, version: versionOf(current) };
   try {
     await writeSection(section.key, clean as never);
   } catch (e) {
@@ -60,7 +72,7 @@ export async function saveContent(key: string, value: unknown): Promise<Result> 
     return { ok: false, error: explainDbError(e) };
   }
   for (const t of tags) updateTag(t);
-  return { ok: true };
+  return { ok: true, version: versionOf(clean) };
 }
 
 /** Back to what the site shipped with. */

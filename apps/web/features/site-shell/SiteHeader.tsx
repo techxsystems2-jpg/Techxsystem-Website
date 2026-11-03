@@ -93,6 +93,8 @@ function HeaderView({ path }: { path: string }) {
               <Mark className="scale-[0.85]" /> <span>TechX <span className="text-ink-3">Systems</span></span>
             </Link>
 
+            {/* links as one group with a fixed gap (owner, 2026-11-04: spread evenly, the gaps read too wide) */}
+            <div className="flex items-center gap-7 max-lg:hidden">
             {nav.map((l) =>
               l.href === "/services" ? (
                 <button
@@ -117,6 +119,7 @@ function HeaderView({ path }: { path: string }) {
                 </Link>
               ),
             )}
+            </div>
 
             <div className="flex items-center gap-1" onMouseEnter={closeFly}>
               <Link href="/free-trial" className={buttonClass("primary", "!h-8 !px-3.5 !text-[12.5px]", "sm")}>Start free trial</Link>

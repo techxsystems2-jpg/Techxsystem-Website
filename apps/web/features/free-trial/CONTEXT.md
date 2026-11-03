@@ -4,7 +4,7 @@ Read this file, `DESIGN.md` §1–6, and the files under **Uses**. Nothing else 
 
 - **Figma:** [Free trial, node 32:155](https://www.figma.com/design/WGW3zGaOx1NkmCCPomJTbV?node-id=32-155) (page "03 — Direction B", 2051 × 2264 capture). Figma wins for UI and copy.
 - **Route:** `app/free-trial/page.tsx` composes the sections in this folder.
-- **Uses:** `features/site-shell` (PageHead, FinalCta), `lib/site.ts`.
+- **Uses:** `features/site-shell` (SkyHero, FinalCta), `lib/site.ts`.
 - **Form:** name, studio, email, photos-per-month chips, drop zone, notes. Sent state: Figma page "02", Direction A. Backend not chosen yet.
 
 ## Copy (transcribed 2026-11-02 from one get_screenshot of Figma node 32:155)

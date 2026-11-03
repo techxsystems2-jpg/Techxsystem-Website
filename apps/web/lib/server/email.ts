@@ -5,7 +5,8 @@ import { rateLimit } from "./rate-limit";
 /* Studio alerts by email through Resend (owner, 2026-11-03), called with fetch: no SDK.
    Credits are limited, so every send passes these gates, cheapest first:
    1. the route's own guards already ran (same-origin, honeypot, validation, per-visitor rate limits);
-   2. the same alert within 10 minutes is sent once (and Resend's Idempotency-Key covers retries for 24 h);
+   2. the same alert is sent once: Resend's Idempotency-Key drops a repeat within 24 h, and a failed send can be retried
+      (a local "sent" mark set before the send used to block that retry; audit, 2026-11-04);
    3. a site-wide cap per day and per month (MAIL_DAILY_CAP / MAIL_MONTHLY_CAP, defaults under Resend's free
       100 a day / 3,000 a month), counted in Redis so it holds across every server instance.
    Mail only ever goes to the studio (MAIL_TO). The visitor's address is the Reply-To, never a recipient, so the forms
@@ -13,7 +14,7 @@ import { rateLimit } from "./rate-limit";
    A skipped or failed email never fails the visitor's request: the submission is saved in Dropbox / Drive as well. */
 
 export type Alert = { kind: "contact" | "trial"; subject: string; lines: [label: string, value: string][]; body?: string; replyTo?: string };
-export type MailResult = { sent: boolean; reason?: "off" | "duplicate" | "daily-cap" | "monthly-cap" | "error" };
+export type MailResult = { sent: boolean; reason?: "off" | "daily-cap" | "monthly-cap" | "error" };
 
 const num = (v: string | undefined, d: number) => (Number.isFinite(Number(v)) && Number(v) > 0 ? Math.floor(Number(v)) : d);
 export const mailConfigured = () => !!process.env.RESEND_API_KEY && !!process.env.MAIL_FROM;
@@ -34,7 +35,6 @@ export async function sendAlert(a: Alert): Promise<MailResult> {
   const { text, html } = render(a);
   const fingerprint = createHash("sha256").update(`${a.kind}\n${a.replyTo ?? ""}\n${text}`).digest("base64url").slice(0, 32);
 
-  if (!(await rateLimit("mail-dup", fingerprint, 1, 600)).ok) return { sent: false, reason: "duplicate" };
   // the month is checked first so a full month doesn't also use up the day's count
   if (!(await rateLimit("mail-month", "all", num(process.env.MAIL_MONTHLY_CAP, 2900), 30 * 86400)).ok) return skipped("monthly-cap");
   if (!(await rateLimit("mail-day", "all", num(process.env.MAIL_DAILY_CAP, 90), 86400)).ok) return skipped("daily-cap");

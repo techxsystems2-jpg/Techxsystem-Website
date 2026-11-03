@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Chip } from "@techx/ui/Chip";
 import { countsOf, type Shot } from "./portfolio";
-import type { WorkCat } from "@/features/services/data";
+import type { WorkCategory } from "@/lib/content/types";
 
 const PAGE = 24;
 
@@ -16,10 +16,14 @@ const PAGE = 24;
    after it run two columns wide in a panoramic crop (32/13 keeps them one row tall), alternating left and right, and
    the floor plans (line drawings, not photos) sit in their own small row under the photos. */
 const wideAt = (i: number) => i % 10 === 0 || i % 10 === 6;
+const noSub = () => () => {}; // the address only changes through pick(), which also sets state
 
-export function Gallery({ items: portfolio }: { items: Shot[] }) {
-  const categories = countsOf(portfolio);
-  const [cat, setCat] = useState<WorkCat | "all">("all");
+export function Gallery({ items: portfolio, cats }: { items: Shot[]; cats: WorkCategory[] }) {
+  const categories = countsOf(portfolio, cats); // the admin's categories, in its order; empty ones are left out
+  // the filter lives in the address (/work?cat=aer), so a service page's "See all work" opens on its own photos
+  const fromUrl = useSyncExternalStore(noSub, () => new URLSearchParams(location.search).get("cat"), () => null);
+  const [picked, setPicked] = useState<string | null>(null);
+  const cat = picked ?? (fromUrl && portfolio.some((s) => s.cat === fromUrl) ? fromUrl : "all");
   const [shown, setShown] = useState(PAGE);
   // `at` outlives `on`, so the viewer closes showing its photo; `set` says which row the photo came from
   const [view, setView] = useState<{ at: number; on: boolean; set: "photos" | "plans" }>({ at: 0, on: false, set: "photos" });
@@ -31,7 +35,12 @@ export function Gallery({ items: portfolio }: { items: Shot[] }) {
   const more = Math.min(PAGE, list.length - shown);
   const viewing = view.set === "plans" ? plans : visible;
 
-  const pick = (c: WorkCat | "all") => { setCat(c); setShown(PAGE); };
+  const pick = (c: string) => {
+    setPicked(c); setShown(PAGE);
+    const u = new URL(location.href);
+    if (c === "all") u.searchParams.delete("cat"); else u.searchParams.set("cat", c);
+    history.replaceState(history.state, "", u);
+  };
 
   return (
     <>
@@ -145,7 +154,7 @@ function Viewer({ list, at, on, onClose, onStep }: { list: Shot[]; at: number; o
       onKeyDown={(e) => { if (e.key === "ArrowRight") step(1, true); if (e.key === "ArrowLeft") step(-1, true); }}
       aria-label={shot ? `${shot.label} edit, ${at + 1} of ${list.length}` : undefined}
       className={[
-        "m-auto max-h-[92svh] w-[min(1100px,94vw)] overflow-visible bg-transparent p-0",
+        "m-auto max-h-[92svh] w-[min(1100px,94vw)] overflow-visible overscroll-contain bg-transparent p-0",
         "scale-90 opacity-0 transition-[opacity,scale,display,overlay] transition-discrete duration-200 ease-[var(--ease-brand)] open:scale-100 open:duration-300 open:opacity-100 starting:open:scale-90 starting:open:opacity-0 motion-reduce:scale-100",
         "backdrop:bg-ink/0 backdrop:backdrop-blur-sm backdrop:transition-[background-color,display,overlay] backdrop:transition-discrete backdrop:duration-200 open:backdrop:bg-ink/70 open:backdrop:duration-300 starting:open:backdrop:bg-ink/0",
         "[@media(prefers-reduced-transparency:reduce)]:backdrop:backdrop-blur-none",

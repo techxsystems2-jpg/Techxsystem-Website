@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState, useTransition, type ReactNode } from "react";
+import { createContext, use, useCallback, useEffect, useId, useRef, useState, useTransition, type ReactNode } from "react";
 import { ArrowDown, ArrowUp, Check, ChevronLeft, ChevronRight, Plus, RotateCcw, Trash2, X } from "lucide-react";
 import { resetContent, saveContent } from "@/app/admin/content-actions";
-import { sectionOf, type Field } from "@/lib/content/fields";
+import { sectionOf, type Field, type OptionSource } from "@/lib/content/fields";
 import { ImageField, MultiUpload } from "./ImageField";
 import { PostEditor } from "./PostEditor";
 import { Badge } from "./ui/badge";
@@ -22,12 +22,24 @@ import { cn } from "./ui/utils";
 type V = unknown;
 type Rec = Record<string, unknown>;
 
-export function Editor({ sectionKey, initial }: { sectionKey: string; initial: V }) {
+type Options = { value: string; label: string }[];
+/** Option lists that come from saved content (the Work categories), handed in by the page. */
+const Sources = createContext<Partial<Record<OptionSource, Options>>>({});
+const optionsOf = (f: { options: Options; source?: OptionSource }, live: Partial<Record<OptionSource, Options>>) =>
+  (f.source && live[f.source]?.length ? live[f.source]! : f.options);
+
+export function Editor(props: { sectionKey: string; initial: V; version: string; sources?: Partial<Record<OptionSource, Options>> }) {
+  return <Sources value={props.sources ?? {}}><EditorBody sectionKey={props.sectionKey} initial={props.initial} version={props.version} /></Sources>;
+}
+
+function EditorBody({ sectionKey, initial, version }: { sectionKey: string; initial: V; version: string }) {
   const section = sectionOf(sectionKey)!;
   const [value, setValue] = useState<V>(initial);
   const [saved, setSaved] = useState<V>(initial);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [stale, setStale] = useState(false);
+  const base = useRef(version); // the stored version this tab's copy is based on
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [resetting, startReset] = useTransition();
   const dirty = JSON.stringify(value) !== JSON.stringify(saved);
@@ -47,9 +59,9 @@ export function Editor({ sectionKey, initial }: { sectionKey: string; initial: V
       do {
         again.current = false;
         const snapshot = latest.current;
-        const r = await saveContent(sectionKey, snapshot);
-        if (r.ok) { setSaved(snapshot); setSavedAt(new Date()); setError(null); }
-        else { setError(r.error); break; }
+        const r = await saveContent(sectionKey, snapshot, base.current);
+        if (r.ok) { if (r.version) base.current = r.version; setSaved(snapshot); setSavedAt(new Date()); setError(null); }
+        else { setError(r.error); setStale(!!r.stale); break; }
       } while (again.current);
     } finally {
       running.current = false;
@@ -112,7 +124,7 @@ export function Editor({ sectionKey, initial }: { sectionKey: string; initial: V
             <span className="truncate">{status}</span>
           </span>
           <span className="ml-auto flex items-center gap-2">
-            {error ? <Button size="sm" onClick={() => { setError(null); void saveNow(); }}><Check /> Retry</Button>
+            {error ? (stale ? <Button size="sm" onClick={() => location.reload()}><RotateCcw /> Reload</Button> : <Button size="sm" onClick={() => { setError(null); void saveNow(); }}><Check /> Retry</Button>)
               : <span className="hidden text-xs text-muted-foreground md:inline">Saves automatically · <kbd className="rounded border px-1 font-mono text-[11px]">⌘S</kbd> to save now</span>}
           </span>
         </div>
@@ -121,7 +133,7 @@ export function Editor({ sectionKey, initial }: { sectionKey: string; initial: V
   );
 }
 
-function FieldView({ field, value, onChange, path, top = false }: { field: Field; value: V; onChange: (v: V) => void; path: string; top?: boolean }) {
+function FieldView({ field, value, onChange, path, top = false, compact = false }: { field: Field; value: V; onChange: (v: V) => void; path: string; top?: boolean; compact?: boolean }) {
   switch (field.type) {
     case "text":
       return <Input value={String(value ?? "")} maxLength={field.max} placeholder={field.placeholder} onChange={(e) => onChange(e.target.value)} className={field.big ? "h-12 text-xl font-semibold tracking-tight md:text-2xl" : undefined} />;
@@ -147,7 +159,7 @@ function FieldView({ field, value, onChange, path, top = false }: { field: Field
       const on = Array.isArray(value) ? (value as string[]) : [];
       return (
         <div className="flex flex-wrap gap-1.5">
-          {field.options.map((o) => {
+          {optionsOf(field, use(Sources)).map((o) => {
             const checked = on.includes(o.value);
             return (
               <Button key={o.value} type="button" size="sm" variant={checked ? "default" : "outline"} aria-pressed={checked}
@@ -162,7 +174,7 @@ function FieldView({ field, value, onChange, path, top = false }: { field: Field
     case "select":
       return (
         <NativeSelect value={String(value ?? "")} onChange={(e) => onChange(e.target.value)}>
-          {field.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          {optionsOf(field, use(Sources)).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </NativeSelect>
       );
     case "object": {
@@ -226,6 +238,14 @@ function FieldView({ field, value, onChange, path, top = false }: { field: Field
         flush();
         return out;
       };
+      // photo cards (gallery, team): one column sized by the card, not the screen, and the photo needs no "Photo" label
+      if (compact) return (
+        <div className="grid gap-3">
+          {field.fields.map((f) => f.field.type === "image"
+            ? <FieldView key={f.key} field={f.field} value={obj[f.key]} onChange={(v) => onChange({ ...obj, [f.key]: v })} path={`${path}.${f.key}`} />
+            : one(f, false))}
+        </div>
+      );
       const side = field.fields.filter((f) => f.side);
       if (!side.length) return <div className="grid gap-4">{draw(field.fields, top)}</div>;
       // long items (a post, a service): the content in the main column, its settings in a column beside it
@@ -277,11 +297,14 @@ function ListView({ field, value, onChange, path, top }: { field: Extract<Field,
     return (
       <div className="grid gap-4">
         {removed}
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
           {rows.map((r, i) => (
-            <li key={i} className="flex flex-col gap-3 rounded-xl border bg-card p-3 shadow-xs">
-              <FieldView field={item} value={r} onChange={(v) => set(i, v)} path={path} />
-              {!field.fixed && <RowTools i={i} n={rows.length} move={move} remove={remove} />}
+            <li key={i} className="flex flex-col rounded-xl border bg-card shadow-xs">
+              <div className="flex-1 p-3"><FieldView field={item} value={r} onChange={(v) => set(i, v)} path={path} compact /></div>
+              <div className="flex items-center gap-2 border-t py-1.5 pr-1.5 pl-3">
+                <span className="flex-1 font-mono text-xs text-muted-foreground tabular-nums">{String(i + 1).padStart(2, "0")}</span>
+                {!field.fixed && <RowTools i={i} n={rows.length} move={move} remove={remove} />}
+              </div>
             </li>
           ))}
         </ul>

@@ -6,7 +6,6 @@ import { DEFAULTS, siteFrom, type ContentKey, type ContentMap } from "./types";
    prerendered and fast; the admin's save action calls updateTag(`content:<key>`) and the next request gets the new
    value (lib/content/actions.ts). A missing or broken value falls back to the default, so the site never breaks. */
 
-export { contentKey } from "@/lib/server/content-store";
 
 /** The cache tag of one service or post page. */
 export const itemTag = (key: "services" | "blog", slug: string) => `content:${key}:${slug}`;

@@ -42,9 +42,12 @@ export default async function Blog() {
             {posts.map((p) => (
               <RevealItem as="li" key={p.slug} className="flex">
                 <Link href={`/blog/${p.slug}`} className="group flex w-full flex-col rounded-card bg-surface p-2 shadow-hair transition-[box-shadow,translate,scale] duration-200 hover:-translate-y-0.5 hover:shadow-raised active:scale-[0.99]">
-                  <span className="relative block aspect-[16/10] overflow-hidden rounded-inner bg-sunk outline-1 -outline-offset-1 outline-black/10">
-                    {p.cover && <Image src={p.cover} alt="" fill sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" />}
-                  </span>
+                  {/* a post without a cover photo shows no empty box (2026-11-04) */}
+                  {p.cover && (
+                    <span className="relative block aspect-[16/10] overflow-hidden rounded-inner bg-sunk outline-1 -outline-offset-1 outline-black/10">
+                      <Image src={p.cover} alt="" fill sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+                    </span>
+                  )}
                   <span className="flex flex-1 flex-col px-3 pb-3 pt-4">
                     <span className="font-mono text-[11px] uppercase tracking-[0.04em] text-ink-2">{postDate(p.date)} · {readingMinutes(p.body)} min read</span>
                     <span className="mt-2 text-h4">{p.title}</span>

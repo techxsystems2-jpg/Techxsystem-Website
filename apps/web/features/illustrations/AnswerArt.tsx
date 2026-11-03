@@ -23,10 +23,11 @@ export function useSequence(length: number, ms: readonly number[], play: boolean
   const [step, setStep] = useState(length - 1);
   useEffect(() => {
     if (!play) return;
-    let k = 0;
+    let k = 0, passes = 0;
     let t: ReturnType<typeof setTimeout>;
     const tick = () => {
       setStep(k);
+      if (k === length - 1 && ++passes >= 2) return; // two passes, then rest on the finished frame: looping art must stop (Web Interface Guidelines, 2026-11-04)
       t = setTimeout(tick, ms[k] ?? 900);
       k = (k + 1) % length;
     };

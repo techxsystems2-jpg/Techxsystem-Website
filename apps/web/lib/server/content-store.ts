@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { db } from "./db";
 import { kvDel, kvGet, kvSet, storeKind } from "./kv";
 import { DEFAULTS, type ContentKey, type ContentMap, type Post, type Service } from "@/lib/content/types";
@@ -19,6 +20,9 @@ const missingTable = (e: unknown) => (e as { code?: string })?.code === "42P01";
 
 const json = (v: unknown) => JSON.stringify(v ?? null);
 /** JSON with object keys sorted, so two copies of a record compare equal whatever order their fields were built in. */
+/** Short fingerprint of a stored section: the admin sends back the one it loaded, so a stale tab can't overwrite newer content. */
+export const versionOf = (v: unknown) => createHash("sha256").update(same(v)).digest("base64url").slice(0, 16);
+
 const same = (v: unknown): string => JSON.stringify(v, (_k, x) => (x && typeof x === "object" && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map((k) => [k, (x as Record<string, unknown>)[k]])) : x));
 const parse = <T>(s: string | null | undefined, fallback: T): T => { try { return s ? (JSON.parse(s) as T) : fallback; } catch { return fallback; } };
 

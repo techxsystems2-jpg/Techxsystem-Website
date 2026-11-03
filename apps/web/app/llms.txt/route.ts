@@ -23,6 +23,9 @@ ${services.map((s) => `- [${s.name}](${u(`/services/${s.slug}`)}): ${s.line} ${s
 - [About](${u("/about")}): The studio, its story and the team.
 - [Free trial](${u("/free-trial")}): 10 photos edited free. No card, no contract.
 - [Contact](${u("/contact")}): WhatsApp, email or phone.
+- [Questions](${u("/faq")}): Turnaround, prices, files, revisions and the free trial, answered.
+- [TechX vs AI editors](${u("/techx-vs-ai-editors")}): What a team of editors adds over an AI app, and when an app is enough.
+- [Privacy](${u("/privacy")}): What we collect; Google Analytics used for marketing only.
 
 ${posts.length ? `## Blog\n${posts.map((p) => `- [${p.title}](${u(`/blog/${p.slug}`)}): ${p.excerpt}`).join("\n")}\n\n` : ""}## Contact
 - WhatsApp: ${site.contact.whatsapp}

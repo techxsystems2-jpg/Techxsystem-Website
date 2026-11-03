@@ -4,7 +4,7 @@ Read this file, `DESIGN.md` §1–6, and the files under **Uses**. Nothing else 
 
 - **Figma:** [Work (portfolio), node 29:155](https://www.figma.com/design/WGW3zGaOx1NkmCCPomJTbV?node-id=29-155) (page "03 — Direction B", 2051 × 2963 capture). Figma wins for UI and copy.
 - **Route:** `app/work/page.tsx` composes the sections in this folder.
-- **Uses:** `features/site-shell` (PageHead, FinalCta), `lib/site.ts`.
+- **Uses:** `features/site-shell` (SkyHero, FinalCta), `lib/site.ts`.
 - **Uses also:** `features/before-after` (hover-to-raw tiles), `@techx/ui` Chip + segmented toggle.
 
 ## Copy (Figma 29:155)

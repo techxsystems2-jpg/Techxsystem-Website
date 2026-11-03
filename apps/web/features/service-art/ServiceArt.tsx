@@ -51,10 +51,11 @@ function useSteps(n: number, play: boolean, ms = 1100, hold = 2400) {
   const [k, setK] = useState(n);
   useEffect(() => {
     if (!play) return;
-    let i = 0;
+    let i = 0, passes = 0;
     let t: ReturnType<typeof setTimeout>;
     const tick = () => {
       setK(i);
+      if (i === n && ++passes >= 2) return; // two passes, then rest on the finished frame: looping art must stop (Web Interface Guidelines, 2026-11-04)
       t = setTimeout(tick, i === n ? hold : ms);
       i = i === n ? 0 : i + 1;
     };

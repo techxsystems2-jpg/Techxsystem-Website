@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { safeEqual, seal, unseal } from "./crypto";
 
 /* Admin sign-in for /admin with an email and a password (owner, 2026-11-03: "simple email and password"):
@@ -14,6 +15,8 @@ export const adminConfigured = () => !!adminEmailSetting() && !!process.env.ADMI
 /** The signed-in admin's email, or null. */
 export async function adminEmail(): Promise<string | null> {
   if (!adminConfigured()) return null;
+  // request time only: the session check reads the clock (expiry), which a prefetch prerender must not do
+  await connection();
   const s = unseal<{ e?: string }>((await cookies()).get(ADMIN_COOKIE)?.value, "admin-session");
   return s?.e && s.e === adminEmailSetting() ? s.e : null;
 }

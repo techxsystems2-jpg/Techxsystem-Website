@@ -4,7 +4,7 @@ Read this file, `DESIGN.md` §1–6, and the files under **Uses**. Nothing else 
 
 - **Figma:** [About, node 33:155](https://www.figma.com/design/WGW3zGaOx1NkmCCPomJTbV?node-id=33-155) (page "03 — Direction B", 2051 × 3805 capture). Figma wins for UI and copy.
 - **Route:** `app/about/page.tsx` composes the sections in this folder.
-- **Uses:** `features/site-shell` (PageHead, FinalCta), `lib/site.ts`.
+- **Uses:** `features/site-shell` (SkyHero, FinalCta), `lib/site.ts`.
 - **Content rule:** team, timeline and studio photo are unconfirmed (docs/OPEN_ITEMS.md). Placeholders stay visible.
 
 ## Copy (Figma 33:155)

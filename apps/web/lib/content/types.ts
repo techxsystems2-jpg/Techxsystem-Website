@@ -11,6 +11,7 @@ export type Facts = {
   startingPrice: string;
   trust: { clients: number; rating: number };
   contact: { whatsapp: string; email: string; phone: string; studio: string; hours: string };
+  offices: Office[];
   announcement: { text: string; short: string };
 };
 /** A service and everything its page (/services/<slug>) shows. The six built-in slugs keep their animated cards;
@@ -24,12 +25,17 @@ export type Service = {
   seo: { title: string; description: string };
 };
 export type Quote = { q: string; name: string; from: string };
+/** An office on the Contact page. `country` is a two-letter code (IN, GB, US, AU); `address` and `phones` are lines. */
+export type Office = { label: string; city: string; country: string; address: string[]; phones: string[] };
+export const COUNTRIES = [{ value: "IN", label: "India" }, { value: "GB", label: "United Kingdom" }, { value: "US", label: "United States" }, { value: "AU", label: "Australia" }];
 export type QA = { q: string; a: string };
 export type Faqs = { home: QA[]; pricing: QA[]; contact: QA[]; trial: QA[] };
 export type Milestone = { year: string; title: string; text: string };
 export type Value = { title: string; text: string };
 export type Member = { name: string; role: string; photo: string };
 export type Shot = { src: string; cat: string; label: string };
+/** A Work category (owner, 2026-11-04: categories can be added from the admin). `key` is the short code photos refer to. */
+export type WorkCategory = { key: string; label: string };
 /** Search settings for one page. Empty strings mean "use the page's built-in title / description / share image". */
 export type PageSeo = { title: string; description: string; image: string; noindex: boolean };
 export const SEO_PAGES = [
@@ -65,6 +71,7 @@ export type ContentMap = {
   values: Value[];
   team: Member[];
   work: Shot[];
+  categories: WorkCategory[];
   seo: Seo;
   blog: Post[];
 };
@@ -73,7 +80,7 @@ export type ContentKey = keyof ContentMap;
 const qa = (rows: [string, string][]): QA[] => rows.map(([q, a]) => ({ q, a }));
 
 // per-service extras that used to live in the pages (Figma price-list turnarounds, table tags, menu photos)
-const TURNAROUND: Record<string, string> = { "photo-editing": "12–24 h", "virtual-twilight": "12–24 h", "virtual-staging": "24 h", "drone-editing": "12–24 h", "floor-plans": "24 h", "video-editing": "24–48 h" };
+const TURNAROUND: Record<string, string> = { "photo-editing": "10–16 h", "virtual-twilight": "10–16 h", "virtual-staging": "24 h", "drone-editing": "10–16 h", "floor-plans": "24 h", "video-editing": "24–48 h" };
 const TAG: Record<string, string> = { "photo-editing": "Most ordered", "virtual-staging": "New" };
 const CARD_PHOTO: Record<string, string> = { "photo-editing": "/photos/ext.webp", "virtual-twilight": "/photos/twi.webp", "virtual-staging": "/photos/int.webp", "drone-editing": "/photos/aer.webp", "floor-plans": "/photos/plan.webp", "video-editing": "/photos/ext.webp" };
 
@@ -82,16 +89,18 @@ export const DEFAULTS: ContentMap = {
     startingPrice: siteDefaults.startingPrice,
     trust: { ...siteDefaults.trust },
     contact: { whatsapp: siteDefaults.contact.whatsapp, email: siteDefaults.contact.email, phone: siteDefaults.contact.phone, studio: siteDefaults.contact.studio, hours: siteDefaults.contact.hours },
+    offices: siteDefaults.offices.map((o) => ({ ...o, address: [...o.address], phones: [...o.phones] })),
     announcement: { text: announcement.text, short: announcement.short },
   },
   pricing: {
     plans: [
       { name: "Essential", who: "For everyday listings. Clean, bright and true to life.", price: "$0.50", label: "Essential includes", featured: false,
-        items: ["HDR merging of your brackets", "Lens and perspective correction", "Colour, white balance and exposure", "Noise reduction", "Resizing for your listing", "Back in 12–24 hours", "Free revisions"] },
+        items: ["HDR merging of your brackets", "Lens and perspective correction", "Colour, white balance and exposure", "Noise reduction", "Resizing for your listing", "Back in 10–16 hours", "Free revisions"] },
       { name: "Signature", who: "For listings that need to stand out. Skies, lawns and windows fixed.", price: "$1.00", label: "Everything in Essential, plus", featured: true,
         items: ["Window enhancement", "Sky replacement", "Grass replacement", "Fire in fireplaces", "TV screen fill", "Flash and reflection removal", "A saved style guide"] },
       { name: "Luxury", who: "For high-end homes that need hand-finished detail.", price: "$1.50", label: "Everything in Signature, plus", featured: false,
-        items: ["Hand-masked blends", "Object removal"] },
+        // owner, 2026-11-04: what Luxury includes (the old site has no levels; confirmed by the owner)
+        items: ["Hand-masked blends", "Flash and ambient frames blended by hand", "Object removal", "Cords, wires and small clutter removed", "Colour and white balance matched across the whole set", "Commercial and architectural buildings"] },
     ],
     bulk: ["Volume pricing", "A dedicated editor", "One monthly invoice, delivered photos only", "Photos, twilights, floor plans and video in one order", "Mix levels in one order", "24/7 support"],
   },
@@ -120,7 +129,7 @@ export const DEFAULTS: ContentMap = {
   ],
   faqs: {
     home: qa([
-      ["How fast will I get my photos back?", "Within 12–24 hours. Send them by evening in the US or Australia and they're usually ready by morning."],
+      ["How fast will I get my photos back?", "Within 10–16 hours. Send them by evening in the US or Australia and they're usually ready by morning."],
       ["Do I need to pay before you start?", "No. Your first 10 photos are free. After that you're billed monthly, only for photos we deliver."],
       ["What if I don't like an edit?", "Tell us what to change and we'll redo it free, usually the same day."],
       ["Are your edits MLS-compliant?", "Yes. We never change the property itself, and staged rooms are clearly labelled."],
@@ -162,6 +171,7 @@ export const DEFAULTS: ContentMap = {
     { name: "SM Swaleh", role: "Client relationships", photo: "" },
   ],
   work: portfolio.map((s) => ({ src: s.src, cat: s.cat, label: s.label })),
+  categories: categories.map((c) => ({ key: c.key, label: c.label })),
   seo: Object.fromEntries(SEO_PAGES.map((p) => [p.key, { title: "", description: "", image: "", noindex: false }])) as Seo,
   blog: [], // no invented posts: the blog shows an empty state until the first one is published
 };
@@ -175,6 +185,7 @@ export function siteFrom(f: Facts) {
     ...siteDefaults,
     startingPrice: f.startingPrice,
     trust: f.trust,
+    offices: f.offices,
     contact: { ...f.contact, whatsappUrl: `https://wa.me/${digits(f.contact.whatsapp)}`, phoneUrl: `tel:+${digits(f.contact.phone)}` },
     announcement: { ...announcement, text: f.announcement.text, short: f.announcement.short },
   };

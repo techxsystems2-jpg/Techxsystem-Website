@@ -4,7 +4,7 @@ Read this file, `DESIGN.md` §1–6, and the files under **Uses**. Nothing else 
 
 - **Figma:** [Contact, node 34:155](https://www.figma.com/design/WGW3zGaOx1NkmCCPomJTbV?node-id=34-155) (page "03 — Direction B", 2051 × 2576 capture). Figma wins for UI and copy.
 - **Route:** `app/contact/page.tsx` composes the sections in this folder.
-- **Uses:** `features/site-shell` (PageHead, FinalCta), `lib/site.ts`.
+- **Uses:** `features/site-shell` (SkyHero, FinalCta), `lib/site.ts`.
 - **Content rule:** WhatsApp number to confirm (two numbers in Figma).
 
 ## Copy (transcribed 2026-11-02 from one get_screenshot of Figma node 34:155)
@@ -15,7 +15,7 @@ Read this file, `DESIGN.md` §1–6, and the files under **Uses**. Nothing else 
 - **FAQ:** QUESTIONS · "Before you write" · "Still unsure? Message the studio on WhatsApp. An editor replies." · Chat on WhatsApp · How fast do you reply? ("Usually within the hour on WhatsApp, day or night your time.") · Can I visit the studio? · Do you sign NDAs?
 
 ## Changes from Figma (and why)
-- Studio shows **India** only (owner rule); Figma's town and street are dropped. Line under it: "Editing for photographers in the US, UK and Australia."
+- Studio shows **India** only (owner rule, again 2026-11-03: "only India, not Aligarh"); Figma's town and street are dropped. The full office addresses live in the Offices section (owner, 2026-11-03), from the old site. Line under it: "Editing for photographers in the US, UK and Australia."
 - Figma's drawn map → TechX's own drone edit (`tx-aer.jpg`), with a live "Studio open now / closed" pill.
 - Hours are converted live from 9 AM – 7 PM IST (Intl, so daylight saving is right); **London** added (UK market).
 - Phone shown as **+91 571 297 6655** (Figma: "0571 297 6655") so overseas callers can dial it.

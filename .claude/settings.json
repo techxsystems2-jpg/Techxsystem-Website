@@ -1,4 +1,18 @@
 {
+  "permissions": {
+    "deny": [
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(git reset:*)",
+      "Bash(git clean:*)",
+      "Bash(git rebase:*)",
+      "Bash(git merge:*)",
+      "Bash(git branch -D:*)",
+      "Bash(git branch -d:*)",
+      "Bash(vercel --prod:*)",
+      "Bash(rm -rf .git:*)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {
@@ -13,18 +27,7 @@
       }
     ]
   },
-  "permissions": {
-    "deny": [
-      "Bash(git push:*)",
-      "Bash(git commit:*)",
-      "Bash(git reset:*)",
-      "Bash(git clean:*)",
-      "Bash(git rebase:*)",
-      "Bash(git merge:*)",
-      "Bash(git branch -D:*)",
-      "Bash(git branch -d:*)",
-      "Bash(vercel --prod:*)",
-      "Bash(rm -rf .git:*)"
-    ]
+  "enabledPlugins": {
+    "ponytail@ponytail": true
   }
 }

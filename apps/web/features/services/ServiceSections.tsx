@@ -28,15 +28,16 @@ export function Fixes({ lead, rest, items, note }: { lead: string; rest: string;
 }
 
 /** "Recent work": three of TechX's finished edits in this service's category, with a link to the full gallery. */
-export async function RecentWork({ cats }: { cats: WorkCat[] }) {
-  const shots = shotsFor(cats, 3, toShots(await getContent("work")));
+export async function RecentWork({ cats }: { cats: string[] }) {
+  const [work, all] = await Promise.all([getContent("work"), getContent("categories")]);
+  const shots = shotsFor(cats, 3, toShots(work, all));
   return (
     <section className="wrap pt-24 md:pt-32">
       <SectionHead
         label="Recent work"
         lead="From our studio."
         rest="Finished edits, as they went back to the photographer."
-        side={<Link href="/work" className={buttonClass("secondary")}>See all work <ArrowIcon className="transition-transform duration-200 group-hover:translate-x-0.5" /></Link>}
+        side={<Link href={cats[0] ? `/work?cat=${cats[0]}` : "/work"} className={buttonClass("secondary")}>See all work <ArrowIcon className="transition-transform duration-200 group-hover:translate-x-0.5" /></Link>}
       />
       <RevealGroup as="ul" className="grid gap-3 sm:grid-cols-3">
         {shots.map((s) => (

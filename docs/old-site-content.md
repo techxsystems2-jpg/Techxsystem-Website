@@ -20,6 +20,8 @@ The live site shows ranges, each with the footnote "*Depends upon the Nature & Q
 | Virtual staging | **Not on the live site** | From $8 / room (placeholder, to confirm) |
 | Levels | Not on the live site | Essential from $0.50 · Signature from $1.00 · Luxury from $1.50 (to confirm) |
 
+Luxury includes (owner, 2026-11-04; not on the live site): hand-masked blends; flash and ambient frames blended by hand; object removal; cords, wires and small clutter removed; colour and white balance matched across the whole set; commercial and architectural buildings.
+
 Photo editing includes (live site): free test; lens correction; merging; colour correction; noise reduction; white balance, contrast and exposure; removal of camera flashes and minor reflections; window enhancement; fire in fireplaces and TV screens; sky replacement; grass replacement; perspective (vertical and horizontal) correction; resizing; delivery in up to 12–24 hours.
 
 Virtual twilight includes: adjusting brightness and contrast, highlighting features and lightening shadows; replacing the sky with a dusk sky; turning on interior, exterior, pool and garden lights; adding fire to fireplaces, moons and stars; delivery in up to 12–24 hours.

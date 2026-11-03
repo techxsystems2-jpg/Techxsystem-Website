@@ -55,7 +55,7 @@ same rules as the panel (field limits, address and date clean-up). Code: `app/ap
 3. Run in `apps/web`: `npm run db:setup` (again after any new file in `db/migrations/`). It creates the table (`db/migrations/0001_site_content.sql`) and
    copies anything already saved on this computer (`.data/`) into the database, without overwriting what's there.
    Safe to run again. The site never changes the database schema by itself.
-4. **Vercel Blob** (Vercel → Storage → Blob → connect to the project): sets `BLOB_READ_WRITE_TOKEN`. Photos live in
+4. **Vercel Blob** (Vercel → Storage → Blob → connect to the project): sets `BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN`. Photos live in
    Blob, not in the database. Without it photos can't be uploaded on Vercel.
 5. Redeploy once. The /admin overview shows "Saves: PostgreSQL" when the database is in use, and warns on Vercel if
    saves or photos have nowhere to go.
@@ -117,11 +117,17 @@ doesn't refresh.
 
 - In Vercel → Settings → Environment Variables (Production): `RESEND_API_KEY`, `MAIL_FROM`, `MAIL_TO` (email alerts, see `.env.example`), `ADMIN_EMAIL`, `ADMIN_PASSWORD` (long and unique: 16+
   characters, not used anywhere else), `APP_SECRET` (32+ random characters, different from the one on your computer),
-  `DATABASE_URL`, `BLOB_READ_WRITE_TOKEN`, and the Upstash pair for rate limits. Without Upstash the sign-in limit only
+  `DATABASE_URL`, `BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN`, and the Upstash pair for rate limits. Without Upstash the sign-in limit only
   counts per server instance.
-- `BLOB_READ_WRITE_TOKEN` must be set **before the build**: the image optimiser only accepts photos from that store.
+- `BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN` must be set **before the build**: the image optimiser only accepts photos from that store.
 - Old sign-in cookies stopped working with the 2026-11-03 change; sign in once more.
 - Protect `main` on GitHub (no direct or force pushes), give the database user no DROP/TRUNCATE rights, and keep the
   production database link out of `.env.local`.
 - After deploying, check: `/admin/services` signed out (private window) shows only the sign-in card; response headers
   include `Strict-Transport-Security` and `Content-Security-Policy`.
+
+## Contact list (2026-11-04)
+
+Admin → Inbox → Contact list shows every contact message and free-trial request, newest first (`lib/server/contacts.ts`,
+table `contacts`). Create the table once with `npm run db:setup` in `apps/web`. A message counts as received if it reaches
+any one of: the upload folder, the email alert, or this list.

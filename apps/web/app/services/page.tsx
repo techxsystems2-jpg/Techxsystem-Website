@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const pointers: { text: string; icon: ReactNode }[] = [
   { text: "One order, one invoice", icon: POINT_ICONS.card },
-  { text: "Back in 12–24 hours", icon: POINT_ICONS.clock },
+  { text: "Back in 10–16 hours", icon: POINT_ICONS.clock },
   { text: "Every photo checked twice", icon: POINT_ICONS.shield },
 ];
 

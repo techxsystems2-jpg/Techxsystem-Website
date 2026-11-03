@@ -1,7 +1,9 @@
 /* Phones (phone.tsx): frames, the status bar, the lock screen and
    notification banners. */
 
-@layer stageshow {
+/* Not in a named layer (2026-11-04): a layer's rank depends on which stylesheet names it first, and in the dev
+   server this file could load before the site's CSS, ranking below Tailwind's reset (padding: 0), so phone content
+   slid up under the status bar. Unlayered rules rank the same however the files load. */
   /* Zero specificity for the positioning, so a demo's own class (.xx-phone
      { position: absolute }) wins whichever stylesheet happens to load last */
   :where(.ss-phone) {
@@ -536,4 +538,3 @@
     background: currentColor;
     opacity: 0.5;
   }
-}

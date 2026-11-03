@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { put } from "@vercel/blob";
 
 /* Images uploaded from the admin panel (owner, 2026-11-03).
-   Vercel Blob when BLOB_READ_WRITE_TOKEN is set (production); otherwise apps/web/public/uploads/ (local development
+   Vercel Blob when BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN is set (production); otherwise apps/web/public/uploads/ (local development
    only, git-ignored). The browser shrinks photos to WebP ≤ 2400 px before sending (features/admin/ImageField.tsx),
    so uploads stay well under the 4 MB action limit. Files are checked by their bytes, not their name. */
 
@@ -16,7 +16,11 @@ const kinds = [
   { ext: "png", type: "image/png", test: (b: Uint8Array) => b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47 },
 ] as const;
 
-export const mediaStoreKind = () => (process.env.BLOB_READ_WRITE_TOKEN ? "blob" : "local") as "blob" | "local";
+/** The Blob store's token. The owner saved it as BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN (2026-11-04); the library only
+    looks for BLOB_READ_WRITE_TOKEN by itself, so it is handed over explicitly on every call. */
+export const blobToken = () => process.env.BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN || undefined;
+
+export const mediaStoreKind = () => (blobToken() ? "blob" : "local") as "blob" | "local";
 
 /** Saves an image and returns the URL the site uses for it. Throws a short, user-facing message on bad input. */
 export async function storeImage(file: File, folder: string): Promise<string> {
@@ -27,7 +31,7 @@ export async function storeImage(file: File, folder: string): Promise<string> {
   if (!kind) throw new Error("Use a JPEG, PNG or WebP photo.");
   const name = `${folder.replace(/[^a-z0-9-]/gi, "") || "misc"}/${randomUUID()}.${kind.ext}`;
   if (mediaStoreKind() === "blob") {
-    const blob = await put(`site/${name}`, Buffer.from(bytes), { access: "public", contentType: kind.type, addRandomSuffix: false });
+    const blob = await put(`site/${name}`, Buffer.from(bytes), { access: "public", contentType: kind.type, addRandomSuffix: false, token: blobToken() });
     return blob.url;
   }
   const out = path.join(process.cwd(), "public", "uploads", name);

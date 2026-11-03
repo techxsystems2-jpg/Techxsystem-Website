@@ -96,7 +96,7 @@ export function MessageForm() {
                   <input id="c-name" name="name" value={d.name} onChange={(e) => set("name", e.target.value)} maxLength={TRIAL.limits.name} autoComplete="name" placeholder="Your name" aria-invalid={!!errors.name} aria-describedby={errors.name ? "c-name-error" : undefined} className={inputClass} />
                 </Field>
                 <Field id="c-email" label="Email" error={errors.email}>
-                  <input id="c-email" name="email" type="email" value={d.email} onChange={(e) => set("email", e.target.value.trim())} maxLength={TRIAL.limits.email} autoComplete="email" inputMode="email" placeholder="you@studio.com" aria-invalid={!!errors.email} aria-describedby={errors.email ? "c-email-error" : undefined} className={inputClass} />
+                  <input spellCheck={false} autoCapitalize="none" id="c-email" name="email" type="email" value={d.email} onChange={(e) => set("email", e.target.value.trim())} maxLength={TRIAL.limits.email} autoComplete="email" inputMode="email" placeholder="you@studio.com" aria-invalid={!!errors.email} aria-describedby={errors.email ? "c-email-error" : undefined} className={inputClass} />
                 </Field>
               </div>
               <label htmlFor="c-message" className="mt-4 text-small font-medium">Message</label>

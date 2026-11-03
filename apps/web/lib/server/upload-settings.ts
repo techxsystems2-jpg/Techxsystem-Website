@@ -35,4 +35,5 @@ export async function saveSettings(next: UploadSettings) {
 
 /** Folder and file names safe on Dropbox, Google Drive and disk. */
 export const cleanName = (s: string, max = 80) =>
-  s.normalize("NFKC").replace(/[\\/:*?"<>|\u0000-\u001f]/g, " ").replace(/\s+/g, " ").trim().slice(0, max) || "untitled";
+  // a name of only dots ("." / "..") means a parent folder to Dropbox and disk, so it becomes "untitled" too
+  s.normalize("NFKC").replace(/[\\/:*?"<>|\u0000-\u001f]/g, " ").replace(/\s+/g, " ").trim().slice(0, max).replace(/^\.+$/, "") || "untitled";

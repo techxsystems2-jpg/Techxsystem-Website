@@ -12,7 +12,7 @@ const steps = [
   { t: "Upload the shoot", d: "Upload RAW or JPEG brackets on our site, or paste a Dropbox or Google Drive link. No plugins, no desktop app.", who: "You · 2 minutes" },
   { t: "Tell us once", d: "Leave notes by email or WhatsApp the first time. We turn them into your style guide, and every editor follows it on every job after.", who: "You · once" },
   { t: "Edit, then check", d: "One editor works on your set. A team lead checks every image against your style guide before anything leaves the studio.", who: "TechX · overnight" },
-  { t: "Download and revise", d: "Your photos are ready by morning. Download the set, or ask for a change on any image. Revisions are free and usually back the same day.", who: "You · 12–24 h after upload" },
+  { t: "Download and revise", d: "Your photos are ready by morning. Download the set, or ask for a change on any image. Revisions are free and usually back the same day.", who: "You · 10–16 h after upload" },
 ];
 
 export function StepRows() {

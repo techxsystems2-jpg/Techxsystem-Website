@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
-// The site's own Vercel Blob store, read from its token (vercel_blob_rw_<storeId>_…), so the image optimiser only
+// The site's own Vercel Blob store, read from its token (BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN = vercel_blob_rw_<storeId>_…), so the image optimiser only
 // serves our photos and can't be used for anyone else's Blob images (security audit, 2026-11-03). Without a token
 // there are no Blob photos to show.
-const blobStore = /^vercel_blob_rw_([a-z0-9]+)_/i.exec(process.env.BLOB_READ_WRITE_TOKEN ?? "")?.[1]?.toLowerCase();
+const blobStore = /^vercel_blob_rw_([a-z0-9]+)_/i.exec(process.env.BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN ?? "")?.[1]?.toLowerCase();
 
 // Content-Security-Policy (security audit, 2026-11-03). Every source the browser may load from, and nothing else:
 // - scripts: this site only. 'unsafe-inline' stays because the pages are prerendered and cached; Next.js writes its page

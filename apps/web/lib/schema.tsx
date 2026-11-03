@@ -27,10 +27,14 @@ export const siteSchema = (live: SiteData) => ({
       foundingDate: "2016",
       email: live.contact.email,
       telephone: live.contact.phone,
-      address: { "@type": "PostalAddress", addressCountry: "IN" },
+      // every office from the admin (Site facts → Offices); the first is the head office
+      address: live.offices.length
+        ? live.offices.map((o) => ({ "@type": "PostalAddress", name: `${o.label}, ${o.city}`, streetAddress: o.address.join(", "), addressLocality: o.city, addressCountry: o.country }))
+        : { "@type": "PostalAddress", addressCountry: "IN" },
       areaServed: ["US", "AU", "GB"],
       contactPoint: [
         { "@type": "ContactPoint", contactType: "customer service", email: live.contact.email, telephone: live.contact.phone, availableLanguage: "en" },
+        ...live.offices.flatMap((o) => o.phones.map((p) => ({ "@type": "ContactPoint", contactType: "customer service", telephone: p, areaServed: o.country === "IN" ? undefined : o.country, availableLanguage: "en", name: `${o.label}, ${o.city}` }))),
       ],
     },
     { "@type": "WebSite", "@id": abs("/#website"), url: site.url, name: site.name, inLanguage: "en", publisher: { "@id": ORG_ID } },

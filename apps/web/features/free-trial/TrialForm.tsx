@@ -236,7 +236,7 @@ export function TrialForm() {
               </div>
               <div className="mt-4">
                 <Field id="email" label="Email" error={errors.email} help="We'll send your edited photos here.">
-                  <input id="email" name="email" type="email" value={d.email} onChange={(e) => set("email", e.target.value.trim())} maxLength={TRIAL.limits.email} autoComplete="email" inputMode="email" placeholder="jake@northlight.media" aria-invalid={!!errors.email} aria-describedby={errors.email ? "email-error" : "email-help"} className={input} />
+                  <input spellCheck={false} autoCapitalize="none" id="email" name="email" type="email" value={d.email} onChange={(e) => set("email", e.target.value.trim())} maxLength={TRIAL.limits.email} autoComplete="email" inputMode="email" placeholder="jake@northlight.media" aria-invalid={!!errors.email} aria-describedby={errors.email ? "email-error" : "email-help"} className={input} />
                 </Field>
               </div>
               {/* honeypot: hidden from people, filled in by bots */}
@@ -264,7 +264,7 @@ export function TrialForm() {
                 </label>
                 <div className="mx-auto mt-4 max-w-[380px] text-left">
                   <label htmlFor="link" className="sr-only">Or paste a Dropbox / Drive link</label>
-                  <input id="link" name="link" type="url" value={d.link} onChange={(e) => set("link", e.target.value.trim())} maxLength={TRIAL.limits.link} placeholder="or paste a Dropbox / Drive link" aria-invalid={!!errors.link} aria-describedby={errors.link ? "link-error" : undefined} className={`${input} mt-0 text-center`} />
+                  <input spellCheck={false} autoCapitalize="none" id="link" name="link" type="url" value={d.link} onChange={(e) => set("link", e.target.value.trim())} maxLength={TRIAL.limits.link} placeholder="or paste a Dropbox / Drive link" aria-invalid={!!errors.link} aria-describedby={errors.link ? "link-error" : undefined} className={`${input} mt-0 text-center`} />
                   <Err id="link-error" msg={errors.link} />
                 </div>
               </div>

@@ -4,7 +4,7 @@ Read this file, `DESIGN.md` §1–6, and the files under **Uses**. Nothing else 
 
 - **Figma:** [How it works, node 30:155](https://www.figma.com/design/WGW3zGaOx1NkmCCPomJTbV?node-id=30-155) (page "03 — Direction B", 2051 × 3889 capture). Figma wins for UI and copy.
 - **Route:** `app/how-it-works/page.tsx` composes the sections in this folder.
-- **Uses:** `features/site-shell` (PageHead, FinalCta), `lib/site.ts`.
+- **Uses:** `features/site-shell` (SkyHero, FinalCta), `lib/site.ts`.
 - **Uses also:** `features/illustrations` (upload list, style guide, QC checklist, download gallery vignettes).
 
 ## Copy (Figma 30:155)

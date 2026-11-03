@@ -42,7 +42,11 @@ export async function SiteFooter() {
               Pixel Caption<span className="sr-only"> (opens in a new tab)</span>
             </a>
           </span>
-          <span>Privacy · Terms · Refunds</span>
+          <nav aria-label="Legal" className="flex gap-4">
+            {[["/privacy", "Privacy"], ["/terms", "Terms"], ["/refunds", "Refunds"]].map(([href, label]) => (
+              <Link key={href} href={href!} className="text-ink-2 underline-offset-4 transition-colors duration-150 hover:text-ink hover:underline">{label}</Link>
+            ))}
+          </nav>
         </div>
       </div>
     </footer>

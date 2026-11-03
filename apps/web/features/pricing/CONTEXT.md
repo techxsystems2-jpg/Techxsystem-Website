@@ -4,7 +4,7 @@ Read this file, `DESIGN.md` §1–6, and the files under **Uses**. Nothing else 
 
 - **Figma:** [Pricing, node 31:155](https://www.figma.com/design/WGW3zGaOx1NkmCCPomJTbV?node-id=31-155) (page "03 — Direction B", 2051 × 5064 capture). Figma wins for UI and copy.
 - **Route:** `app/pricing/page.tsx` composes the sections in this folder.
-- **Uses:** `features/site-shell` (PageHead, FinalCta), `lib/site.ts`.
+- **Uses:** `features/site-shell` (SkyHero, FinalCta), `lib/site.ts`.
 - **Rates:** levels and notes are already verified in `features/home/CONTEXT.md` §7. Starting price is "from $0.50" (owner, 2026-10-30), always phrased as a starting price.
 - **Calculator:** listings, photos, level, twilights → monthly total, tabular figures (Motion `animate` on the number).
 

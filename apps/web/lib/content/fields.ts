@@ -1,4 +1,4 @@
-import { DEFAULTS, SEO_PAGES, WORK_CATEGORIES, type ContentKey } from "./types";
+import { COUNTRIES, DEFAULTS, SEO_PAGES, WORK_CATEGORIES, type ContentKey } from "./types";
 
 /* What the admin panel shows for each content key, and the rules a save must pass. One description drives both the
    form (features/admin/Editor.tsx) and the server-side clean-up (`coerce`, run by the save action), so the panel can
@@ -11,12 +11,16 @@ export type Field =
   | { type: "toggle" }
   | { type: "lines"; max?: number; help?: string } // one entry per line → string[]
   | { type: "image" }
-  | { type: "select"; options: { value: string; label: string }[] }
-  | { type: "multi"; options: { value: string; label: string }[] } // tick any number → string[]
+  | { type: "select"; options: { value: string; label: string }[]; source?: OptionSource }
+  | { type: "multi"; options: { value: string; label: string }[]; source?: OptionSource } // tick any number → string[]
   | { type: "object"; fields: { key: string; label: string; help?: string; field: Field; side?: boolean }[]; fold?: boolean } // side: settings column beside the main form; fold: its groups open one at a time
   | { type: "list"; item: Field; fixed?: boolean; max?: number; title?: (row: Record<string, unknown>, i: number) => string; add?: string;
       /** long items (posts, services): a list of rows, each opening on its own screen; the value names one ("post") */
       detail?: string; meta?: (row: Record<string, unknown>) => string };
+
+/** Options that come from saved content instead of the code (e.g. the Work categories the owner adds in the admin). */
+export type OptionSource = "categories";
+const CODE = /^[a-z0-9][a-z0-9-]{0,39}$/;
 
 const t = (max = 160, placeholder?: string): Field => ({ type: "text", max, placeholder });
 const ta = (max = 1200, rows = 3): Field => ({ type: "textarea", max, rows });
@@ -42,6 +46,13 @@ export const SECTIONS: Section[] = [
         { key: "studio", label: "Studio location (as shown)", field: t(60) },
         { key: "hours", label: "Studio hours", field: t(60) },
       ] } },
+      { key: "offices", label: "Offices (Contact page)", field: { type: "list", max: 6, add: "Add an office", title: (r) => String(r.city || "New office"), meta: (r) => String(r.label || ""), item: { type: "object", fields: [
+        { key: "label", label: "Label", help: "e.g. Head office, Branch office.", field: t(40) },
+        { key: "city", label: "City", field: t(40) },
+        { key: "country", label: "Country", field: { type: "select", options: COUNTRIES } },
+        { key: "address", label: "Address", field: { type: "lines", max: 4, help: "One line per line of the address." } },
+        { key: "phones", label: "Phone numbers", field: { type: "lines", max: 4, help: "International form, one per line, e.g. +91 571 297 6655." } },
+      ] } } },
       { key: "announcement", label: "Announcement bar", field: { type: "object", fields: [
         { key: "text", label: "Text (desktop)", field: t(120) },
         { key: "short", label: "Short text (phones)", field: t(40) },
@@ -73,7 +84,7 @@ export const SECTIONS: Section[] = [
       { key: "slug", label: "Page address", help: "The part after /services/. Leave empty for a new service and it's made from the name. Changing it breaks old links.", side: true, field: t(40) },
       { key: "line", label: "One line (cards)", field: ta(160, 2) },
       { key: "from", label: "Starting price", help: "e.g. From $1.00 / image", side: true, field: t(30) },
-      { key: "turnaround", label: "Turnaround", help: "e.g. 12–24 h", side: true, field: t(20) },
+      { key: "turnaround", label: "Turnaround", help: "e.g. 10–16 h", side: true, field: t(20) },
       { key: "tag", label: "Tag in the price list (optional)", help: "e.g. New, Most ordered", side: true, field: t(20) },
       { key: "image", label: "Photo (cards and menu)", side: true, field: { type: "image" } },
       { key: "hero", label: "Page header", field: { type: "object", fields: [
@@ -90,7 +101,7 @@ export const SECTIONS: Section[] = [
         ] } } },
       ] } },
       { key: "levels", label: "Show the editing levels on this page", side: true, field: { type: "toggle" } },
-      { key: "work", label: "Recent work from these categories", field: { type: "multi", options: WORK_CATEGORIES.map((c) => ({ value: c.key, label: c.label })) } },
+      { key: "work", label: "Recent work from these categories", field: { type: "multi", source: "categories", options: WORK_CATEGORIES.map((c) => ({ value: c.key, label: c.label })) } },
       { key: "faqs", label: "Questions", field: qaList() },
       { key: "note", label: "Note under \"What's included\" (optional)", field: t(120) },
       { key: "seo", label: "Search (Google) for this page", side: true, field: { type: "object", fields: [
@@ -149,8 +160,16 @@ export const SECTIONS: Section[] = [
     blurb: "The photos on the Work page, in order. Each needs a category; the service pages show the first ones of theirs.",
     field: { type: "list", max: 400, add: "Add photos", title: (r) => String(r.label || r.cat), item: { type: "object", fields: [
       { key: "src", label: "Photo", field: { type: "image" } },
-      { key: "cat", label: "Category", field: { type: "select", options: WORK_CATEGORIES.map((c) => ({ value: c.key, label: c.label })) } },
+      { key: "cat", label: "Category", field: { type: "select", source: "categories", options: WORK_CATEGORIES.map((c) => ({ value: c.key, label: c.label })) } },
       { key: "label", label: "Label (optional)", field: t(40) },
+    ] } },
+  },
+  {
+    key: "categories", title: "Work categories", pages: ["Work", "Service pages"],
+    blurb: "The categories photos are sorted into (Interior, Drone and so on). Add one for a new service, and it appears in the photo menus, on the Work page filters and in each service's recent work.",
+    field: { type: "list", max: 30, add: "Add a category", title: (r) => String(r.label || "New category"), meta: (r) => (r.key ? `Code: ${r.key}` : "Code made from the name"), item: { type: "object", fields: [
+      { key: "label", label: "Name", help: "As shown on the Work page, e.g. Commercial.", field: t(30) },
+      { key: "key", label: "Code", help: "Short code photos use. Left empty, it's made from the name. Don't change it once photos use it.", field: t(40) },
     ] } },
   },
   {
@@ -217,10 +236,13 @@ export function coerce(field: Field, input: unknown, fallback: unknown): unknown
     }
     case "multi": {
       const arr = Array.isArray(input) ? input.map(String) : Array.isArray(fallback) ? (fallback as string[]) : [];
+      // saved-content options (categories) can be any well-formed code; the rest must be one of the listed options
+      if (field.source) return [...new Set(arr.filter((v) => CODE.test(v)))];
       return field.options.map((o) => o.value).filter((v) => arr.includes(v));
     }
     case "select": {
       const s = String(input ?? "");
+      if (field.source) return CODE.test(s) ? s : (fallback ?? field.options[0]?.value ?? "");
       return field.options.some((o) => o.value === s) ? s : (fallback ?? field.options[0]?.value ?? "");
     }
     case "object": {
@@ -240,6 +262,3 @@ export function coerce(field: Field, input: unknown, fallback: unknown): unknown
     }
   }
 }
-
-/** Default for a key, for "reset to the original". */
-export const defaultOf = (key: ContentKey) => DEFAULTS[key];

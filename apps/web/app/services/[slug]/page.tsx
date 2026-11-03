@@ -65,7 +65,7 @@ async function ServiceBody({ params }: Props) {
         </div>
       )}
 
-      {s.work.length > 0 && <RecentWork cats={s.work as WorkCat[]} />}
+      {s.work.length > 0 && <RecentWork cats={s.work} />}
       {s.faqs.length > 0 && <Faq title={`About ${s.short.toLowerCase()}`} lede="Still unsure? Message the studio on WhatsApp. An editor replies." faqs={s.faqs} />}
       <FinalCta lead="Try it on your own photos." rest="Ten images, free, back by morning." />
     </>

@@ -12,7 +12,6 @@ Read this file and `DESIGN.md` §1–6. Nothing else is needed.
 | `StickyTrialBar.tsx` | Mobile only: "10 photos free · no card" + Start trial, after the hero scrolls away | yes |
 | `FinalCta.tsx` | Label "Free trial" · "You capture the media." / muted "Send us ten photos and we'll do the rest." · "No card · No contract · Back by morning" · Start free trial + Chat on WhatsApp · WhatsApp / Email / Studio strip. Pages pass their own `lead` / `rest` | no |
 | `SiteFooter.tsx` | Logo + "Real estate photo editing, by people, since 2016. Studio in India." · Services · Company · Resources · Start · bottom row: © · "Designed & developed by Pixel Caption" (pixelcaption.com) · legal · "© 2026 TechX Systems" · Privacy · Terms · Refunds | no |
-| `PageHead.tsx` | Inner-page header: mono label, two-tone H1, lede | no |
 | `Logo.tsx` | Mark + "TechX Systems" (Figma footer stacks the mark above the wordmark) | no |
 
 Rules: every page ends with `FinalCta` (information map rule 1). Pricing, Contact and Start free trial stay one click away at every width.

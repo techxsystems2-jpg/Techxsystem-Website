@@ -8,7 +8,8 @@ export type Limit = { ok: boolean; remaining: number; retryAfter: number };
 
 const memory = new Map<string, { count: number; reset: number }>();
 
-const redis = () => {
+/** Upstash Redis REST settings, or null when not configured (also used by the content store, kv.ts). */
+export const redis = () => {
   const url = process.env.UPSTASH_REDIS_REST_URL, token = process.env.UPSTASH_REDIS_REST_TOKEN;
   return url && token ? { url, token } : null;
 };

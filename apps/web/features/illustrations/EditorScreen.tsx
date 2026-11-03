@@ -32,12 +32,13 @@ export function useEditSteps(play: boolean, loop: boolean) {
   const [k, setK] = useState(S);
   useEffect(() => {
     if (!play) return;
-    let i = 0;
+    let i = 0, passes = 0;
     let t: ReturnType<typeof setTimeout>;
     const tick = () => {
       setK(i);
       if (i === S) {
-        if (loop) t = setTimeout(() => { i = 0; tick(); }, HOLD_MS);
+        // two passes, then rest on the finished frame: looping art must stop (Web Interface Guidelines, 2026-11-04)
+        if (loop && ++passes < 2) t = setTimeout(() => { i = 0; tick(); }, HOLD_MS);
         return;
       }
       i += 1;

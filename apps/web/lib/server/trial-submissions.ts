@@ -1,6 +1,7 @@
 import { validateDetails, validateFiles, type FieldErrors, type TrialDetails, type TrialFile } from "@/lib/trial";
 import { after } from "next/server";
 import { sendAlert } from "./email";
+import { addContact } from "./contacts";
 import { randomId, seal, unseal } from "./crypto";
 import { openStore } from "./destinations";
 import { cleanName, type Destination } from "./upload-settings";
@@ -56,7 +57,8 @@ export async function startSubmission(d: TrialDetails, rawFiles: TrialFile[], or
   const label = `${new Date().toISOString().slice(0, 10)} ${d.name}${d.studio ? ` (${d.studio})` : ""} ${randomId(2)}`;
   const ref = await store.folder(label);
   await store.writeText(ref, "Trial details.txt", detailsText(d, files));
-  // studio alert by email, sent after the response so the visitor never waits on it (lib/server/email.ts)
+  // the admin's contact list, then the studio alert by email; both after the response so the visitor never waits
+  after(() => addContact({ kind: "trial", name: d.name, email: d.email, studio: d.studio, volume: d.volume, message: d.notes, link: d.link, files: files.length, folder: label }));
   after(() => sendAlert({
     kind: "trial", subject: `Free trial: ${d.name}${d.studio ? ` (${d.studio})` : ""}, ${files.length} file${files.length === 1 ? "" : "s"}`,
     replyTo: d.email, body: d.notes || undefined,

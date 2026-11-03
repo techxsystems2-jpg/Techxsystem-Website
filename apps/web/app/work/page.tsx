@@ -23,7 +23,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Work() {
-  const portfolio = toShots(await getContent("work"));
+  const [work, cats] = await Promise.all([getContent("work"), getContent("categories")]);
+  const portfolio = toShots(work, cats);
   return (
     <>
       <SkyHero
@@ -40,7 +41,7 @@ export default async function Work() {
 
       <section className="wrap mt-14">
         <Reveal>
-          <Gallery items={portfolio} />
+          <Gallery items={portfolio} cats={cats} />
         </Reveal>
         {/* placeholder, visibly marked until TechX sends raw files (docs/OPEN_ITEMS.md) */}
         <p className="mx-auto mt-8 max-w-[560px] text-center font-mono text-[12px] uppercase tracking-[0.04em] text-ink-2">

@@ -31,7 +31,7 @@ const steps = [
   { n: "01", t: "Upload the shoot", d: "Drag RAW or JPEG brackets into the portal, or paste a Dropbox or Drive link.", who: "You · 2 minutes" },
   { n: "02", t: "Tell us once", d: "Tell us how you like your photos once. It becomes a style guide every editor on your account follows.", who: "You · once" },
   { n: "03", t: "Edit, then check", d: "One editor works your set start to finish. A team lead checks every image before delivery.", who: "TechX · overnight" },
-  { n: "04", t: "Download and revise", d: "Ready by morning. Ask for changes on any image, free.", who: "You · 12–24 h later" },
+  { n: "04", t: "Download and revise", d: "Ready by morning. Ask for changes on any image, free.", who: "You · 10–16 h later" },
 ];
 
 

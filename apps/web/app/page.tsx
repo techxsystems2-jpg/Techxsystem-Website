@@ -5,6 +5,7 @@ import { Hero } from "@/features/home/Hero";
 import { HowItWorks } from "@/features/home/HowItWorks";
 import { LogoStrip } from "@/features/home/LogoStrip";
 import { Pricing } from "@/features/home/Pricing";
+import { WorkBand } from "@/features/home/WorkBand";
 import { ServicesGrid } from "@/features/home/ServicesGrid";
 import { Testimonials } from "@/features/home/Testimonials";
 import { FinalCta } from "@/features/site-shell/FinalCta";
@@ -31,6 +32,7 @@ export default async function Home() {
       <LogoStrip />
       <Answers />
       <ServicesGrid />
+      <WorkBand />
       <HowItWorks />
       <Pricing />
       <Compare />

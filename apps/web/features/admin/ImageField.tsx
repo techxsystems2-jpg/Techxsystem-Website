@@ -44,7 +44,7 @@ export function ImageField({ value, onChange, folder }: { value: string; onChang
     setBusy(false);
   };
   return (
-    <div className="grid max-w-[360px] gap-2">
+    <div className="grid w-full max-w-[360px] gap-2">
       <div className="relative aspect-[4/3] overflow-hidden rounded-lg border bg-muted">
         {/* eslint-disable-next-line @next/next/no-img-element -- admin preview of an arbitrary uploaded URL */}
         {value ? <img src={value} alt="" className="size-full object-cover" /> : <button type="button" onClick={() => ref.current?.click()} className="grid size-full place-items-center content-center gap-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"><ImagePlus className="size-5" />Upload a photo</button>}

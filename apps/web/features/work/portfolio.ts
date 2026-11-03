@@ -13,7 +13,7 @@ export const categories: { key: WorkCat; label: string; count: number }[] = [
   { key: "plan", label: "Floor plan", count: 3 },
 ];
 
-export type Shot = { src: string; cat: WorkCat; label: string; square: boolean };
+export type Shot = { src: string; cat: string; label: string; square: boolean };
 
 const shotsOf = (c: (typeof categories)[number]): Shot[] =>
   Array.from({ length: c.count }, (_, i) => ({ src: `/photos/work/${c.key}-${i + 1}.webp`, cat: c.key, label: c.label, square: c.key === "plan" }));
@@ -28,17 +28,20 @@ export const portfolio: Shot[] = (() => {
   return out;
 })();
 
-/** The gallery as stored by the admin (lib/content, key "work": src, category, label) → display shots. */
-export function toShots(items: { src: string; cat: string; label: string }[]): Shot[] {
-  return items.map((s) => ({ src: s.src, cat: s.cat as WorkCat, label: s.label || (categories.find((c) => c.key === s.cat)?.label ?? ""), square: s.cat === "plan" }));
+type Cat = { key: string; label: string };
+
+/** The gallery as stored by the admin (lib/content, key "work": src, category, label) → display shots. The label falls
+    back to the category's name from the admin's category list (lib/content key "categories"). */
+export function toShots(items: { src: string; cat: string; label: string }[], cats: Cat[] = categories): Shot[] {
+  return items.map((s) => ({ src: s.src, cat: s.cat, label: s.label || (cats.find((c) => c.key === s.cat)?.label ?? ""), square: s.cat === "plan" }));
 }
 
 /** Category chips with live counts (categories with no photos are left out). */
-export const countsOf = (shots: Shot[]) => categories.map((c) => ({ ...c, count: shots.filter((s) => s.cat === c.key).length })).filter((c) => c.count > 0);
+export const countsOf = (shots: Shot[], cats: Cat[] = categories) => cats.map((c) => ({ ...c, count: shots.filter((s) => s.cat === c.key).length })).filter((c) => c.count > 0);
 
 /** The first few shots of the given categories, alternating between them (service pages' "Recent work"). */
-export function shotsFor(cats: WorkCat[], n = 3, from: Shot[] = portfolio): Shot[] {
-  const per = Object.fromEntries(cats.map((c) => [c, from.filter((s) => s.cat === c)])) as Record<WorkCat, Shot[]>;
+export function shotsFor(cats: string[], n = 3, from: Shot[] = portfolio): Shot[] {
+  const per = Object.fromEntries(cats.map((c) => [c, from.filter((s) => s.cat === c)])) as Record<string, Shot[]>;
   const out: Shot[] = [];
   for (let i = 0; out.length < n && i < 40; i++) for (const c of cats) { const s = per[c][i]; if (s && out.length < n) out.push(s); }
   return out;

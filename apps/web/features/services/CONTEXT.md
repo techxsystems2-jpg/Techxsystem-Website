@@ -4,7 +4,7 @@ Read this file, `DESIGN.md` §1–6, and the files under **Uses**. Nothing else 
 
 - **Figma:** [Services (template for all six), node 28:155](https://www.figma.com/design/WGW3zGaOx1NkmCCPomJTbV?node-id=28-155) (page "03 — Direction B", 2051 × 4570 capture). Figma wins for UI and copy.
 - **Route:** `app/services/page.tsx` composes the sections in this folder.
-- **Uses:** `features/site-shell` (PageHead, FinalCta), `lib/site.ts`.
+- **Uses:** `features/site-shell` (SkyHero, FinalCta), `lib/site.ts`.
 - **Template:** one page design reused for every slug in `lib/site.ts` `services` (copy, fixes and prices swap per service). Only Photo editing & HDR is designed.
 - **Uses also:** `features/before-after`.
 

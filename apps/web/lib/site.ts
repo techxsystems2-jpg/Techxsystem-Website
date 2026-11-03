@@ -9,9 +9,9 @@ export const site = {
   tagline: "You capture the media. We do the rest.",
   startingPrice: "$0.50",
   description:
-    "Real estate photo editing by hand. Send your brackets after the shoot and get listing-ready photos by morning, US time, checked by a second editor. From $0.50 an image. Try 10 photos free.",
+    "Real estate post production by people, not presets. Upload after the shoot and it's ready by morning, US time, from $0.50 an image. Ten photos free.",
   // Hero trust badge (owner, 2026-10-30). Both figures to confirm with TechX before launch (docs/OPEN_ITEMS.md).
-  trust: { clients: 500, rating: 4.9 },
+  trust: { clients: 120, rating: 4.9 }, // owner, 2026-11-04: 120+ clients
   contact: {
     // Figma shows two WhatsApp numbers (final CTA: 74176 20537, Home answer card: 96530 59304). Confirm which one.
     whatsapp: "+91 74176 20537",
@@ -24,6 +24,13 @@ export const site = {
     studio: "India",
     hours: "9 AM – 7 PM IST", // confirm
   },
+  // Offices and their numbers, from TechX's current site (docs/old-site-content.md; owner, 2026-11-03: show them on
+  // Contact). Phones in international form so callers abroad can dial them as written.
+  offices: [
+    { label: "Head office", city: "Aligarh", country: "IN", address: ["Street No. 1, Dhaurra", "Aligarh, Uttar Pradesh 202002"], phones: ["+91 571 297 6655", "+91 74176 20537"] },
+    { label: "Branch office", city: "New Delhi", country: "IN", address: ["G-35, 3rd Floor, Abul Fazal Enclave 2", "Shaheen Bagh, Okhla, New Delhi 110025"], phones: ["+91 96530 59304", "+91 89239 90537"] },
+    { label: "London office", city: "London", country: "GB", address: ["118 Pall Mall, St James's", "London SW1Y 5EA"], phones: ["+44 7838 388450"] },
+  ],
 };
 
 /** Announcement bar above the header (owner, 2026-10-31). Built from verified copy: the free-trial offer
@@ -58,6 +65,6 @@ export const services = [
 export const footer: { title: string; links: { label: string; href?: string }[] }[] = [
   { title: "Services", links: services.map((s) => ({ href: `/services/${s.slug}`, label: s.short })) },
   { title: "Company", links: [{ href: "/about", label: "About" }, { href: "/work", label: "Work" }, { href: "/pricing", label: "Pricing" }, { href: "/about#reviews", label: "Reviews" }] },
-  { title: "Resources", links: [{ href: "/blog", label: "Blog" }, { label: "FAQ" }, { label: "TechX vs AI editors" }, { label: "Shoot guides" }] },
-  { title: "Start", links: [{ href: "/free-trial", label: "Free trial" }, { label: "Client login" }, { href: "/contact", label: "Contact" }] },
+  { title: "Resources", links: [{ href: "/blog", label: "Blog" }, { href: "/faq", label: "FAQ" }, { href: "/techx-vs-ai-editors", label: "TechX vs AI editors" }, { href: "/shoot-guides", label: "Shoot guides" }] },
+  { title: "Start", links: [{ href: "/free-trial", label: "Free trial" }, { href: "/client-login", label: "Client login" }, { href: "/contact", label: "Contact" }] },
 ];

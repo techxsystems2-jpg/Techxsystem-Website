@@ -1,5 +1,6 @@
 import { after, type NextRequest } from "next/server";
 import { sendAlert, type Alert } from "@/lib/server/email";
+import { addContact } from "@/lib/server/contacts";
 import { randomId } from "@/lib/server/crypto";
 import { NotReady, openStore } from "@/lib/server/destinations";
 import { rateLimitAll, tooMany } from "@/lib/server/rate-limit";
@@ -9,8 +10,9 @@ import { validateContact } from "@/lib/trial";
 /* "Send a message" on /contact. Saves the message as a text file in the admin's chosen Dropbox / Google Drive,
    under "<top folder>/Contact messages/<date> <name>/message.txt", so it sits next to the trials.
    Same guards as the trial: same-origin, small JSON body, honeypot, rate limits, shared validation.
-   The studio also gets an email alert (lib/server/email.ts, credit-capped). If storage is down the email alone counts;
-   only when neither works does it answer 503 "not_ready", and the form falls back to the visitor's mail app. */
+   It's also recorded in the admin's contact list (lib/server/contacts.ts), and the studio gets an email alert
+   (lib/server/email.ts, credit-capped). Any one of the three counts as received; only when none works does it answer
+   503 "not_ready", and the form falls back to the visitor's mail app. */
 export async function POST(req: NextRequest) {
   if (!sameOrigin(req)) return fail("Forbidden", 403, "forbidden");
   const ip = clientIp(req);
@@ -29,14 +31,17 @@ export async function POST(req: NextRequest) {
     if (limited) return tooMany(limited, "messages");
 
     const alert: Alert = { kind: "contact", subject: `Website message from ${d.name}`, replyTo: d.email, body: d.message, lines: [["Name", d.name], ["Email", d.email]] };
+    // the admin's contact list (/admin/contacts) also keeps the message, so it counts as received on its own
+    const recorded = await addContact({ kind: "contact", name: d.name, email: d.email, message: d.message });
     try {
       const store = await openStore();
       const ref = await store.folder(`${new Date().toISOString().slice(0, 10)} ${d.name} ${randomId(2)}`, "Contact messages");
       await store.writeText(ref, "message.txt", [`From: ${d.name} <${d.email}>`, `Received: ${new Date().toISOString()}`, "", d.message, ""].join("\n"));
     } catch (e) {
-      if (!(e instanceof NotReady)) throw e;
-      if ((await sendAlert(alert)).sent) return Response.json({ ok: true }); // saved nowhere else, so wait for the email
-      throw e;
+      if (!(e instanceof NotReady) && !recorded) throw e;
+      if (!recorded && !(await sendAlert(alert)).sent) throw e; // saved nowhere else, so wait for the email
+      if (!recorded) return Response.json({ ok: true });
+      console.error("[contact] folder not saved; the message is in the contact list", e);
     }
     after(() => sendAlert(alert)); // saved; the alert goes out after the response
     return Response.json({ ok: true });

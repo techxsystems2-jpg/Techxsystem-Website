@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "db:setup": "node scripts/db-setup.mjs"
+    "db:setup": "node scripts/db-setup.mjs",
+    "test": "node --test tests/"
   },
   "dependencies": {
     "@number-flow/react": "^0.6.2",

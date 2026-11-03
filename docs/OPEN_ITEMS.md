@@ -51,7 +51,7 @@
 ## Raised during the build (2026-10-30)
 
 - [x] **Starting price** (settled 2026-11-02: Essential from $0.50, every price "From"): the owner set "from $0.50 an image" (always a starting price). Figma levels are Essential $0.70, Signature $1.00, Luxury $1.50. Reconcile.
-- [ ] **Turnaround:** Figma says "10–16 hours" (hero), "12 hours" (answer card), "12–24 hours" (steps, FAQ).
+- [x] **Turnaround:** settled 2026-11-04 (owner): photo edits **10–16 hours** everywhere. Was: Figma says "10–16 hours" (hero), "12 hours" (answer card), "12–24 hours" (steps, FAQ).
 - [ ] **WhatsApp number:** +91 74176 20537 (final CTA) vs +91 96530 59304 (Home answer card).
 - [x] **Drone & aerial** now "From $0.50 / image" (2026-11-02); was "From $0.70" in Figma; confirm against the $0.50 starting price.
 - [ ] **Hero trust badge:** "Serving 500+ clients" and "4.9 rating" are the owner's figures (2026-10-30). Confirm both with TechX before launch, and know where the 4.9 comes from in case a client asks (`lib/site.ts` → `site.trust`).

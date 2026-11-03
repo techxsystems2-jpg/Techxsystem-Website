@@ -48,6 +48,14 @@ export async function gdriveCreateFolder(access: string, name: string, parent?: 
   return f.id;
 }
 
+/** The folder with this name inside `parent`, made only if it isn't there yet (Drive allows duplicate names, so a
+    plain create made a new "Contact messages" folder for every message; audit, 2026-11-04). */
+export async function gdriveFolderIn(access: string, name: string, parent: string) {
+  const q = `'${parent}' in parents and name = '${name.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}' and mimeType = '${FOLDER}' and trashed = false`;
+  const found = await api<{ files: { id: string }[] }>(access, `https://www.googleapis.com/drive/v3/files?fields=files(id)&pageSize=1&q=${encodeURIComponent(q)}`);
+  return found.files[0]?.id ?? gdriveCreateFolder(access, name, parent);
+}
+
 /** True while the folder still exists and isn't in the bin (the admin may have deleted it). */
 export async function gdriveFolderAlive(access: string, id: string) {
   try {
