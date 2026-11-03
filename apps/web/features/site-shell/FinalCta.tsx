@@ -4,17 +4,14 @@ import { Eyebrow } from "@techx/ui/Eyebrow";
 import { ArrowIcon, WhatsAppIcon } from "@techx/ui/Icons";
 import { Reveal } from "@/features/motion/Reveal";
 import { ScrollFill } from "@/features/motion/ScrollFill";
-import { site } from "@/lib/site";
-import { CtaFx } from "./CtaFx";
+import { getSite } from "@/lib/content";
 
 /** Every page ends with the free-trial call to action and the contact strip (information map rule 1). */
-export function FinalCta({ lead = "You capture the media.", rest = "Send us ten photos and we'll do the rest." }: { lead?: string; rest?: string }) {
-  const { contact } = site;
+export async function FinalCta({ lead = "You capture the media.", rest = "Send us ten photos and we'll do the rest." }: { lead?: string; rest?: string }) {
+  const { contact } = await getSite();
   return (
     <section className="wrap mt-24 md:mt-34">
-      {/* cta-panel: on the White background it gets the hero's sky gradient so the last call to action stands out (globals.css) */}
-      <Reveal className="cta-panel relative overflow-hidden rounded-panel bg-surface px-6 py-16 text-center shadow-hair md:py-24">
-        <CtaFx />
+      <Reveal className="relative overflow-hidden rounded-panel bg-surface px-6 py-16 text-center shadow-hair md:py-24">
         <div aria-hidden="true" className="absolute inset-x-[10%] -bottom-[60%] h-[420px] bg-[radial-gradient(50%_50%_at_35%_50%,rgb(48_116_254/0.16),transparent_70%),radial-gradient(45%_50%_at_68%_50%,rgb(142_31_63/0.12),transparent_70%)] blur-[10px]" />
         <div className="relative">
           <Eyebrow>Free trial</Eyebrow>
@@ -30,23 +27,23 @@ export function FinalCta({ lead = "You capture the media.", rest = "Send us ten 
               WhatsApp and Email are links. Envelope is the Pikaicons envelope used on the overnight timeline;
               the pin is drawn in the same outline style (DESIGN.md §7). */}
           {/* phones: one left-aligned column so the icons line up; wider: a centred row */}
-          <dl className="mx-auto mt-12 grid w-fit gap-y-5 text-left sm:flex sm:w-auto sm:max-w-[920px] sm:flex-wrap sm:justify-center sm:gap-x-12 md:gap-x-16">
+          <ul className="mx-auto mt-12 grid w-fit gap-y-5 text-left sm:flex sm:w-auto sm:max-w-[920px] sm:flex-wrap sm:justify-center sm:gap-x-12 md:gap-x-16">
             {[
               { k: "WhatsApp", v: contact.whatsapp, href: contact.whatsappUrl, icon: <WhatsAppIcon size={18} className="text-[#25D366]" /> },
               { k: "Email", v: contact.email, href: `mailto:${contact.email}`, icon: <Glyph d={ENVELOPE} /> },
               { k: "Studio", v: `${contact.studio} · ${contact.hours}`, icon: <Glyph d={PIN} /> },
             ].map(({ k, v, href, icon }) => (
-              <div key={k} className="flex items-center gap-3.5">
+              <li key={k} className="flex items-center gap-3.5">
                 <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-surface text-ink shadow-hair">{icon}</span>
                 <div>
-                  <dt className="font-mono text-label uppercase text-ink-2">{k}</dt>
-                  <dd className="mt-1 text-[15px] font-medium">
-                    {href ? <a href={href} rel="noopener" className="underline-offset-4 hover:text-blue hover:underline">{v}</a> : v}
-                  </dd>
+                  <p className="font-mono text-label uppercase text-ink-2">{k}</p>
+                  <p className="mt-1 text-[15px] font-medium">
+                    {href ? <a href={href} rel="noopener" className="underline-offset-4 hover:text-blue-2 hover:underline">{v}</a> : v}
+                  </p>
                 </div>
-              </div>
+              </li>
             ))}
-          </dl>
+          </ul>
         </div>
       </Reveal>
     </section>

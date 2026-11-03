@@ -3,6 +3,7 @@ import { buttonClass } from "@techx/ui/Button";
 import { ArrowIcon } from "@techx/ui/Icons";
 import { RevealGroup, RevealItem } from "@/features/motion/Reveal";
 import { SectionHead } from "./SectionHead";
+import { getContent } from "@/lib/content";
 
 /* Pricing (owner, 2026-11-02): layout after the owner's reference. Each level is a soft tray holding a raised header
    panel (name + who it's for), then the starting price, the trial button, a dotted rule, a mono "includes" label and the
@@ -11,32 +12,7 @@ import { SectionHead } from "./SectionHead";
    Copy rewritten from TechX's own site (techxsystems.com): the fixes in each level are the old site's photo-editing
    list, split across the Figma levels; 12–24 h and 24/7 support are the old site's words. Every price is a starting
    price ("From"); Essential from $0.50 (owner). */
-export const plans = [
-  {
-    name: "Essential",
-    who: "For everyday listings. Clean, bright and true to life.",
-    price: "$0.50",
-    label: "Essential includes",
-    f: ["HDR merging of your brackets", "Lens and perspective correction", "Colour, white balance and exposure", "Noise reduction", "Resizing for your listing", "Back in 12–24 hours", "Free revisions"],
-  },
-  {
-    name: "Signature",
-    who: "For listings that need to stand out. Skies, lawns and windows fixed.",
-    price: "$1.00",
-    label: "Everything in Essential, plus",
-    f: ["Window enhancement", "Sky replacement", "Grass replacement", "Fire in fireplaces", "TV screen fill", "Flash and reflection removal", "A saved style guide"],
-    featured: true,
-  },
-  {
-    name: "Luxury",
-    who: "For high-end homes that need hand-finished detail.",
-    price: "$1.50",
-    label: "Everything in Signature, plus",
-    f: ["Hand-masked blends", "Object removal"],
-  },
-];
-
-const bulk = ["Volume pricing", "A dedicated editor", "One monthly invoice, delivered photos only", "Photos, twilights, floor plans and video in one order", "Mix levels in one order", "24/7 support"];
+// Levels and the bulk row are admin-managed (lib/content, key "pricing"); defaults in lib/content/types.ts.
 
 // Pikaicons (free pack) check-tick-circle, as used in HowItWorks
 const Tick = ({ className = "" }: { className?: string }) => (
@@ -45,11 +21,12 @@ const Tick = ({ className = "" }: { className?: string }) => (
   </svg>
 );
 
-export function Pricing({ head = true }: { head?: boolean }) {
+export async function Pricing({ head = true }: { head?: boolean }) {
+  const { plans, bulk } = await getContent("pricing");
   return (
     <section id="pricing" className={`wrap ${head ? "pt-28 md:pt-40" : ""}`}>
       {head && <SectionHead center label="Pricing" lead="Pay for what we deliver." rest="No contract, no minimum." />}
-      <RevealGroup className="grid items-stretch gap-4 lg:grid-cols-3">
+      <RevealGroup className={`grid items-stretch gap-4 ${["", "lg:grid-cols-1", "lg:grid-cols-2", "lg:grid-cols-3", "md:grid-cols-2 xl:grid-cols-4"][plans.length] ?? "lg:grid-cols-3"}`}>
         {plans.map((p) => (
           // Signature keeps the site's featured treatment: the moving brand-blue edge (edge-glow), no heavy shadow
           <RevealItem key={p.name} className={`flex rounded-card ${p.featured ? "edge-glow p-[1.5px]" : ""}`}>
@@ -57,7 +34,7 @@ export function Pricing({ head = true }: { head?: boolean }) {
               <div className={`rounded-inner px-6 py-6 ${p.featured ? "bg-blue-tint" : "bg-[linear-gradient(180deg,#F6F9FF_0%,#FFFFFF_100%)] shadow-hair"}`}>
                 <p className="flex items-center justify-between gap-3">
                   <span className="text-h4">{p.name}</span>
-                  {p.featured && <span className="rounded-md bg-surface px-2 py-[3px] font-mono text-[11px] uppercase tracking-[0.04em] text-blue">Most chosen</span>}
+                  {p.featured && <span className="rounded-md bg-surface px-2 py-[3px] font-mono text-[11px] uppercase tracking-[0.04em] text-blue-2">Most chosen</span>}
                 </p>
                 <p className="mt-2 text-small text-ink-2">{p.who}</p>
               </div>
@@ -73,8 +50,8 @@ export function Pricing({ head = true }: { head?: boolean }) {
                 <div className="mt-8 border-t border-dotted border-line-2" />
                 <p className="mt-7 font-mono text-[11px] uppercase tracking-[0.06em] text-ink-2">{p.label}:</p>
                 <ul className="mt-5 space-y-3.5">
-                  {p.f.map((f) => (
-                    <li key={f} className="flex items-center gap-3 text-small text-ink"><Tick className={p.featured ? "text-blue" : "text-ink-3"} />{f}</li>
+                  {p.items.map((f) => (
+                    <li key={f} className="flex items-center gap-3 text-small text-ink"><Tick className={p.featured ? "text-blue-2" : "text-ink-3"} />{f}</li>
                   ))}
                 </ul>
               </div>

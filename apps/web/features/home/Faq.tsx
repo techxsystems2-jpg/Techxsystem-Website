@@ -6,21 +6,15 @@ import { Eyebrow } from "@techx/ui/Eyebrow";
 import { buttonClass } from "@techx/ui/Button";
 import { WhatsAppIcon } from "@techx/ui/Icons";
 import { Reveal } from "@/features/motion/Reveal";
-import { site } from "@/lib/site";
+import { useSite } from "@/features/content/ContentProvider";
+import type { QA } from "@/lib/content/types";
 
-// First answer from Figma; the other four from the Direction B page until Figma has them (confirm with TechX).
-const homeFaqs: readonly (readonly [string, string])[] = [
-  ["How fast will I get my photos back?", "Within 12–24 hours. Send them by evening in the US or Australia and they're usually ready by morning."],
-  ["Do I need to pay before you start?", "No. Your first 10 photos are free. After that you're billed monthly, only for photos we deliver."],
-  ["What if I don't like an edit?", "Tell us what to change and we'll redo it free, usually the same day."],
-  ["Are your edits MLS-compliant?", "Yes. We never change the property itself, and staged rooms are clearly labelled."],
-  ["Which files do you accept?", "RAW (CR2, CR3, NEF, ARW, RAF), DNG, JPEG and TIFF. Brackets of 3, 5 or 7 are all fine."],
-] as const;
 
 const spring = { type: "spring", bounce: 0, duration: 0.45 } as const;
 
-/** Questions block. Home uses the defaults; other pages pass their own heading, lede and questions (contact: Figma 34:155). */
-export function Faq({ title = "Before you send your first shoot.", lede = "Still unsure? Message the studio on WhatsApp. An editor answers, not a bot.", faqs = homeFaqs }: { title?: string; lede?: string; faqs?: readonly (readonly [string, string])[] }) {
+/** Questions block. Each page passes its own questions from the content store (lib/content, key "faqs"). */
+export function Faq({ title = "Before you send your first shoot.", lede = "Still unsure? Message the studio on WhatsApp. An editor answers, not a bot.", faqs }: { title?: string; lede?: string; faqs: readonly QA[] }) {
+  const site = useSite();
   const [open, setOpen] = useState(0);
   return (
     <section className="wrap grid gap-10 pt-28 md:grid-cols-[1fr_1.6fr] md:pt-40">
@@ -31,7 +25,7 @@ export function Faq({ title = "Before you send your first shoot.", lede = "Still
         <a href={site.contact.whatsappUrl} rel="noopener" className={buttonClass("whatsapp", "mt-6")}><WhatsAppIcon />Chat on WhatsApp</a>
       </Reveal>
       <Reveal delay={0.1}>
-        {faqs.map(([q, a], i) => {
+        {faqs.map(({ q, a }, i) => {
           const on = open === i;
           return (
             <div key={q} className="border-b border-line">

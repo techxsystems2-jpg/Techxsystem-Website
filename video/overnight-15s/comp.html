@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TechX · You sleep, we edit (15 s)</title>
+<!--
+  Concept C (owner, 2026-11-03): "You sleep, we edit". One frame split down the middle: New York on the left goes
+  through its night, the studio in India on the right works through its day. The photos are the carry: they cross
+  the seam to be edited and cross back finished, and the seam itself closes into the end card.
+  Built on onetake's contract: every value is a pure function of t (window.__seek), moves from motion.js (OM).
+  Times follow the site's own timeline: upload 7:02 PM ET, editing ~9:10 AM IST, delivered 7:58 AM ET.
+  Beat sheet (t · beat · what carries into the next):
+   0.0–1.3  white frame, the seam draws down the middle, "You sleep." / "We edit." rise   → the seam
+   1.3–2.4  left turns to night, right to morning; five brackets land on the left (7:02 PM) → the stack
+   2.4–3.3  the stack hops across the seam                                                 → the stack
+   3.3–7.4  right: merge, the edit sweeps across, verticals settle, "checked twice" stamp.
+            left: nothing moves but the clock and the stars (the still stretch)          → the photo
+   7.4–8.4  the finished photo hops back across                                           → the photo
+   8.4–10.4 New York's sky turns to sunrise, 7:58 AM, "Your photos are ready" lands       → the photo
+   10.5–11.4 three more finished photos snap in (hits)                                     → the morning
+   11.6–12.7 the seam opens: the morning takes the whole frame                            → the ground
+   12.7–15  end card: "Edited while you slept." · from $0.50 an image · 10 photos free, held still
+-->
+<script src="look.js"></script>
+<style>
+:root{ --ground:#F5F8FD; --deep:#101A3A; --card:#fff; --line:#E4E4E7; --mute:#6B6B73; --ink:#0A0A0B; --accent:#3074FE; --accent2:#8E1F3F;
+  --display:'Geist',system-ui,sans-serif; --text:'Geist',system-ui,sans-serif; --mono:'Geist Mono',ui-monospace,monospace; }
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:var(--ground)}
+body{font-family:var(--text);color:var(--ink);-webkit-font-smoothing:antialiased}
+#stage{position:absolute;inset:0;overflow:hidden;background:var(--ground)}
+.abs{position:absolute;left:0;top:0;will-change:transform,opacity}
+/* both worlds are full-frame layers; New York is clipped to the left half until the seam opens */
+.half{position:absolute;inset:0;overflow:hidden}
+#R{clip-path:inset(0 0 0 50%)} #L{z-index:1;clip-path:inset(0 50% 0 0)}
+.sky{position:absolute;inset:0;opacity:0}
+#nightL{background:linear-gradient(180deg,#0B1330 0%,#16245A 60%,#27397A 100%)}
+#dawnL{background:linear-gradient(180deg,#BFD9FF 0%,#E7F1FF 45%,#FFE3C4 100%)}
+#dayR{background:linear-gradient(180deg,#DCEEFF 0%,#F2F8FF 55%,#FFF6E6 100%)}
+#eveR{background:linear-gradient(180deg,#F7E6D8 0%,#FBEFE6 60%,#FFF7EE 100%)}
+#seam{position:absolute;z-index:2;left:959px;top:0;width:2px;height:1080px;background:linear-gradient(180deg,transparent,rgba(10,10,11,.18) 20%,rgba(10,10,11,.18) 80%,transparent);transform-origin:50% 50%}
+.star{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff}
+#moon{position:absolute;left:640px;top:150px;width:78px;height:78px;border-radius:50%;box-shadow:inset -18px 6px 0 0 #F4F1E6;}
+#sun{position:absolute;left:1650px;top:140px;width:92px;height:92px;border-radius:50%;background:radial-gradient(circle,#FFD58A 0%,#FFB955 60%,rgba(255,185,85,0) 72%)}
+.place{position:absolute;top:72px;font:500 26px/1 var(--text);letter-spacing:-.01em}
+.place small{display:block;margin-top:12px;font:400 44px/1 var(--mono);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+#pL{left:80px;color:#fff} #pR{left:1040px;color:var(--ink)}
+.flag{display:inline-block;width:30px;height:20px;border-radius:3px;margin-right:12px;vertical-align:-2px;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+.word{position:absolute;top:900px;font:560 64px/1 var(--display);letter-spacing:-.03em;white-space:nowrap}
+#wL{left:80px;color:#fff} #wR{left:1040px;color:var(--ink)}
+.photo{position:absolute;z-index:3;left:0;top:0;width:480px;height:320px;border-radius:14px;overflow:hidden;background:#ddd;
+  box-shadow:0 30px 70px -28px rgba(10,10,11,.55),0 0 0 6px #fff;will-change:transform,opacity}
+.photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+#edge{position:absolute;top:0;bottom:0;width:3px;background:#fff;box-shadow:0 0 18px rgba(255,255,255,.95)}
+.chip{position:absolute;z-index:3;left:0;top:0;padding:14px 20px;border-radius:14px;background:#fff;white-space:nowrap;
+  box-shadow:0 0 0 1px rgba(10,10,11,.06),0 18px 40px -18px rgba(10,10,11,.45);font:500 24px/1.2 var(--text);will-change:transform,opacity}
+.chip small{display:block;margin-top:4px;font:400 18px/1.2 var(--text);color:var(--mute)}
+.tick{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#E7F6EE;margin-right:12px;vertical-align:-6px}
+#steps{position:absolute;z-index:3;left:0;top:0;display:flex;gap:28px;font:400 20px/1 var(--mono);color:var(--mute);white-space:nowrap}
+#steps span{transition:none} #steps .on{color:var(--ink)}
+#endW{position:absolute;z-index:4;left:0;right:0;top:400px;text-align:center;font:560 104px/1 var(--display);letter-spacing:-.035em;white-space:nowrap}
+#endW span{display:inline-block;margin:0 .13em}
+#endS{position:absolute;z-index:4;left:0;right:0;top:560px;text-align:center;font:450 34px/1 var(--text);color:var(--mute)}
+#endS b{color:var(--ink);font-weight:560}
+#mark{position:absolute;z-index:4;left:0;right:0;top:860px;text-align:center;font:560 30px/1 var(--text);letter-spacing:-.01em}
+#mark span{color:#9A9AA2}
+#hud{position:absolute;right:14px;bottom:10px;font:13px monospace;color:#c00;display:none}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="L" class="half">
+    <div id="nightL" class="sky"></div><div id="dawnL" class="sky"></div>
+    <div id="stars"></div>
+    <div id="moon"></div>
+    <div id="pL" class="place"><span class="flag" style="background:linear-gradient(180deg,#B22234 0 14%,#fff 14% 28%,#B22234 28% 42%,#fff 42% 57%,#B22234 57% 71%,#fff 71% 85%,#B22234 85%)"></span>New York<small id="cL">7:02 PM</small></div>
+    <div id="wL" class="word">You sleep.</div>
+  </div>
+  <div id="R" class="half">
+    <div id="dayR" class="sky"></div><div id="eveR" class="sky"></div>
+    <div id="pR" class="place"><span class="flag" style="background:linear-gradient(180deg,#FF9933 0 33.3%,#fff 33.3% 66.6%,#138808 66.6%)"></span>India · TechX studio<small id="cR">4:32 AM</small></div>
+    <div id="wR" class="word">We edit.</div>
+  </div>
+  <div id="sun" class="abs" style="left:0;top:0;z-index:0"></div>
+  <div id="seam"></div>
+
+  <!-- the five brackets, then one photo -->
+  <div id="stack"></div>
+  <div id="steps" class="abs"><span data-i="0">Merge</span><span data-i="1">Sky</span><span data-i="2">Windows</span><span data-i="3">Verticals</span></div>
+  <div id="check" class="chip"><span class="tick"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="#17A05E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Checked by a second editor</div>
+  <div id="ready" class="chip"><span class="tick" style="background:#EBF1FF"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M3 15a5 5 0 0 0 5 5h8a5 5 0 0 0 5-5M12 4v11m-3-2.8 3 2.8 3-2.8" fill="none" stroke="#3074FE" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Your photos are ready<small>42 edited · 7:58 AM · from TechX Studio</small></div>
+  <div id="more"></div>
+
+  <div id="endW"><span>Edited</span><span>while</span><span>you</span><span>slept.</span></div>
+  <div id="endS">From <b>$0.50</b> an image · <b>10 photos free</b></div>
+  <div id="mark">TechX <span>Systems</span></div>
+  <div id="hud"></div>
+</div>
+<script src="motion.js"></script>
+<script>
+const { clamp, lerp, tween, ease, wordRise, popIn, rng } = OM;
+const $ = (s) => document.querySelector(s);
+const W = 1920, H = 1080;
+
+// ── static build (deterministic) ─────────────────────────────────────────────────────────────────────────────
+const R = rng(7);
+const stars = Array.from({ length: 34 }, () => ({ x: 40 + R() * 880, y: 40 + R() * 560, p: R() * 6.28, a: 0.35 + R() * 0.55 }));
+$('#stars').innerHTML = stars.map((s, i) => `<i class="star" id="s${i}" style="left:${s.x}px;top:${s.y}px"></i>`).join('');
+const EXPO = [0.42, 0.66, 0.95, 1.3, 1.65];
+// the five exposures, the raw merge, the edit layer (clipped), all in one photo box that travels
+$('#stack').innerHTML = EXPO.map((b, i) => `<div class="photo" id="b${i}"><img src="img/tx-ext.jpg" style="filter:brightness(${b})"></div>`).join('') +
+  `<div class="photo" id="main"><img id="raw" src="img/tx-ext.jpg" style="filter:brightness(.66) contrast(.8) saturate(.55) sepia(.08)"><img id="after" src="img/tx-ext.jpg"><div id="edge"></div></div>`;
+const MORE = ['int-4.webp', 'twi-2.webp', 'aer-5.webp'];
+$('#more').innerHTML = MORE.map((f, i) => `<div class="photo" id="m${i}" style="width:300px;height:200px"><img src="img/${f}"></div>`).join('');
+
+// ── helpers ──────────────────────────────────────────────────────────────────────────────────────────────────
+function place(el, cx, cy, s = 1, op = 1, extra = '') {
+  const w = el.offsetWidth, h = el.offsetHeight;
+  el.style.transform = `translate(${(cx - w / 2).toFixed(2)}px,${(cy - h / 2).toFixed(2)}px) scale(${s.toFixed(4)})${extra}`;
+  el.style.opacity = op.toFixed(3);
+}
+const k = (t, a, b, c = ease.expoOut) => tween(t, a, b, c);
+// a hop across the seam: straight in x, an arc in y, a little smaller at the top of the arc
+function hopAt(t, t0, t1, A, B, lift = 150) {
+  const u = k(t, t0, t1, ease.cubicInOut);
+  return { x: lerp(A[0], B[0], u), y: lerp(A[1], B[1], u) - Math.sin(Math.PI * u) * lift, s: 1 - 0.1 * Math.sin(Math.PI * u), u };
+}
+// clocks: New York minutes since midnight (can pass 1440), India = New York + 9:30
+const NY = [[0, 1142], [2.4, 1142], [8.4, 1890], [10.0, 1918], [99, 1918]];
+function nyMin(t) { for (let i = 1; i < NY.length; i++) if (t <= NY[i][0]) { const [t0, m0] = NY[i - 1], [t1, m1] = NY[i]; return Math.round(lerp(m0, m1, ease.sineInOut(clamp((t - t0) / (t1 - t0), 0, 1)))); } return 1918; }
+const fmt = (m) => { m = ((m % 1440) + 1440) % 1440; const h = Math.floor(m / 60), mm = m % 60, ap = h < 12 ? 'AM' : 'PM'; return `${(h % 12) || 12}:${String(mm).padStart(2, '0')} ${ap}`; };
+
+const L = { x: 480, y: 520 }, Rr = { x: 1440, y: 520 };
+
+function seek(t) {
+  // seam, then the two worlds
+  const seamK = k(t, 0.15, 1.0);
+  const open = k(t, 11.6, 12.7, ease.cubicInOut);               // the seam opens into one morning frame
+  $('#seam').style.transform = `scaleY(${seamK.toFixed(4)})`;
+  $('#seam').style.opacity = (1 - open).toFixed(3);
+  const night = k(t, 1.2, 2.0) * (1 - k(t, 8.6, 10.2, ease.sineInOut));
+  $('#nightL').style.opacity = night.toFixed(3);
+  $('#dawnL').style.opacity = k(t, 8.6, 10.2, ease.sineInOut).toFixed(3);
+  $('#dayR').style.opacity = (k(t, 1.2, 2.0) * (1 - k(t, 6.8, 9.0, ease.sineInOut))).toFixed(3);
+  $('#eveR').style.opacity = (k(t, 1.2, 2.0) * k(t, 6.8, 9.0, ease.sineInOut)).toFixed(3);
+  // left grows over the right as the seam opens; the right slides out
+  $('#L').style.clipPath = `inset(0 ${(50 * (1 - open)).toFixed(3)}% 0 0)`;
+  // stars twinkle only while it is night
+  stars.forEach((s, i) => { $('#s' + i).style.opacity = (night * s.a * (0.65 + 0.35 * Math.sin(t * 1.6 + s.p))).toFixed(3); });
+  const moon = k(t, 1.4, 2.4);
+  $('#moon').style.opacity = (moon * (1 - k(t, 8.6, 9.6))).toFixed(3);
+  $('#moon').style.transform = `translateY(${((1 - moon) * 30 + k(t, 2.4, 9.6, ease.linear) * -12).toFixed(1)}px)`;
+  const sun = k(t, 1.3, 2.6) * (1 - k(t, 11.6, 12.4));
+  $('#sun').style.opacity = sun.toFixed(3);
+  $('#sun').style.transform = `translate(1650px, ${(150 + (1 - k(t, 1.3, 3.4)) * 70 + k(t, 6.8, 9.0, ease.sineInOut) * 120).toFixed(1)}px)`;
+  // labels and clocks
+  const lab = k(t, 1.3, 2.0);
+  $('#pL').style.opacity = (lab * (1 - open)).toFixed(3); $('#pR').style.opacity = (lab * (1 - open)).toFixed(3);
+  const ny = nyMin(t);
+  $('#cL').textContent = fmt(ny); $('#cR').textContent = fmt(ny + 570);
+  $('#pL').style.color = t > 9.4 ? 'var(--ink)' : '#fff';
+  // words
+  [['#wL', 0.3], ['#wR', 0.62]].forEach(([id, t0]) => {
+    const w = wordRise(t, t0); const out = k(t, 11.4, 11.9, ease.linear);
+    $(id).style.opacity = (w.op * (1 - out)).toFixed(3);
+    $(id).style.transform = `translateY(${w.y.toFixed(1)}px) scale(${w.s.toFixed(4)})`;
+  });
+  $('#wL').style.color = t > 9.4 ? 'var(--ink)' : '#fff';
+
+  // ── the photo's journey ──
+  // 1.6–2.3 five brackets land on the left, fanned; 2.4–3.3 the stack hops across; 3.4–3.9 they merge into one
+  const back = hopAt(t, 7.4, 8.4, [Rr.x, Rr.y], [L.x, L.y], 130);
+  const go = hopAt(t, 2.4, 3.3, [L.x, L.y], [Rr.x, Rr.y], 150);
+  let cx, cy, cs;
+  if (t < 7.4) { cx = go.x; cy = go.y; cs = go.s; } else { cx = back.x; cy = back.y; cs = back.s; }
+  // end: the photo moves to the centre and steps back for the end card
+  const toEnd = k(t, 11.6, 12.7, ease.cubicInOut);
+  cx = lerp(cx, 960, toEnd); cy = lerp(cy, 520, toEnd);
+  const endFade = 1 - k(t, 12.3, 12.9, ease.linear);
+  const merge = k(t, 3.4, 4.0);
+  EXPO.forEach((b, i) => {
+    const p = popIn(t, 1.55 + i * 0.09);
+    const off = (i - 2) * (1 - merge);
+    const tilt = (i - 2) * 2.2 * (1 - merge);
+    place($('#b' + i), cx + off * 26, cy + off * 18 + p.dy, cs * p.s, p.op * (1 - k(t, 3.85, 4.05, ease.linear)), ` rotate(${tilt.toFixed(2)}deg)`);
+  });
+  const mainOn = k(t, 3.85, 4.05, ease.linear);
+  // verticals settle: the raw frame leans 1.6° until the last fix
+  const lean = 1.6 * (1 - k(t, 5.55, 6.1));
+  place($('#main'), cx, cy, cs, mainOn * endFade, ` rotate(${lean.toFixed(3)}deg)`);
+  const sweep = k(t, 4.3, 5.5, ease.cubicInOut);               // the edit sweeps left to right
+  $('#after').style.clipPath = `inset(0 ${((1 - sweep) * 100).toFixed(2)}% 0 0)`;
+  $('#edge').style.left = `${(sweep * 100).toFixed(2)}%`;
+  $('#edge').style.opacity = (sweep > 0 && sweep < 1 ? 1 : 0).toString();
+  // the four fixes, named under the photo while they happen
+  const stepsOp = k(t, 3.5, 3.9) * (1 - k(t, 6.9, 7.3, ease.linear));
+  place($('#steps'), Rr.x, Rr.y + 230, 1, stepsOp);
+  document.querySelectorAll('#steps span').forEach((sp, i) => sp.classList.toggle('on', t >= [3.95, 4.7, 5.2, 6.0][i]));
+  // the second check
+  const c = popIn(t, 6.3);
+  place($('#check'), Rr.x, Rr.y - 230 + c.dy, c.s, c.op * (1 - k(t, 7.2, 7.5, ease.linear)));
+  // morning: the "ready" note lands over the photo
+  const r = popIn(t, 9.7);
+  place($('#ready'), L.x, L.y - 240 + r.dy, r.s, r.op * (1 - k(t, 11.5, 11.9, ease.linear)));
+  // hits: three more finished photos snap in around it
+  MORE.forEach((f, i) => {
+    const at = 10.55 + i * 0.32;
+    const p = popIn(t, at, { omega: 26 });
+    const pos = [[L.x - 330, L.y + 120], [L.x + 330, L.y + 110], [L.x + 10, L.y + 285]][i];
+    const px = lerp(pos[0], 960 + (i - 1) * 340, toEnd), py = lerp(pos[1], 760, toEnd);
+    place($('#m' + i), px, py + p.dy, p.s * (1 - 0.15 * toEnd), p.op * (1 - k(t, 12.2, 12.8, ease.linear)), ` rotate(${((i - 1) * 3 * (1 - toEnd)).toFixed(2)}deg)`);
+  });
+
+  // ── end card ──
+  document.querySelectorAll('#endW span').forEach((sp, i) => {
+    const w = wordRise(t, 12.75 + i * 0.12);
+    sp.style.opacity = w.op.toFixed(3); sp.style.transform = `translateY(${w.y.toFixed(1)}px) scale(${w.s.toFixed(4)})`;
+  });
+  const es = wordRise(t, 13.35), em = wordRise(t, 13.6);
+  $('#endS').style.opacity = es.op.toFixed(3); $('#endS').style.transform = `translateY(${es.y.toFixed(1)}px)`;
+  $('#mark').style.opacity = em.op.toFixed(3); $('#mark').style.transform = `translateY(${em.y.toFixed(1)}px)`;
+
+  if (HUD) $('#hud').textContent = t.toFixed(2) + 's';
+  return Promise.all([...document.images].map((im) => (im.complete ? null : im.decode().catch(() => null))));
+}
+
+const q = new URLSearchParams(location.search);
+const HUD = q.has('hud'); if (HUD) $('#hud').style.display = 'block';
+window.__meta = { dur: 15, fps: 30, inFrame: { main: [4.0, 12.3] } };
+window.__seek = async (t) => { await seek(t); return true; };
+window.__track = (t) => { const r = $('#main').getBoundingClientRect(); return { main: [r.x + r.width / 2, r.y + r.height / 2] }; };
+// farthest on-screen travel between two times: the hops (~960 px over 1 s) and the seam opening
+window.__motion = (t0, t1) => { const a = (t) => { const g = hopAt(t, 2.4, 3.3, [L.x, L.y], [Rr.x, Rr.y]), b = hopAt(t, 7.4, 8.4, [Rr.x, Rr.y], [L.x, L.y]); return Math.max(g.x, b.x) + 960 * k(t, 11.6, 12.7, ease.cubicInOut); }; return Math.abs(a(t1) - a(t0)) + 4; };
+const fontsReady = (window.LOOK && LOOK.ready) ? LOOK.ready : document.fonts.ready;
+window.__ready = fontsReady.then(() => seek(q.has('t') ? +q.get('t') : 0));
+if (q.has('play')) { const t0 = performance.now(); const loop = () => { seek(((performance.now() - t0) / 1000) % 15); requestAnimationFrame(loop); }; window.__ready.then(loop); }
+</script>
+</body>
+</html>

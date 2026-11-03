@@ -17,7 +17,7 @@ export function StickyTrialBar() {
     return () => removeEventListener("scroll", on);
   }, []);
 
-  if (path === "/free-trial") return null;
+  if (path === "/free-trial" || path.startsWith("/admin")) return null;
 
   return (
     <div

@@ -1,114 +1,110 @@
-import { Suspense, type ReactNode } from "react";
-import type { Metadata } from "next";
-import { buttonClass } from "@techx/ui/Button";
-import { Eyebrow } from "@techx/ui/Eyebrow";
-import { adminConfigured, isAdmin } from "@/lib/server/admin";
-import { dropboxConfigured } from "@/lib/server/dropbox";
-import { gdriveConfigured } from "@/lib/server/gdrive";
-import { getSettings, settingsStoreKind, type Destination } from "@/lib/server/upload-settings";
-import { disconnect, login, logout, save } from "./actions";
+import Link from "next/link";
+import { ArrowUpRight, CheckCircle2, CircleAlert, FileText, HardDrive, Images, Layers, Quote, Upload } from "lucide-react";
+import { SECTIONS } from "@/lib/content/fields";
+import { getContent } from "@/lib/content";
+import { savedSections } from "@/lib/server/content-store";
+import { storeKind } from "@/lib/server/kv";
+import { isAdmin } from "@/lib/server/admin";
+import { mediaStoreKind } from "@/lib/server/media";
+import { Badge } from "@/features/admin/ui/badge";
+import { SaveAllButton } from "@/features/admin/SaveAllButton";
+import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from "@/features/admin/ui/card";
 
-/* /admin: where free-trial uploads land (owner, 2026-11-02). The admin signs in, connects Dropbox and/or Google Drive,
-   picks one as the destination and names the top folder. Not linked from the site, not indexed. Setup: docs/uploads.md. */
-export const metadata: Metadata = { title: "Admin · Uploads", robots: { index: false, follow: false } };
+/* Admin overview (owner, 2026-11-03), a shadcn/ui dashboard: what's on the site at a glance, every section that can
+   be edited (with Original / Edited), and where saves and photos are stored. Numbers are counted from the live
+   content, never invented. */
+export default async function AdminHome() {
+  if (!(await isAdmin())) return null; // checked here too: the page must carry no data without a session (security audit)
+  const [edited, services, work, quotes, posts] = await Promise.all([
+    savedSections(SECTIONS.map((s) => s.key)).then((m) => SECTIONS.map((s) => !!m[s.key])).catch(() => SECTIONS.map(() => false)),
+    getContent("services"), getContent("work"), getContent("testimonials"), getContent("blog"),
+  ]);
+  const published = posts.filter((p) => p.published).length;
+  const onVercel = !!process.env.VERCEL;
+  const store = storeKind(), media = mediaStoreKind();
+  const unsaved = SECTIONS.filter((s, i) => s.key !== "blog" && !edited[i]).length;
+  const ready = !onVercel || (store !== "file" && media !== "local");
 
-const messages: Record<string, string> = {
-  saved: "Saved. New uploads go to the destination below.",
-  "dropbox-connected": "Dropbox connected.",
-  "gdrive-connected": "Google Drive connected.",
-  disconnected: "Disconnected.",
-  "connect-failed": "Couldn't connect. Check the app keys and the redirect URL (docs/uploads.md), then try again.",
-  "connect-first": "Connect that account before choosing it.",
-  "pick-one": "Choose a destination.",
-  "bad-password": "That password isn't right.",
-};
-
-export default function Admin({ searchParams }: PageProps<"/admin">) {
-  return (
-    <section className="wrap max-w-[760px] pb-10 pt-28 md:pt-36">
-      <Eyebrow>Admin</Eyebrow>
-      <h1 className="mt-4 text-h2">Free-trial uploads</h1>
-      <Suspense fallback={<div className="mt-8 h-64 animate-pulse rounded-card bg-sunk" />}>
-        <Body searchParams={searchParams} />
-      </Suspense>
-    </section>
-  );
-}
-
-async function Body({ searchParams }: { searchParams: PageProps<"/admin">["searchParams"] }) {
-  const status = (await searchParams).status;
-  const note = typeof status === "string" ? messages[status] : undefined;
-
-  if (!adminConfigured()) {
-    return <Panel><p className="text-ink-2">Set <Code>ADMIN_PASSWORD</Code> and <Code>APP_SECRET</Code> in the environment to turn this page on (see <Code>.env.example</Code> and <Code>docs/uploads.md</Code>).</p></Panel>;
-  }
-  if (!(await isAdmin())) {
-    return (
-      <Panel>
-        {note && <Note>{note}</Note>}
-        <form action={login} className="grid gap-4 sm:max-w-[360px]">
-          <label className="text-small font-medium">Password
-            <input name="password" type="password" required autoComplete="current-password" className={input} />
-          </label>
-          <button type="submit" className={buttonClass("primary", "justify-self-start")}>Sign in</button>
-        </form>
-      </Panel>
-    );
-  }
-
-  const s = await getSettings();
-  const dev = process.env.NODE_ENV !== "production";
-  const options: { id: Destination; name: string; line: string; ready: boolean; account?: string; configured: boolean; env?: string }[] = [
-    { id: "dropbox", name: "Dropbox", line: "Files land in Apps / <your app name> / <folder> in the connected Dropbox.", ready: !!s.dropbox, account: s.dropbox?.account, configured: dropboxConfigured(), env: "DROPBOX_APP_KEY, DROPBOX_APP_SECRET" },
-    { id: "gdrive", name: "Google Drive", line: "Files land in My Drive / <folder> of the connected Google account.", ready: !!s.gdrive, account: s.gdrive?.account, configured: gdriveConfigured(), env: "GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET" },
-    ...(dev ? [{ id: "local" as const, name: "This computer (development only)", line: "Files land in apps/web/.uploads. For trying the form without any keys.", ready: true, configured: true }] : []),
+  const stats = [
+    { label: "Services", value: services.length, note: "Each with its own page", href: "/admin/services", Icon: Layers },
+    { label: "Work photos", value: work.length, note: "In the gallery", href: "/admin/work", Icon: Images },
+    { label: "Testimonials", value: quotes.length, note: "Real client quotes", href: "/admin/testimonials", Icon: Quote },
+    { label: "Blog posts", value: posts.length, note: `${published} published · ${posts.length - published} draft${posts.length - published === 1 ? "" : "s"}`, href: "/admin/blog", Icon: FileText },
   ];
 
   return (
-    <>
-      {note && <Note>{note}</Note>}
-      {!dev && settingsStoreKind() === "file" && (
-        <Note warn>Settings can&rsquo;t be saved on this host. Add <Code>UPSTASH_REDIS_REST_URL</Code> and <Code>UPSTASH_REDIS_REST_TOKEN</Code> (docs/uploads.md).</Note>
-      )}
-      {!s.destination && <Note warn>No destination yet: the free-trial form can&rsquo;t take uploads until one is chosen.</Note>}
+    <div className="mx-auto grid max-w-[1240px] gap-8">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl font-semibold tracking-tight">Overview</h1>
+        <p className="text-sm text-muted-foreground">Edit any part of the website. Changes go live a few seconds after you save; no redeploy needed.</p>
+      </div>
 
-      <form action={save}>
-        <Panel>
-          <p className="mb-2.5 font-mono text-label uppercase text-ink-2">Where uploads land</p>
-          <div className="grid gap-3">
-            {options.map((o) => (
-              <label key={o.id} className="flex cursor-pointer items-start gap-3.5 rounded-inner p-4 ring-1 ring-line has-[:checked]:bg-blue-tint/50 has-[:checked]:ring-2 has-[:checked]:ring-blue">
-                <input type="radio" name="destination" value={o.id} defaultChecked={s.destination === o.id} disabled={!o.ready} className="mt-1 accent-[var(--color-blue)]" />
-                <span className="grid flex-1 gap-1">
-                  <span className="font-medium">{o.name}</span>
-                  <span className="text-small text-ink-2">{o.line}</span>
-                  <span className="text-small">
-                    {o.id === "local" ? null : o.ready ? <span className="text-green">Connected as {o.account}</span>
-                      : o.configured ? <span className="text-ink-2">Not connected</span>
-                      : <span className="text-warning">Add {o.env} to the environment first</span>}
-                  </span>
-                </span>
-                {o.id !== "local" && o.configured && (o.ready
-                  ? <button type="submit" formAction={disconnect} name="provider" value={o.id} className={buttonClass("ghost", "", "sm")}>Disconnect</button>
-                  : <a href={`/api/admin/oauth/${o.id}`} className={buttonClass("secondary", "", "sm")}>Connect</a>)}
-              </label>
-            ))}
-          </div>
-          <label className="mt-6 block text-small font-medium">Top folder name
-            <input name="folder" defaultValue={s.folder} maxLength={80} className={input} />
-            <span className="mt-1.5 block font-normal text-ink-2">Each trial gets its own folder inside it: date, name, studio. With &ldquo;Trial details.txt&rdquo; and an upload report.</span>
-          </label>
-          <button type="submit" className={buttonClass("primary", "mt-6")}>Save</button>
-        </Panel>
-      </form>
-      <form action={logout} className="mt-4"><button type="submit" className={buttonClass("ghost", "-ml-3", "sm")}>Sign out</button></form>
-    </>
+      {onVercel && !ready && (
+        <div role="status" className="flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          <CircleAlert className="mt-0.5 size-4 shrink-0" />
+          <p>
+            {store === "file" && <>Saves can&rsquo;t be stored on this host yet: add <Code>DATABASE_URL</Code> (your PostgreSQL link) and redeploy. </>}
+            {media === "local" && <>Photos can&rsquo;t be uploaded yet: add a Vercel Blob store (<Code>BLOB_READ_WRITE_TOKEN</Code>).</>}
+          </p>
+        </div>
+      )}
+
+      {/* an empty blog is a real state, so it doesn't count as "not saved" */}
+      {store === "postgres" && unsaved > 0 && <SaveAllButton missing={unsaved} />}
+
+      {/* at a glance */}
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {stats.map(({ label, value, note, href, Icon }) => (
+          <Link key={label} href={href} className="group rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50" data-slot="stat">
+            <Card className="h-full bg-gradient-to-t from-muted/60 to-card transition-shadow group-hover:shadow-md">
+              <CardHeader>
+                <CardDescription>{label}</CardDescription>
+                <CardTitle className="text-3xl font-semibold tabular-nums">{value}</CardTitle>
+                <CardAction><span className="flex size-8 items-center justify-center rounded-md border bg-background text-muted-foreground"><Icon className="size-4" /></span></CardAction>
+              </CardHeader>
+              <CardFooter className="text-sm text-muted-foreground">{note}</CardFooter>
+            </Card>
+          </Link>
+        ))}
+      </div>
+
+      {/* sections */}
+      <div className="grid gap-4">
+        <h2 className="text-base font-semibold">Sections</h2>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {SECTIONS.map((s, i) => (
+            <Link key={s.key} href={`/admin/${s.key}`} className="group rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50" data-slot="section-card">
+              <Card className="h-full gap-4 transition-[box-shadow,border-color] group-hover:border-ring/60 group-hover:shadow-md">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-1.5">{s.title}<ArrowUpRight className="size-3.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" /></CardTitle>
+                  <CardAction><Badge variant={edited[i] ? "default" : "secondary"}>{edited[i] ? "Edited" : "Original"}</Badge></CardAction>
+                  <CardDescription className="line-clamp-2">{s.blurb}</CardDescription>
+                </CardHeader>
+                <CardFooter className="mt-auto text-xs text-muted-foreground">{s.pages.join(" · ")}</CardFooter>
+              </Card>
+            </Link>
+          ))}
+          <Link href="/admin/uploads" className="group rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50" data-slot="section-card">
+            <Card className="h-full gap-4 transition-[box-shadow,border-color] group-hover:border-ring/60 group-hover:shadow-md">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-1.5">Free-trial uploads<ArrowUpRight className="size-3.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" /></CardTitle>
+                <CardAction><span className="flex size-6 items-center justify-center text-muted-foreground"><Upload className="size-4" /></span></CardAction>
+                <CardDescription>Where files from the free-trial form land: Dropbox or Google Drive.</CardDescription>
+              </CardHeader>
+              <CardFooter className="mt-auto text-xs text-muted-foreground">Free trial</CardFooter>
+            </Card>
+          </Link>
+        </div>
+      </div>
+
+      {/* storage */}
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-xl border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+        <span className="flex items-center gap-2"><HardDrive className="size-4" /> Saves: <span className="text-foreground">{store === "postgres" ? "PostgreSQL" : store === "redis" ? "Upstash" : "this computer (.data)"}</span></span>
+        <span className="flex items-center gap-2"><Images className="size-4" /> Photos: <span className="text-foreground">{media === "blob" ? "Vercel Blob" : "this computer (public/uploads)"}</span></span>
+        {ready && <span className="flex items-center gap-2 text-emerald-700"><CheckCircle2 className="size-4" /> Ready</span>}
+      </div>
+    </div>
   );
 }
 
-const input = "mt-2 block w-full rounded-input bg-surface px-3.5 py-3 text-[16px] font-normal text-ink outline-none ring-1 ring-line-2 focus:ring-2 focus:ring-blue";
-const Panel = ({ children }: { children: ReactNode }) => <div className="mt-8 rounded-card bg-surface p-5 shadow-hair md:p-7">{children}</div>;
-const Code = ({ children }: { children: ReactNode }) => <code className="rounded bg-sunk px-1 py-0.5 font-mono text-[13px]">{children}</code>;
-const Note = ({ children, warn = false }: { children: ReactNode; warn?: boolean }) => (
-  <p role="status" className={`mt-6 rounded-inner px-4 py-3 text-small ${warn ? "bg-[#FFF6E5] text-[#7A4B00]" : "bg-blue-tint text-ink"}`}>{children}</p>
-);
+const Code = ({ children }: { children: React.ReactNode }) => <code className="rounded bg-white/60 px-1 font-mono text-[12.5px]">{children}</code>;

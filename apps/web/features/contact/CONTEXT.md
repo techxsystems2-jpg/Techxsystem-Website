@@ -26,7 +26,7 @@ Read this file, `DESIGN.md` §1–6, and the files under **Uses**. Nothing else 
 
 ## Home design language (owner, 2026-11-02: "follow the home design")
 - Hero = Home hero: sky + clouds (`hero-sky`, masked fade, hidden on White), live studio badge in the trust-badge pill, two-line display headline rising word by word, lede, WhatsApp + "Send a message", four blue-icon pointers.
-- Channels = Home answer cards: Spotlight, dotted canvas illustration with story caption (WhatsApp `ContactArt`, `EmailArt`, `CallArt` in `ChannelArt.tsx`), maroon 01–03 + mono label, one line, value, blue link stretched over the card.
+- Channels = Home answer cards: Spotlight, the channel acted out on a real device with a story caption (`ContactScenes.tsx`, owner 2026-11-03: WhatsApp chat on a phone, a mail with attachments on the Mac, a call on a phone that ends on "Book a call"), maroon 01–03 + mono label, one line, value, blue link stretched over the card.
 - "Write to the studio" uses Home's `SectionHead`; form (04) and studio (05) cards use the same number + label head, equal height.
 - Studio clock is shared (`useStudioClock.ts`): hero badge and studio card.
 

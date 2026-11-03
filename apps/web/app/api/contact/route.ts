@@ -1,4 +1,5 @@
-import type { NextRequest } from "next/server";
+import { after, type NextRequest } from "next/server";
+import { sendAlert, type Alert } from "@/lib/server/email";
 import { randomId } from "@/lib/server/crypto";
 import { NotReady, openStore } from "@/lib/server/destinations";
 import { rateLimitAll, tooMany } from "@/lib/server/rate-limit";
@@ -8,7 +9,8 @@ import { validateContact } from "@/lib/trial";
 /* "Send a message" on /contact. Saves the message as a text file in the admin's chosen Dropbox / Google Drive,
    under "<top folder>/Contact messages/<date> <name>/message.txt", so it sits next to the trials.
    Same guards as the trial: same-origin, small JSON body, honeypot, rate limits, shared validation.
-   If storage isn't set up, it answers 503 with code "not_ready" and the form falls back to the visitor's mail app. */
+   The studio also gets an email alert (lib/server/email.ts, credit-capped). If storage is down the email alone counts;
+   only when neither works does it answer 503 "not_ready", and the form falls back to the visitor's mail app. */
 export async function POST(req: NextRequest) {
   if (!sameOrigin(req)) return fail("Forbidden", 403, "forbidden");
   const ip = clientIp(req);
@@ -26,9 +28,17 @@ export async function POST(req: NextRequest) {
     ]);
     if (limited) return tooMany(limited, "messages");
 
-    const store = await openStore();
-    const ref = await store.folder(`${new Date().toISOString().slice(0, 10)} ${d.name} ${randomId(2)}`, "Contact messages");
-    await store.writeText(ref, "message.txt", [`From: ${d.name} <${d.email}>`, `Received: ${new Date().toISOString()}`, "", d.message, ""].join("\n"));
+    const alert: Alert = { kind: "contact", subject: `Website message from ${d.name}`, replyTo: d.email, body: d.message, lines: [["Name", d.name], ["Email", d.email]] };
+    try {
+      const store = await openStore();
+      const ref = await store.folder(`${new Date().toISOString().slice(0, 10)} ${d.name} ${randomId(2)}`, "Contact messages");
+      await store.writeText(ref, "message.txt", [`From: ${d.name} <${d.email}>`, `Received: ${new Date().toISOString()}`, "", d.message, ""].join("\n"));
+    } catch (e) {
+      if (!(e instanceof NotReady)) throw e;
+      if ((await sendAlert(alert)).sent) return Response.json({ ok: true }); // saved nowhere else, so wait for the email
+      throw e;
+    }
+    after(() => sendAlert(alert)); // saved; the alert goes out after the response
     return Response.json({ ok: true });
   } catch (e) {
     if (e instanceof NotReady) return fail("Our message inbox is offline for a moment.", 503, "not_ready");

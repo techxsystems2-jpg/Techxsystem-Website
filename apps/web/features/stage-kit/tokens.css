@@ -1,0 +1,9 @@
+/* The few stageshow tokens the Phone reads from its stage (stageshow kit/stage.css, light look). Scoped to
+   .ss-tokens so nothing leaks into the site; the kit's stage reset is deliberately not copied (it would undo the
+   Tailwind classes the scenes are drawn with). */
+.ss-tokens {
+  --ss-accent: #3074fe;
+  --ss-line: rgba(0, 0, 0, 0.06);
+  --ss-text-faint: #9a9a9d;
+  --ss-font: var(--font-sans, system-ui, -apple-system, sans-serif);
+}

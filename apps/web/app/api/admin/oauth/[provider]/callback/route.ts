@@ -13,11 +13,11 @@ export async function GET(req: NextRequest, ctx: RouteContext<"/api/admin/oauth/
   const { provider } = await ctx.params;
   if (!(await isAdmin())) redirect("/admin");
   const jar = await cookies();
-  const state = unseal<{ provider: string; nonce: string }>(req.nextUrl.searchParams.get("state"));
+  const state = unseal<{ provider: string; nonce: string }>(req.nextUrl.searchParams.get("state"), "oauth-state");
   const nonce = jar.get("techx_oauth")?.value;
   jar.delete({ name: "techx_oauth", path: "/api/admin/oauth" });
   const code = req.nextUrl.searchParams.get("code");
-  if (!state || state.provider !== provider || !nonce || state.nonce !== nonce || !code) redirect("/admin?status=connect-failed");
+  if (!state || state.provider !== provider || !nonce || state.nonce !== nonce || !code) redirect("/admin/uploads?status=connect-failed");
 
   const callback = `${req.nextUrl.origin}/api/admin/oauth/${provider}/callback`;
   let ok = false;
@@ -34,5 +34,5 @@ export async function GET(req: NextRequest, ctx: RouteContext<"/api/admin/oauth/
   } catch (e) {
     console.error("[admin/oauth]", e);
   }
-  redirect(ok ? `/admin?status=${provider}-connected` : "/admin?status=connect-failed");
+  redirect(ok ? `/admin/uploads?status=${provider}-connected` : "/admin/uploads?status=connect-failed");
 }

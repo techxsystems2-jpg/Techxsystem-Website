@@ -2,13 +2,14 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { services } from "@/lib/site";
+import { useServices } from "@/features/content/ContentProvider";
 
 /* Service tabs (apple-design review, 2026-11-02). On phones the row scrolls sideways, so:
    - the current service is scrolled into view on arrival (wayfinding: "where am I" is never off screen);
    - the edges fade where more tabs sit beyond them, instead of cutting a tab in half (scroll edge effect);
    - tabs press in on pointer-down. Desktop: all six fit, centred. */
 export function ServiceTabs({ slug }: { slug: string }) {
+  const services = useServices();
   const row = useRef<HTMLUListElement>(null);
   useEffect(() => {
     const ul = row.current;

@@ -1,0 +1,6 @@
+{
+  "from": "TechX Systems website (apps/web): brand blue, maroon accent, Geist",
+  "mood": "light, airy studio white with a deep-blue New York night on one side",
+  "color": { "ground": "#F5F8FD", "deep": "#101A3A", "card": "#FFFFFF", "line": "#E4E4E7", "mute": "#6B6B73", "ink": "#0A0A0B", "accent": "#3074FE", "accent2": "#8E1F3F" },
+  "type": { "display": { "face": "Geist", "weight": 560, "tracking": -0.03 }, "text": { "face": "Geist", "weight": 450, "tracking": -0.01 }, "mono": { "face": "Geist Mono", "weight": 400, "tracking": 0 } }
+}

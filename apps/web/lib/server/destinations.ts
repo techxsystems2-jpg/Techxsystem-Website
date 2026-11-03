@@ -81,7 +81,7 @@ export async function openStore(force?: Destination): Promise<Store> {
       },
       writeText: (ref, name, text) => writeFile(path.join(LOCAL_ROOT, ref, name), text),
       async target(ref, f) {
-        return { name: f.name, method: "PUT", headers: { "Content-Type": "application/octet-stream" }, url: `/api/trial/local-upload?t=${encodeURIComponent(seal({ dir: ref, name: f.name, size: f.size }, 6 * 3600))}` };
+        return { name: f.name, method: "PUT", headers: { "Content-Type": "application/octet-stream" }, url: `/api/trial/local-upload?t=${encodeURIComponent(seal({ dir: ref, name: f.name, size: f.size }, 6 * 3600, "local-upload"))}` };
       },
     };
   }

@@ -7,7 +7,7 @@ import { ArrowIcon, CheckIcon } from "@techx/ui/Icons";
 import { inspectFile } from "@/lib/file-check";
 import { Err, Field, inputClass as input } from "@/features/site-shell/FormField";
 import { POINT_ICONS, PointIcon } from "@/features/site-shell/SkyHero";
-import { site } from "@/lib/site";
+import { useSite } from "@/features/content/ContentProvider";
 import { TRIAL, accept, formatBytes, validateDetails, validateFiles, type FieldErrors, type StartResponse, type TrialDetails, type UploadTarget } from "@/lib/trial";
 import { isApiError, postJson, uploadWithRetry } from "@/lib/uploader";
 
@@ -29,6 +29,7 @@ const spring = { type: "spring", bounce: 0, duration: 0.45 } as const;
 const empty: TrialDetails = { name: "", studio: "", email: "", volume: TRIAL.volumes[1], notes: "", link: "" };
 
 export function TrialForm() {
+  const site = useSite();
   const [d, setD] = useState<TrialDetails>(empty);
   const [items, setItems] = useState<Item[]>([]);
   const [rejected, setRejected] = useState<string[]>([]);
@@ -259,7 +260,7 @@ export function TrialForm() {
                 <label id="trial-files-label" tabIndex={-1} htmlFor="trial-files" className="block cursor-pointer rounded-inner outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-blue">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="mx-auto text-ink"><path d="M12 15V4m0 0L7.5 8.5M12 4l4.5 4.5M4 15v2a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-2" /></svg>
                   <span className="mt-2 block font-medium">Drop up to 10 photos or brackets</span>
-                  <span id="files-help" className="mt-0.5 block text-small text-ink-2">or <span className="text-blue underline underline-offset-4">choose files</span> · JPEG, RAW, DNG, TIFF or a ZIP · 150 MB a file</span>
+                  <span id="files-help" className="mt-0.5 block text-small text-ink-2">or <span className="text-blue-2 underline underline-offset-4">choose files</span> · JPEG, RAW, DNG, TIFF or a ZIP · 150 MB a file</span>
                 </label>
                 <div className="mx-auto mt-4 max-w-[380px] text-left">
                   <label htmlFor="link" className="sr-only">Or paste a Dropbox / Drive link</label>

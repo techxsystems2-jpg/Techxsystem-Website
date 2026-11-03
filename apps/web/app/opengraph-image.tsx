@@ -1,13 +1,15 @@
 import { ImageResponse } from "next/og";
-import { site } from "@/lib/site";
+import { getSite } from "@/lib/content";
+import { site as fixed } from "@/lib/site";
 
 /* Default share image for every page (link previews in WhatsApp, iMessage, LinkedIn, X). The Home hero's words on the
    hero sky, the starting price and the free trial. Pages can add their own opengraph-image later. */
-export const alt = `${site.name}: real estate photo editing, from ${site.startingPrice} an image`;
+export const alt = `${fixed.name}: real estate photo editing for photographers in the US, UK and Australia`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OpenGraphImage() {
+export default async function OpenGraphImage() {
+  const site = await getSite();
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 72, background: "linear-gradient(180deg,#D2ECFF 0%,#EAF5FF 45%,#FFFFFF 100%)", color: "#0A0A0B", fontFamily: "sans-serif" }}>

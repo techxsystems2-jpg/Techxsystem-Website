@@ -17,7 +17,7 @@
 - [ ] "We only use your photos with written permission"
 - [ ] Building a style guide from 2–3 sample photos
 - [ ] Studio hours of 9 AM – 7 PM IST
-- [ ] Timeline milestones (2017 Aligarh studio, 2019 video and floor plans)
+- [ ] Timeline milestones: 2016 founded in Aligarh (confirmed by owner, 2026-11-03); 2017 Delhi studio and 2019 video and floor plans still to confirm
 - [ ] Client portal and "Log in" (does a portal exist?)
 
 **People and places**
@@ -35,10 +35,10 @@
 
 ## Design work not done yet
 
-- [ ] Direction B mobile layouts (Direction A has a mobile Home only)
+- [x] Direction B mobile layouts: every page built responsive and checked at 390px (2026-11-03)
 - [ ] Resources: blog, FAQ, "TechX vs AI editors", shoot guides
 - [ ] Legal pages, client portal and upload flow
-- [ ] Remaining five service pages (copy, fixes and prices per service)
+- [x] Remaining five service pages: built from the old site's facts (2026-11-02); staging details still to confirm
 - [ ] Real photography to replace the illustrated stand-in scenes
 - [ ] Logo refresh, if wanted
 
@@ -62,7 +62,7 @@
 ## Inner pages built (2026-11-02): Figma disagreements and claims to confirm
 - [ ] **Level prices:** Figma Pricing shows Essential $0.70 · Signature $0.75 · Luxury $1.50; Figma Services shows $0.50 · $1.00 · Luxury (Highend Editing, "Commercial & Architectural Buildings") $1.75. Built with the settled $0.50 / $1.00 / $1.50, all "From". Confirm Luxury and whether "Highend / commercial" is a separate level.
 - [ ] **Price list:** Figma shows ranges ($0.70–$1.50, $1.00–$2.00, $5–$8); built as "From". Turnarounds per service (Figma): staging and floor plans 24 h, video 24–48 h, the rest 12–24 h. Services hero said 12–16 hours.
-- [ ] **About dates:** Figma headline "Started by two people in 2013", timeline "2016 Founded in Aligarh · 2017 Studio in Delhi", story "2016 in Delhi, a year later moved to Aligarh". Built with the brief: 2016 in Delhi, 2017 own studio, place shown as "India".
+- [x] **About dates** (settled 2026-11-03, owner): TechX started in Aligarh in 2016; studio in Delhi in 2017. Timeline as in Figma; story says Aligarh. Figma's "2013" headline stays 2016.
 - [ ] **About team:** names and roles from Figma (Adnan Khan, Faraz Ahmad, Akash Kumar, SM Swaleh); portraits are visible placeholders. Confirm who to show; send portraits and a studio photo.
 - [ ] **Work:** Figma promises before/after pairs and credits studios by name (placeholders). Built with TechX's 87 finished edits only. Need raw/edited pairs and photographer permission to show these edits.
 - [ ] **Ways to send:** Figma lists Client portal and WeTransfer; the site takes uploads and Dropbox / Google Drive links only.

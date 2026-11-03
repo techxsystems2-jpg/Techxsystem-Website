@@ -1,9 +1,11 @@
-import { services, site } from "@/lib/site";
+import { getContent, getSite } from "@/lib/content";
+import { publishedPosts } from "@/lib/content/blog";
 
 /* /llms.txt (claude-seo:seo-geo, 2026-11-02): a plain-text map of the site for non-Google AI tools. Google Search
-   ignores it; it costs nothing. Built from lib/site.ts so it never drifts from the pages (prerendered: it reads no request data). */
+   ignores it; it costs nothing. Built from the content store (lib/content) so it never drifts from the pages (prerendered: it reads no request data). */
 
-export function GET() {
+export async function GET() {
+  const [site, services, posts] = await Promise.all([getSite(), getContent("services"), publishedPosts()]);
   const u = (p: string) => new URL(p, site.url).toString();
   const body = `# ${site.name}
 
@@ -22,7 +24,7 @@ ${services.map((s) => `- [${s.name}](${u(`/services/${s.slug}`)}): ${s.line} ${s
 - [Free trial](${u("/free-trial")}): 10 photos edited free. No card, no contract.
 - [Contact](${u("/contact")}): WhatsApp, email or phone.
 
-## Contact
+${posts.length ? `## Blog\n${posts.map((p) => `- [${p.title}](${u(`/blog/${p.slug}`)}): ${p.excerpt}`).join("\n")}\n\n` : ""}## Contact
 - WhatsApp: ${site.contact.whatsapp}
 - Email: ${site.contact.email}
 - Phone: ${site.contact.phone}

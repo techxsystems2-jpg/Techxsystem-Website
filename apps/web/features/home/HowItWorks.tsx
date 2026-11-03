@@ -141,7 +141,7 @@ export function Overnight() {
                 <Image src="/photos/tx-ext.jpg" alt="" fill sizes="24px" className="object-cover transition-[filter] duration-500" style={state === "raw" ? { filter: "brightness(.62) contrast(.78) saturate(.5) sepia(.1)" } : undefined} />
               </span>
               <span className="whitespace-nowrap font-mono text-[10px] text-ink">{clock(et)} ET <span className="text-ink-3">·</span> <span className="text-ink-2">{clock(ist)} IST</span></span>
-              <span className={`grid size-[18px] place-items-center rounded-full transition-colors duration-300 ${state === "checked" ? "bg-[#E7F6EE] text-green" : state === "editing" ? "bg-blue-tint text-blue" : "bg-sunk text-ink-3"}`}>{state === "checked" ? icon(P.check, 11) : state === "editing" ? icon(P.edit, 10) : null}</span>
+              <span className={`grid size-[18px] place-items-center rounded-full transition-colors duration-300 ${state === "checked" ? "bg-[#E7F6EE] text-green" : state === "editing" ? "bg-blue-tint text-blue-2" : "bg-sunk text-ink-3"}`}>{state === "checked" ? icon(P.check, 11) : state === "editing" ? icon(P.edit, 10) : null}</span>
             </motion.span>
           </motion.div>
           <div className="hidden h-[100px] md:block" />
@@ -202,13 +202,13 @@ function StepCards() {
         {steps.map((s, i) => (
           <RevealItem key={s.n} className="group relative flex flex-col rounded-card bg-surface p-2 shadow-hair transition-[box-shadow,translate] duration-[320ms] ease-[var(--ease-brand)] hover:-translate-y-1 hover:shadow-raised">
             <div className="flex flex-1 flex-col" onPointerEnter={(e) => { if (e.pointerType === "mouse" && !reduce) replay(i); }}>
-              <span className="px-4 pb-3 pt-3 font-mono text-label text-ink-3 transition-colors duration-200 group-hover:text-maroon">{s.n}</span>
+              <span className="px-4 pb-3 pt-3 font-mono text-label text-ink-2 transition-colors duration-200 group-hover:text-maroon">{s.n}</span>
               <StepArt n={i} run={runs[i]} />
               <div className="flex flex-1 flex-col px-4 pb-4">
                 <h3 className="mt-5 text-h4">{s.t}</h3>
                 <p className="mt-2 text-small text-ink-2">{s.d}</p>
                 {/* pinned to the card foot so every tag sits on one line across the row */}
-                <p className="mt-auto pt-5 font-mono text-[11px] uppercase tracking-[0.04em] text-blue">{s.who}</p>
+                <p className="mt-auto pt-5 font-mono text-[11px] uppercase tracking-[0.04em] text-blue-2">{s.who}</p>
               </div>
             </div>
           </RevealItem>

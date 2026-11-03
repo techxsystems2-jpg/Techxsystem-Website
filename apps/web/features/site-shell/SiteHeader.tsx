@@ -6,9 +6,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
 import { buttonClass } from "@techx/ui/Button";
-import { BgToggle } from "./BgToggle";
 import { Mark } from "@techx/ui/Icons";
-import { announcement, nav, services } from "@/lib/site";
+import { useServices, useSite } from "@/features/content/ContentProvider";
+import { nav } from "@/lib/site";
 
 /* Header, after apple.com's global nav (owner, 2026-10-30):
    - full-width 48px bar; content held to a centred 1024px column with items spread evenly across it;
@@ -20,17 +20,23 @@ import { announcement, nav, services } from "@/lib/site";
    the whole header slides up 40px so only the nav stays. layout.tsx holds a matching 40px spacer. */
 
 const spring = { type: "spring", bounce: 0, duration: 0.4 } as const;
-const thumbs: Record<string, string> = {
-  "photo-editing": "/photos/ext.webp",
-  "virtual-twilight": "/photos/twi.webp",
-  "virtual-staging": "/photos/int.webp",
-  "drone-editing": "/photos/aer.webp",
-  "floor-plans": "/photos/plan.webp",
-  "video-editing": "/photos/ext.webp",
-};
 
+/** The header for the current URL (active nav link, the announcement link hidden on its own page). */
 export function SiteHeader() {
-  const path = usePathname();
+  return <HeaderView path={usePathname()} />;
+}
+
+/** The same header with no active link: the Suspense fallback, so the server HTML always carries the full header,
+    nav links and announcement (speed + SEO pass, 2026-11-03: with a null fallback the header only appeared after
+    JavaScript loaded, which delayed LCP and hid the nav links from a crawler's first pass). Same layout, so no shift
+    when the path-aware header takes over. */
+export function SiteHeaderShell() {
+  return <HeaderView path="" />;
+}
+
+function HeaderView({ path }: { path: string }) {
+  const { announcement } = useSite();
+  const services = useServices();
   const reduce = useReducedMotion();
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
@@ -58,6 +64,7 @@ export function SiteHeader() {
   const solid = scrolled || menu || flyout;
   const barAway = scrolled || menu;
   const current = (href: string) => path === href || path.startsWith(`${href}/`);
+  if (path.startsWith("/admin")) return null; // the admin panel has its own chrome
 
   return (
     <>
@@ -112,7 +119,6 @@ export function SiteHeader() {
             )}
 
             <div className="flex items-center gap-1" onMouseEnter={closeFly}>
-              <BgToggle className="mr-2 max-lg:hidden" />
               <Link href="/free-trial" className={buttonClass("primary", "!h-8 !px-3.5 !text-[12.5px]", "sm")}>Start free trial</Link>
               <button type="button" onClick={() => setMenu((o) => !o)} aria-expanded={menu} aria-controls="mobile-menu" aria-label={menu ? "Close menu" : "Open menu"} className="grid size-10 place-items-center rounded-[10px] lg:hidden">
                 <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
@@ -135,7 +141,7 @@ export function SiteHeader() {
                     <ul className="mt-3 space-y-1.5">
                       {services.map((s) => (
                         <li key={s.slug}>
-                          <Link href={`/services/${s.slug}`} onClick={() => setFlyout(false)} className="font-display text-[22px] font-semibold leading-tight tracking-[-0.02em] text-ink transition-colors duration-150 hover:text-blue">{s.short}</Link>
+                          <Link href={`/services/${s.slug}`} onClick={() => setFlyout(false)} className="font-display text-[22px] font-semibold leading-tight tracking-[-0.02em] text-ink transition-colors duration-150 hover:text-blue-2">{s.short}</Link>
                         </li>
                       ))}
                     </ul>
@@ -146,10 +152,10 @@ export function SiteHeader() {
                       <motion.li key={s.slug} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.08 + i * 0.03 }}>
                         <Link href={`/services/${s.slug}`} onClick={() => setFlyout(false)} className="group block">
                           <span className="relative block aspect-[16/10] overflow-hidden rounded-xl bg-sunk">
-                            <Image src={thumbs[s.slug]!} alt="" fill sizes="240px" className={`transition-transform duration-500 ease-[var(--ease-brand)] group-hover:scale-[1.05] ${s.slug === "floor-plans" ? "bg-white object-contain p-2" : "object-cover"}`} />
+                            <Image src={s.image || "/photos/ext.webp"} alt="" fill sizes="240px" className={`transition-transform duration-300 ease-[var(--ease-brand)] group-hover:scale-[1.05] ${s.slug === "floor-plans" ? "bg-white object-contain p-2" : "object-cover"}`} />
                           </span>
                           <span className="mt-2 block text-[13px] font-medium text-ink">{s.name}</span>
-                          <span className="mt-0.5 block font-mono text-[11px] uppercase tracking-[0.03em] text-ink-2 group-hover:text-blue">{s.from}</span>
+                          <span className="mt-0.5 block font-mono text-[11px] uppercase tracking-[0.03em] text-ink-2 group-hover:text-blue-2">{s.from}</span>
                         </Link>
                       </motion.li>
                     ))}
@@ -169,7 +175,6 @@ export function SiteHeader() {
                       <Link href={l.href} onClick={() => setMenu(false)} className="flex min-h-12 items-center font-display text-[28px] font-semibold tracking-[-0.02em] text-ink">{l.label}</Link>
                     </motion.div>
                   ))}
-                  <div className="mt-8 flex items-center gap-3"><span className="text-small text-ink-2">Background</span><BgToggle /></div>
                 </div>
               </motion.nav>
             )}

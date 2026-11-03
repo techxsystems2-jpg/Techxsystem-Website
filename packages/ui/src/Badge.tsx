@@ -4,7 +4,7 @@ type Tone = "neutral" | "blue" | "maroon" | "dark" | "glass";
 
 const tones: Record<Tone, string> = {
   neutral: "bg-sunk text-ink-2",
-  blue: "bg-blue-tint text-blue",
+  blue: "bg-blue-tint text-blue-2",
   maroon: "bg-maroon-tint text-maroon",
   dark: "bg-ink text-white",
   glass: "bg-surface/90 text-ink-2 backdrop-blur", // on photos

@@ -15,3 +15,12 @@ next-env.d.ts
 # Free-trial uploads: local settings and the development "This computer" destination
 apps/web/.data/
 apps/web/.uploads/
+
+# Promo film renders (video/): source is comp.html; renders are rebuilt, not committed
+video/**/*.mp4
+video/**/*.wav
+video/**/stills*.png
+video/**/.render.json
+
+# Admin panel uploads in local development (production uses Vercel Blob)
+apps/web/public/uploads/

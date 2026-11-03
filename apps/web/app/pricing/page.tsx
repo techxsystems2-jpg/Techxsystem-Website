@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/content/seo";
 import Link from "next/link";
 import { ArrowIcon } from "@techx/ui/Icons";
 import { Faq } from "@/features/home/Faq";
@@ -10,25 +11,21 @@ import { Spotlight } from "@/features/motion/Spotlight";
 import { Calculator } from "@/features/pricing/Calculator";
 import { FinalCta } from "@/features/site-shell/FinalCta";
 import { HeroBadge, SkyHero } from "@/features/site-shell/SkyHero";
-import { services, site } from "@/lib/site";
+import { getContent, getSite } from "@/lib/content";
 
 /* Pricing (Figma node 31:155; copy in features/pricing/CONTEXT.md), in the shared page design: SkyHero → the three
    levels and bulk row (Home's Pricing) → calculator → how billing works → the full price list → questions → final CTA.
    Figma's level prices ($0.70 / $0.75 / $1.50) and price-list ranges predate the owner's starting prices: every price
    here is "from", Essential from $0.50 (owner, 2026-11-02). Figma's "Pay per image / Studio plans" toggle is dropped:
    the bulk row under the levels already carries studio plans. */
-export const metadata: Metadata = {
-  title: "Pricing: from $0.50 an image",
-  description: `Real estate photo editing from ${site.startingPrice} an image. Three levels, no contract, no minimum, billed monthly for delivered photos only. Revisions free.`,
-  alternates: { canonical: "/pricing" },
-};
-
-// Turnarounds from the Figma price list; staging price is a placeholder to confirm (lib/site.ts).
-const turnaround: Record<string, string> = {
-  "photo-editing": "12–24 h", "virtual-twilight": "12–24 h", "virtual-staging": "24 h",
-  "drone-editing": "12–24 h", "floor-plans": "24 h", "video-editing": "24–48 h",
-};
-const tag: Record<string, string> = { "photo-editing": "Most ordered", "virtual-staging": "New" };
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSite();
+  return pageMetadata("pricing", {
+    title: `Pricing: from ${site.startingPrice} an image`,
+    description: `Real estate photo editing from ${site.startingPrice} an image. Three levels, no contract, no minimum, billed monthly for delivered photos only. Revisions free.`,
+    alternates: { canonical: "/pricing" },
+  });
+}
 
 const billing = [
   ["Per image", "Pick a level per shoot, and mix levels in one order."],
@@ -36,15 +33,9 @@ const billing = [
   ["Revisions", "Always free, usually back the same day."],
 ] as const;
 
-// Answer 1 from Figma; 2 and 4 restate the page's own terms; 3 is an open claim to confirm (docs/OPEN_ITEMS.md).
-const faqs = [
-  ["When am I charged?", "At the end of each month, only for photos we delivered. Your first 10 are free."],
-  ["Do you charge for revisions?", "No. Ask for a change on any image and we'll redo it free, usually the same day."],
-  ["Which payment methods do you take?", "Card, PayPal or bank transfer."],
-  ["Is there a minimum order?", "No. Send one photo or a thousand. Studios sending 500+ a month can talk to us about volume pricing."],
-] as const;
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const [site, services, { plans }, faqs] = await Promise.all([getSite(), getContent("services"), getContent("pricing"), getContent("faqs")]);
   return (
     <>
       <SkyHero
@@ -59,7 +50,7 @@ export default function PricingPage() {
 
       <section className="wrap pt-24 md:pt-32">
         <SectionHead label="Calculator" lead="Work out a month in seconds." rest="Using our starting rates." />
-        <Reveal><Calculator /></Reveal>
+        <Reveal><Calculator plans={plans} /></Reveal>
       </section>
 
       <section className="wrap grid items-center gap-10 pt-24 md:pt-32 lg:grid-cols-2 lg:gap-14">
@@ -96,11 +87,11 @@ export default function PricingPage() {
               {services.map((s) => (
                 <tr key={s.slug} className="group border-b border-line last:border-b-0">
                   <th scope="row" className="px-5 py-5 font-medium md:px-6">
-                    <Link href={`/services/${s.slug}`} className="hover:text-blue">{s.name}</Link>
-                    {tag[s.slug] && <span className={`ml-3 rounded-md px-1.5 py-0.5 align-middle font-mono text-[10.5px] uppercase tracking-[0.04em] ${s.slug === "virtual-staging" ? "bg-blue-tint text-blue" : "bg-sunk text-ink-2"}`}>{tag[s.slug]}</span>}
+                    <Link href={`/services/${s.slug}`} className="hover:text-blue-2">{s.name}</Link>
+                    {s.tag && <span className={`ml-3 rounded-md px-1.5 py-0.5 align-middle font-mono text-[10.5px] uppercase tracking-[0.04em] ${/^new$/i.test(s.tag) ? "bg-blue-tint text-blue-2" : "bg-sunk text-ink-2"}`}>{s.tag}</span>}
                   </th>
                   <td className="px-5 py-5 tabular-nums text-ink-2">{s.from}</td>
-                  <td className="px-5 py-5 tabular-nums text-ink-2">{turnaround[s.slug]}</td>
+                  <td className="px-5 py-5 tabular-nums text-ink-2">{s.turnaround}</td>
                   <td className="px-5 py-5 text-right">
                     <Link href={`/services/${s.slug}`} aria-label={`${s.name} details`} className="inline-grid size-9 place-items-center rounded-full text-ink-3 transition-colors duration-200 hover:bg-blue hover:text-white"><ArrowIcon size={14} /></Link>
                   </td>
@@ -112,7 +103,7 @@ export default function PricingPage() {
         <p className="mt-4 text-small text-ink-2">Prices in USD. Starting prices: the final rate depends on the type and volume of work, and we confirm it before we start. Revisions are always free.</p>
       </section>
 
-      <Faq title="Questions about pricing" lede="Still unsure? Message the studio on WhatsApp. An editor replies." faqs={faqs} />
+      <Faq title="Questions about pricing" lede="Still unsure? Message the studio on WhatsApp. An editor replies." faqs={faqs.pricing} />
       <FinalCta lead="Not sure which level?" rest="Send ten photos and we'll suggest one." />
     </>
   );

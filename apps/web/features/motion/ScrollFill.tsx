@@ -8,7 +8,7 @@ import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } f
     entering the lower part of the screen and passing the middle. Opacity only; reduced motion shows the settled tone. */
 // 35% ink is the old muted grey; it settles at 62% ink so the lead stays the only full-ink part and still reads as
 // the main message (owner, 2026-10-31: "not total black, a little faded")
-const FROM = 0.35;
+const FROM = 0.6; // unfilled words still read at 4.5:1 (body-size words too); 0.35 was 2.3:1 (a11y pass, 2026-11-03)
 const TO = 0.62;
 
 export function ScrollFill({ text }: { text: string }) {

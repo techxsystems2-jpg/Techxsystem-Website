@@ -14,7 +14,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<"/api/admin/oauth/
   if (provider !== "dropbox" && provider !== "gdrive") return new Response("Unknown provider", { status: 404 });
 
   const nonce = randomId(16);
-  const state = seal({ provider, nonce }, 600);
+  const state = seal({ provider, nonce }, 600, "oauth-state");
   (await cookies()).set("techx_oauth", nonce, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/api/admin/oauth", maxAge: 600 });
   const callback = `${req.nextUrl.origin}/api/admin/oauth/${provider}/callback`;
   redirect(provider === "dropbox" ? dropboxAuthUrl(callback, state) : gdriveAuthUrl(callback, state));

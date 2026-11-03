@@ -19,7 +19,7 @@ Read this file, `DESIGN.md` §1–6, and the files under **Uses**. Nothing else 
 - Final CTA: "Step one takes two minutes." / "We'll do the rest tonight."
 
 ## Files
-`app/how-it-works/page.tsx` · `StepRows.tsx`. Uses `StepArt` (`big`), Home's `Overnight`.
+`app/how-it-works/page.tsx` · `StepRows.tsx` · `StepScenes.tsx` (the four step animations, real photos; 2026-11-03). Uses Home's `Overnight`.
 
 ## Status
 - [x] Copy transcribed from Figma (2026-11-02)

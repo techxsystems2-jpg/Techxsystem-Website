@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
+import { getContent } from "@/lib/content";
 import { footer } from "@/lib/site";
 
 /** Lists every service, so it doubles as a sitemap. */
-export function SiteFooter() {
+export async function SiteFooter() {
+  // service names follow the content store; the other columns are fixed
+  const services = await getContent("services");
+  const groups = footer.map((g) => (g.title === "Services" ? { ...g, links: services.map((s) => ({ href: `/services/${s.slug}`, label: s.short })) } : g));
   return (
     <footer className="mt-24 border-t border-line pb-28 pt-14 md:mt-30 md:pb-12">
       <div className="wrap">
@@ -12,9 +16,9 @@ export function SiteFooter() {
             <Logo />
             <p className="mt-3 max-w-[280px] text-small text-ink-2">Real estate photo editing, by people, since 2016. Studio in India.</p>
           </div>
-          {footer.map((g) => (
+          {groups.map((g) => (
             <div key={g.title}>
-              <h2 className="mb-3.5 font-mono text-label uppercase text-ink-3">{g.title}</h2>
+              <h2 className="mb-3.5 font-mono text-label uppercase text-ink-2">{g.title}</h2>
               <ul>
                 {g.links.map((l) => (
                   <li key={l.label}>
@@ -29,7 +33,7 @@ export function SiteFooter() {
             </div>
           ))}
         </div>
-        <div className="mt-14 flex flex-wrap justify-between gap-3 font-mono text-label text-ink-3">
+        <div className="mt-14 flex flex-wrap justify-between gap-3 font-mono text-label text-ink-2">
           <span>© 2026 TechX Systems</span>
           {/* studio credit (owner, 2026-11-02) */}
           <span>

@@ -58,6 +58,6 @@ export const services = [
 export const footer: { title: string; links: { label: string; href?: string }[] }[] = [
   { title: "Services", links: services.map((s) => ({ href: `/services/${s.slug}`, label: s.short })) },
   { title: "Company", links: [{ href: "/about", label: "About" }, { href: "/work", label: "Work" }, { href: "/pricing", label: "Pricing" }, { href: "/about#reviews", label: "Reviews" }] },
-  { title: "Resources", links: [{ label: "Blog" }, { label: "FAQ" }, { label: "TechX vs AI editors" }, { label: "Shoot guides" }] },
+  { title: "Resources", links: [{ href: "/blog", label: "Blog" }, { label: "FAQ" }, { label: "TechX vs AI editors" }, { label: "Shoot guides" }] },
   { title: "Start", links: [{ href: "/free-trial", label: "Free trial" }, { label: "Client login" }, { href: "/contact", label: "Contact" }] },
 ];

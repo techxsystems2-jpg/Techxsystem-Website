@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/content/seo";
 import Link from "next/link";
 import { buttonClass } from "@techx/ui/Button";
 import { ArrowIcon } from "@techx/ui/Icons";
@@ -6,18 +7,23 @@ import { Reveal } from "@/features/motion/Reveal";
 import { FinalCta } from "@/features/site-shell/FinalCta";
 import { HeroBadge, SkyHero } from "@/features/site-shell/SkyHero";
 import { Gallery } from "@/features/work/Gallery";
-import { portfolio } from "@/features/work/portfolio";
+import { toShots } from "@/features/work/portfolio";
+import { getContent } from "@/lib/content";
 
 /* Work (Figma node 29:155; copy in features/work/CONTEXT.md), in the shared page design: SkyHero, the filterable
    gallery of TechX's 87 finished edits, final CTA. Figma's headline promises before/after pairs and credits named
    studios; TechX hasn't sent raw files or credits yet, so the page shows finished edits and says so (AGENTS.md rule 2). */
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const portfolio = await getContent("work");
+  return pageMetadata("work", {
   title: "Work: real estate photo edits",
   description: `${portfolio.length} finished edits from TechX's studio: interiors, exteriors, drone, yachts, twilights and floor plans. Try 10 photos of your own free.`,
   alternates: { canonical: "/work" },
-};
+  });
+}
 
-export default function Work() {
+export default async function Work() {
+  const portfolio = toShots(await getContent("work"));
   return (
     <>
       <SkyHero
@@ -34,7 +40,7 @@ export default function Work() {
 
       <section className="wrap mt-14">
         <Reveal>
-          <Gallery />
+          <Gallery items={portfolio} />
         </Reveal>
         {/* placeholder, visibly marked until TechX sends raw files (docs/OPEN_ITEMS.md) */}
         <p className="mx-auto mt-8 max-w-[560px] text-center font-mono text-[12px] uppercase tracking-[0.04em] text-ink-2">

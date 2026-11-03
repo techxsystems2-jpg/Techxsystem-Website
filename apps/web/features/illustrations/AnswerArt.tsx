@@ -6,10 +6,14 @@ import NumberFlow from "@number-flow/react";
 import { Mark } from "@techx/ui/Icons";
 import Image from "next/image";
 import { useLoop } from "@/features/motion/useLoop";
-import { Canvas, Story } from "./Canvas";
+import { Canvas, SHADOW_HERO, SHADOW_SATELLITE, Shot, Story } from "./Canvas";
 
 /* The five must-keep answers, each acted out as a small working flow (features/illustrations/CONTEXT.md).
-   Every flow runs only while on screen; off screen or under reduced motion it rests on its finished frame. */
+   Every flow runs only while on screen; off screen or under reduced motion it rests on its finished frame.
+   stageshow review (2026-11-03): each composition is drawn at a real type size and shown whole by Shot (never below
+   its design size on a wide card, scaled only when the card is narrower); the caption says each beat once, so the
+   extra labels that repeated it (the "checked twice" bar, the "billed after delivery" stamp, the dashed "free trial"
+   box) are gone; sans labels, monospace only for prices and times; no grey placeholder states. */
 
 const spring = { type: "spring", bounce: 0, duration: 0.5 } as const;
 const pop = { type: "spring", bounce: 0.35, duration: 0.5 } as const;
@@ -73,7 +77,8 @@ export function ProcessArt() {
   return (
     <div ref={ref}>
       <Canvas className="h-[292px]" story={<Story steps={PROCESS_STORY} at={s} />}>
-        <div className="relative h-[256px] w-[348px] shrink-0 origin-center scale-[0.74] min-[400px]:scale-[0.78]">
+        <Shot w={348} h={206} mode="fit">
+        <div className="relative h-[206px] w-[348px]">
           {/* the route between the two places, and the shoot travelling it: out at 0, back at 4 */}
           <svg viewBox="0 0 348 50" className="absolute inset-x-0 top-0 h-[50px] w-full overflow-visible" aria-hidden="true">
             <path d={arc} fill="none" stroke="#D5D9E0" strokeWidth="1.5" strokeDasharray="3 5" />
@@ -95,7 +100,7 @@ export function ProcessArt() {
                   <span className="mt-2 block h-1 overflow-hidden rounded-full bg-white/15">
                     <motion.span className="block h-full origin-left rounded-full bg-blue" initial={{ scaleX: 0.05 }} animate={{ scaleX: 1 }} transition={{ duration: 1, ease: [0.77, 0, 0.175, 1] }} />
                   </span>
-                  <p className="mt-2 font-mono text-[9px] text-white/60">Notes: swap sky, pull windows</p>
+                  <p className="mt-2 text-[10px] text-white/60">Notes: swap sky, pull windows</p>
                 </motion.div>
               )}
               {s >= 1 && s <= 3 && (
@@ -113,7 +118,7 @@ export function ProcessArt() {
                       <motion.div key={t} className="relative h-[24px] overflow-hidden rounded" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 1.2 + i * 0.07 }}><Thumb name={t} sizes="40px" /></motion.div>
                     ))}
                   </div>
-                  <p className="mt-1.5 font-mono text-[9px] text-ink-2">Edited, checked twice</p>
+                  <p className="mt-1.5 text-[10px] text-ink-2">Edited, checked twice</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -127,7 +132,7 @@ export function ProcessArt() {
                   <motion.div className="flex items-center gap-1.5" initial={{ opacity: 0.4 }} animate={{ opacity: 1 }} transition={{ delay: 2.1, duration: 0.3 }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5" /><path d="M3.5 7l8.5 6 8.5-6" /></svg>
                     <p className="text-[11px] font-medium">Studio inbox</p>
-                    <motion.span className="ml-auto rounded-full bg-blue px-1.5 font-mono text-[9px] text-white" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ ...pop, delay: 2.1 }}>1 new</motion.span>
+                    <motion.span className="ml-auto rounded-full bg-blue px-1.5 text-[10px] font-medium text-white" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ ...pop, delay: 2.1 }}>1 new</motion.span>
                   </motion.div>
                   <p className="mt-2 text-[9.5px] text-white/60">Arrives overnight. Opened at 9 AM.</p>
                 </motion.div>
@@ -149,13 +154,8 @@ export function ProcessArt() {
             </AnimatePresence>
           </Place>
 
-          {/* checked twice: once by the editor, once by the QC assigned to the account */}
-          <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1.5 rounded-xl bg-surface px-2 py-1.5 shadow-hair">
-            <span className="mr-0.5 font-mono text-[9px] uppercase tracking-[0.04em] text-ink-2">Checked twice</span>
-            <CheckPill label="1 · Your editor" on={s >= 2} now={s === 2} />
-            <CheckPill label="2 · QC · Akash" on={s >= 3} now={s === 3} maroon />
-          </div>
         </div>
+        </Shot>
       </Canvas>
     </div>
   );
@@ -164,7 +164,7 @@ export function ProcessArt() {
 /** One side of the world: city, live clock, and the sky behind it (night fades to day by opacity). */
 function Place({ city, zone, time, night, className, children }: { city: string; zone: string; time: string; night: boolean; className: string; children: ReactNode }) {
   return (
-    <div className={`absolute top-[34px] h-[164px] w-[156px] overflow-hidden rounded-xl bg-[linear-gradient(170deg,#EAF5FF,#FFFFFF_70%)] shadow-raised ${className}`}>
+    <div className={`absolute top-[34px] h-[164px] w-[156px] overflow-hidden rounded-xl bg-[linear-gradient(170deg,#EAF5FF,#FFFFFF_70%)] ${SHADOW_SATELLITE} ${className}`}>
       <motion.div aria-hidden="true" className={`absolute inset-0 ${NIGHT}`} initial={false} animate={{ opacity: night ? 1 : 0 }} transition={{ duration: 0.8 }} />
       <div className={`relative p-2.5 transition-colors duration-700 ${night ? "text-white" : "text-ink"}`}>
         <div className="flex items-center gap-1.5">
@@ -177,16 +177,6 @@ function Place({ city, zone, time, night, className, children }: { city: string;
         <div className="mt-2.5">{children}</div>
       </div>
     </div>
-  );
-}
-
-function CheckPill({ label, on, now, maroon = false }: { label: string; on: boolean; now: boolean; maroon?: boolean }) {
-  return (
-    <motion.span className={`flex items-center gap-1 rounded-full py-0.5 pl-0.5 pr-2 text-[10px] font-medium ${on ? (maroon ? "bg-maroon-tint text-maroon" : "bg-blue-tint text-blue") : "bg-sunk text-ink-3"}`}
-      initial={false} animate={{ scale: now ? 1.06 : 1 }} transition={pop}>
-      {on ? <Tick size={14} /> : <span className="size-3.5 rounded-full border-[1.5px] border-line-2" />}
-      {label}
-    </motion.span>
   );
 }
 
@@ -211,10 +201,11 @@ export function PricesArt() {
   return (
     <div ref={ref}>
       <Canvas className="h-[292px]" story={<Story steps={PRICE_STORY} at={s} />}>
-        <div className="relative w-[300px] shrink-0 origin-center scale-[0.8] rounded-xl bg-surface p-3 shadow-raised min-[400px]:scale-[0.86]">
+        <Shot w={300} h={226} mode="fit">
+        <div className={`relative w-[300px] rounded-xl bg-surface p-3 ${SHADOW_HERO}`}>
           <div className="mb-2 flex items-center justify-between px-0.5">
-            <span className="font-mono text-[10px] uppercase tracking-[0.04em] text-ink-2">Your listing</span>
-            <span className="font-mono text-[10px] text-ink-2">4 photos</span>
+            <span className="text-[11.5px] font-medium text-ink-2">Your listing</span>
+            <span className="text-[11px] text-ink-2">4 photos · {s === 4 ? "billed after delivery" : "draft"}</span>
           </div>
           <div className="space-y-1">
             {lines.map((l, i) => {
@@ -225,7 +216,7 @@ export function PricesArt() {
                   <span className="min-w-0 flex-1 truncate text-[11.5px] font-medium text-ink">{l.name}</span>
                   <AnimatePresence initial={false}>
                     {on && (
-                      <motion.span key="lvl" className={`rounded-full px-1.5 py-px font-mono text-[9.5px] uppercase tracking-[0.03em] ${l.level === "Twilight" ? "bg-maroon-tint text-maroon" : "bg-blue-tint text-blue"}`}
+                      <motion.span key="lvl" className={`rounded-full px-1.5 py-px text-[10.5px] font-medium ${l.level === "Twilight" ? "bg-maroon-tint text-maroon" : "bg-blue-tint text-blue-2"}`}
                         initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={pop}>{l.level}</motion.span>
                     )}
                   </AnimatePresence>
@@ -243,22 +234,18 @@ export function PricesArt() {
             <span className="text-[12px] font-semibold text-ink">Listing total</span>
             <span className="font-mono text-[14px] font-medium tabular-nums text-ink"><NumberFlow value={total} format={usd} locales="en-US" /></span>
           </div>
-          <AnimatePresence>
-            {s === 4 && (
-              <motion.span key="stamp" className="absolute -right-3 -top-3 flex items-center gap-1 rounded-full bg-ink py-1 pl-1 pr-2.5 text-[10px] font-medium text-white shadow-raised"
-                initial={{ opacity: 0, scale: 0.9, rotate: -6 }} animate={{ opacity: 1, scale: 1, rotate: 3 }} exit={{ opacity: 0 }} transition={pop}>
-                <Tick size={14} /> Billed after delivery
-              </motion.span>
-            )}
-          </AnimatePresence>
+
         </div>
+        </Shot>
       </Canvas>
     </div>
   );
 }
 
 /* 04 · How to start, as a round trip (owner, 2026-10-31): ten photos fly from your stack into the free-trial drop zone
-   (no card, no contract), then the edited ten come back underneath, so the whole trial reads on one screen. */
+   (no card, no contract), then the edited ten come back underneath, so the whole trial reads on one screen.
+   2026-11-03: the photos fly straight into the "Editing your ten" card; its thumbnails are the raw shots until they
+   come back edited (never grey placeholders). */
 
 /* 04 · How to start (owner, 2026-11-02: restored into the bento, same animation, sized to the card). */
 const OPT_MS = [...Array.from({ length: 10 }, () => 300), 1200, 2800] as const;
@@ -274,8 +261,9 @@ export function OptInArt() {
   return (
     <div ref={ref}>
       <Canvas className="h-[292px]" story={<Story steps={OPT_STORY} at={beat} />}>
-        <div className="relative grid w-[320px] shrink-0 origin-center scale-[0.84] justify-items-center gap-4 min-[400px]:scale-[0.9]">
-          <div className="flex items-center gap-10">
+        <Shot w={320} h={214} mode="fit" max={1.06}>
+        <div className="relative grid w-[320px] justify-items-center gap-5 pt-4">
+          <div className="flex items-center">
             <div className="relative h-[92px] w-[120px]">
               {[0, 1, 2].map((i) => (
                 <div key={i} className="absolute inset-0 overflow-hidden rounded-xl border-4 border-white shadow-raised transition-transform duration-[320ms] ease-[var(--ease-brand)] group-hover/card:[transform:rotate(var(--r))_translateX(var(--x))]"
@@ -283,40 +271,35 @@ export function OptInArt() {
                   <Thumb name={(["tx-int.jpg", "tx-ext.jpg", "tx-twi.jpg"] as const)[i]!} raw sizes="140px" />
                 </div>
               ))}
-              <span className="absolute -right-3 -top-3 z-10 rounded-full bg-ink px-2 py-1 font-mono text-[10px] text-white shadow-raised"><NumberFlow value={sent} locales="en-US" /> / 10 free</span>
+              <span className="absolute -right-3 -top-3 z-10 rounded-full bg-ink px-2 py-1 text-[11px] font-medium tabular-nums text-white shadow-raised"><NumberFlow value={sent} locales="en-US" /> / 10 free</span>
               <AnimatePresence>
                 {sending && (
                   <motion.div key={s} className="absolute inset-0 z-20 overflow-hidden rounded-xl border-4 border-white shadow-raised"
-                    initial={{ x: 0, y: 0, rotate: 0, scale: 1, opacity: 1 }} animate={{ x: 160, y: -4, rotate: 8, scale: 0.55, opacity: 0 }} transition={{ duration: 0.45, ease: [0.77, 0, 0.175, 1] }}>
+                    initial={{ x: 0, y: 0, rotate: 0, scale: 1, opacity: 1 }} animate={{ x: 0, y: 92, rotate: 4, scale: 0.4, opacity: 0 }} transition={{ duration: 0.45, ease: [0.77, 0, 0.175, 1] }}>
                     <Thumb name={thumbs[s % 4]!} raw sizes="140px" />
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
-            <motion.div className="grid h-[92px] w-[120px] place-items-center rounded-xl border-[1.5px] border-dashed text-center"
-              animate={{ borderColor: sending ? "#3074FE" : "#D5D9E0", backgroundColor: sending ? "rgb(238 242 255 / 0.8)" : "rgb(255 255 255 / 0.6)", scale: sending && s % 2 ? 1.03 : 1 }} transition={{ duration: 0.25 }}>
-              <span className="text-[12.5px] font-medium">Free trial
-                <span className="mt-1 block font-mono text-[9.5px] uppercase leading-snug tracking-[0.04em] text-blue">No card<br />No contract</span>
-              </span>
-            </motion.div>
           </div>
           {/* the edited ten, back by morning */}
-          <motion.div className="w-full rounded-xl bg-surface p-2.5 shadow-raised" initial={false} animate={{ opacity: s >= 10 ? 1 : 0.45, y: s >= 10 ? 0 : 6 }} transition={spring}>
+          <motion.div className={`w-full rounded-xl bg-surface p-2.5 ${SHADOW_HERO}`} initial={false} animate={{ scale: sending && s % 2 ? 1.02 : 1 }} transition={{ duration: 0.2 }}>
             <div className="mb-2 flex items-center gap-1.5">
               {back ? <Tick size={14} /> : <span className="block size-3.5 animate-spin rounded-full border-[1.5px] border-dashed border-blue [animation-duration:3s]" />}
               <span className="text-[11.5px] font-semibold text-ink">{back ? "10 / 10 edited, free" : "Editing your ten"}</span>
-              <span className="ml-auto font-mono text-[9.5px] text-ink-2">Back by morning</span>
+              <span className="ml-auto text-[11px] text-ink-2">{back ? "No card, no contract" : "Back by morning"}</span>
             </div>
             <div className="grid grid-cols-5 gap-1">
               {[...thumbs, "tx-ext.jpg"].map((t, i) => (
-                <motion.div key={i} className="relative h-[30px] overflow-hidden rounded-md" initial={false} animate={{ opacity: back ? 1 : 0.5 }} transition={{ duration: 0.3, delay: back ? i * 0.06 : 0 }}>
+                <motion.div key={i} className="relative h-[34px] overflow-hidden rounded-md" initial={false} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: back ? i * 0.06 : 0 }}>
                   <Thumb name={t} raw={!back} sizes="64px" />
-                  {i === 4 && <span className="absolute inset-0 grid place-items-center bg-ink/55 font-mono text-[10px] text-white">+6</span>}
+                  {i === 4 && <span className="absolute inset-0 grid place-items-center bg-ink/55 text-[11px] font-medium text-white">+6</span>}
                 </motion.div>
               ))}
             </div>
           </motion.div>
         </div>
+        </Shot>
       </Canvas>
     </div>
   );
@@ -324,7 +307,7 @@ export function OptInArt() {
 
 /* 05 · How to contact: a real exchange on WhatsApp, with the editor typing before the reply (copy from Figma). Framed as a
    chat window (studio, editor online, read ticks) with WhatsApp · Email · Call underneath, so every channel is in view. */
-const CHAT_MS = [500, 1100, 1300, 1400, 1300, 2600] as const;
+const CHAT_MS = [1100, 1300, 1400, 1300, 2600] as const;
 const chat = [
   { me: false, text: "Can you do twilights for three listings tonight?" },
   { me: true, text: "Yes. Upload by 9 PM and they're ready by 8 AM EST." },
@@ -335,35 +318,33 @@ const Read = () => <svg width="14" height="10" viewBox="0 0 16 10" aria-hidden="
 export function ContactArt() {
   const { ref, play } = useLoop<HTMLDivElement>();
   const s = useSequence(CHAT_MS.length, CHAT_MS, play);
-  // 0 empty · 1 JM · 2 typing · 3 reply · 4 JM · 5 hold
-  const shown = [0, 1, 1, 2, 3, 3][s]!;
+  // 0 JM asks · 1 typing · 2 reply · 3 JM · 4 hold (the chat always has its first message: no empty beat)
+  const shown = [1, 1, 2, 3, 3][s]!;
   return (
     <div ref={ref}>
-      <Canvas className="h-[292px]" story={<Story steps={["Message the studio on WhatsApp", "An editor replies, not a bot", "Booked in. Upload when ready"]} at={s <= 1 ? 0 : s <= 3 ? 1 : 2} />}>
-        {/* fixed-height box: the scaled window keeps its look but no longer pushes the caption out of the canvas */}
-        <div className="grid h-[214px] w-full place-items-center">
-        <div className="mx-auto w-[calc(100%-24px)] max-w-[380px] origin-center scale-[0.78] overflow-hidden rounded-xl bg-surface/70 shadow-raised backdrop-blur">
+      <Canvas className="h-[292px]" story={<Story steps={["Message the studio on WhatsApp", "An editor replies, not a bot", "Booked in. Upload when ready"]} at={s === 0 ? 0 : s <= 2 ? 1 : 2} />}>
+        <Shot w={320} h={226} mode="fit" max={0.96}>
+        <div className={`w-[320px] overflow-hidden rounded-xl bg-surface/80 backdrop-blur ${SHADOW_HERO}`}>
           <div className="flex items-center gap-2 border-b border-line bg-surface px-3 py-2">
             <span className="grid size-7 place-items-center rounded-full bg-ink"><Mark className="scale-[0.55] brightness-0 invert" /></span>
             <span className="grid leading-tight">
               <span className="text-[12px] font-semibold text-ink">TechX studio</span>
-              <span className="flex items-center gap-1 text-[10px] text-ink-2"><span className="size-1.5 rounded-full bg-green" />{s === 2 ? "Editor typing…" : "Editor online"}</span>
+              <span className="flex items-center gap-1 text-[10.5px] text-ink-2"><span className="size-1.5 rounded-full bg-green" />{s === 1 ? "Editor typing…" : "Editor online"}</span>
             </span>
-            <span className="ml-auto font-mono text-[9.5px] uppercase tracking-[0.04em] text-ink-2">WhatsApp</span>
           </div>
-          <div className="grid min-h-[168px] content-start gap-2.5 p-3">
+          <div className="grid h-[132px] content-end gap-2 overflow-hidden p-2.5">
             <AnimatePresence initial={false}>
               {chat.slice(0, shown).map((m, i) => (
                 <motion.div key={m.text} layout className={`flex items-end gap-2 ${m.me ? "justify-end" : ""}`} initial={{ opacity: 0, y: 10, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }} transition={pop}>
-                  {!m.me && <span className="grid size-7 shrink-0 place-items-center rounded-full bg-line font-mono text-[10px]">JM</span>}
-                  <p className={`max-w-[250px] px-3.5 py-2.5 text-[13px] leading-snug ${m.me ? "rounded-[16px_16px_4px_16px] bg-blue text-white shadow-[0_6px_16px_-6px_rgb(48_116_254/0.55)]" : "rounded-[16px_16px_16px_4px] bg-surface shadow-hair"}`}>
+                  {!m.me && <span className="grid size-6 shrink-0 place-items-center rounded-full bg-[#E8D9C5] text-[10px] font-medium text-[#6B4A1F]">JM</span>}
+                  <p className={`max-w-[230px] px-3 py-2 text-[12px] leading-snug ${m.me ? "rounded-[16px_16px_4px_16px] bg-blue-2 text-white shadow-[0_6px_16px_-6px_rgb(48_116_254/0.55)]" : "rounded-[16px_16px_16px_4px] bg-surface shadow-hair"}`}>
                     {m.text}{m.me && shown > i + 1 && <Read />}
                   </p>
                 </motion.div>
               ))}
-              {s === 2 && (
+              {s === 1 && (
                 <motion.div key="typing" layout className="flex justify-end" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={pop}>
-                  <span className="flex gap-1 rounded-full bg-blue/10 px-3.5 py-3">
+                  <span className="flex gap-1 rounded-full bg-blue/10 px-3 py-2.5">
                     {[0, 1, 2].map((d) => <motion.i key={d} className="size-1.5 rounded-full bg-blue" animate={{ y: [0, -3, 0], opacity: [0.4, 1, 0.4] }} transition={{ duration: 0.9, repeat: Infinity, delay: d * 0.15 }} />)}
                   </span>
                 </motion.div>
@@ -374,10 +355,10 @@ export function ContactArt() {
             {["WhatsApp", "Email", "Call"].map((c, i) => (
               <span key={c} className={`rounded-full px-2.5 py-1 text-[10.5px] font-medium ${i === 0 ? "bg-ink text-white" : "bg-sunk text-ink-2"}`}>{c}</span>
             ))}
-            <span className="ml-auto self-center font-mono text-[9.5px] text-ink-2">An editor answers</span>
+            <span className="ml-auto self-center text-[10.5px] text-ink-2">An editor answers</span>
           </div>
         </div>
-        </div>
+        </Shot>
       </Canvas>
     </div>
   );

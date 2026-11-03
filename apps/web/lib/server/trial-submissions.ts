@@ -1,4 +1,6 @@
 import { validateDetails, validateFiles, type FieldErrors, type TrialDetails, type TrialFile } from "@/lib/trial";
+import { after } from "next/server";
+import { sendAlert } from "./email";
 import { randomId, seal, unseal } from "./crypto";
 import { openStore } from "./destinations";
 import { cleanName, type Destination } from "./upload-settings";
@@ -54,13 +56,20 @@ export async function startSubmission(d: TrialDetails, rawFiles: TrialFile[], or
   const label = `${new Date().toISOString().slice(0, 10)} ${d.name}${d.studio ? ` (${d.studio})` : ""} ${randomId(2)}`;
   const ref = await store.folder(label);
   await store.writeText(ref, "Trial details.txt", detailsText(d, files));
+  // studio alert by email, sent after the response so the visitor never waits on it (lib/server/email.ts)
+  after(() => sendAlert({
+    kind: "trial", subject: `Free trial: ${d.name}${d.studio ? ` (${d.studio})` : ""}, ${files.length} file${files.length === 1 ? "" : "s"}`,
+    replyTo: d.email, body: d.notes || undefined,
+    lines: [["Name", d.name], ["Studio", d.studio], ["Email", d.email], ["Photos a month", d.volume], ["Link", d.link],
+      ["Files", `${files.length} uploading`], ["Folder", `${store.dest === "gdrive" ? "Google Drive" : store.dest === "dropbox" ? "Dropbox" : "Upload folder"}: ${label}`]],
+  }));
   const targets = await Promise.all(files.map((f) => store.target(ref, f, origin)));
-  const ticket = seal({ dest: store.dest, ref, files, email: d.email } satisfies Ticket, 12 * 3600);
+  const ticket = seal({ dest: store.dest, ref, files, email: d.email } satisfies Ticket, 12 * 3600, "trial-ticket");
   return { ticket, targets };
 }
 
 function readTicket(token: string) {
-  const t = unseal<Ticket>(token);
+  const t = unseal<Ticket>(token, "trial-ticket");
   if (!t) throw new TrialError("This upload has expired. Please send the form again.");
   return t;
 }

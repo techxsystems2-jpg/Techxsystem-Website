@@ -14,7 +14,7 @@ import { LOCAL_ROOT } from "@/lib/server/destinations";
    Disabled in production. */
 export async function PUT(req: NextRequest) {
   if (process.env.NODE_ENV === "production") return new Response("Not found", { status: 404 });
-  const t = unseal<{ dir: string; name: string; size: number }>(req.nextUrl.searchParams.get("t"));
+  const t = unseal<{ dir: string; name: string; size: number }>(req.nextUrl.searchParams.get("t"), "local-upload");
   if (!t || !req.body) return Response.json({ error: "Upload link expired" }, { status: 403 });
   const file = path.join(LOCAL_ROOT, t.dir, t.name);
   if (!file.startsWith(LOCAL_ROOT + path.sep)) return Response.json({ error: "Bad path" }, { status: 400 });

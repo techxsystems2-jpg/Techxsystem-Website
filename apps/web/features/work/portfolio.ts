@@ -28,9 +28,18 @@ export const portfolio: Shot[] = (() => {
   return out;
 })();
 
+/** The gallery as stored by the admin (lib/content, key "work": src, category, label) → display shots. */
+export function toShots(items: { src: string; cat: string; label: string }[]): Shot[] {
+  return items.map((s) => ({ src: s.src, cat: s.cat as WorkCat, label: s.label || (categories.find((c) => c.key === s.cat)?.label ?? ""), square: s.cat === "plan" }));
+}
+
+/** Category chips with live counts (categories with no photos are left out). */
+export const countsOf = (shots: Shot[]) => categories.map((c) => ({ ...c, count: shots.filter((s) => s.cat === c.key).length })).filter((c) => c.count > 0);
+
 /** The first few shots of the given categories, alternating between them (service pages' "Recent work"). */
-export function shotsFor(cats: WorkCat[], n = 3): Shot[] {
+export function shotsFor(cats: WorkCat[], n = 3, from: Shot[] = portfolio): Shot[] {
+  const per = Object.fromEntries(cats.map((c) => [c, from.filter((s) => s.cat === c)])) as Record<WorkCat, Shot[]>;
   const out: Shot[] = [];
-  for (let i = 0; out.length < n && i < 40; i++) for (const c of cats) { const s = byCat[c][i]; if (s && out.length < n) out.push(s); }
+  for (let i = 0; out.length < n && i < 40; i++) for (const c of cats) { const s = per[c][i]; if (s && out.length < n) out.push(s); }
   return out;
 }

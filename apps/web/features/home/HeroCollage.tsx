@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Image from "next/image";
 import { useInView, useReducedMotion } from "motion/react";
 
@@ -17,7 +17,9 @@ import { useInView, useReducedMotion } from "motion/react";
    Size scale --s: 1 phone · 1.25 tablet · 1.5 desktop (owner: photos big enough to see).
    Owner, 2026-11-02: ~1.7× faster (140 / 110 / 80s per crossing); near tiles are solid (no multiply blend), so a
    blurred tile behind never shows through a sharp one.
-   Photos: public/photos/field (docs/PHOTO_CREDITS.md). */
+   Photos: public/photos/field (docs/PHOTO_CREDITS.md).
+   Speed pass (2026-11-03): the 27 tiles' photos (~400 KB) load only after the page has loaded and the browser is idle,
+   then fade in, so they never compete with the hero photo (the page's LCP) on a slow phone. */
 
 const PHOTOS = ["f01", "f13", "f07", "f16", "f02", "f10", "f14", "f05", "f11", "f17", "f03", "f08", "f15", "f06", "f12", "f18", "f04", "f09"];
 // [width, height] before the layer and screen scale: landscape, portrait, square, the odd large one
@@ -36,6 +38,15 @@ export function HeroCollage() {
   const inView = useInView(ref, { margin: "100px" });
   const reduce = useReducedMotion();
   const state = inView && !reduce ? "running" : "paused";
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    // after load, at the next idle moment (Safari has no requestIdleCallback: a short timeout instead)
+    let t: ReturnType<typeof setTimeout> | undefined;
+    const go = () => { t = setTimeout(() => (typeof requestIdleCallback === "function" ? requestIdleCallback(() => setReady(true), { timeout: 2000 }) : setReady(true)), 0); };
+    if (document.readyState === "complete") go();
+    else addEventListener("load", go, { once: true });
+    return () => { removeEventListener("load", go); clearTimeout(t); };
+  }, []);
   return (
     <div ref={ref} aria-hidden="true" className="pointer-events-none absolute inset-x-0 -bottom-[110px] -top-[50px] [--s:1] md:[--s:1.25] lg:[--s:1.5]">
       {/* one shared noise definition for the grain on the soft tiles */}
@@ -52,7 +63,7 @@ export function HeroCollage() {
               // even spacing in the lane; neighbouring lanes sit half a gap apart so they never line up
               const at = (j + li * 0.5 + layer.phase) / layer.perLane;
               return (
-                <div key={`${li}-${j}`} className={`collage-tile absolute left-[-420px] overflow-hidden ${layer.blur ? "mix-blend-multiply" : ""}`}
+                <div key={`${li}-${j}`} className={`collage-tile absolute left-[-420px] overflow-hidden transition-opacity duration-700 ${ready ? "opacity-100" : "opacity-0"} ${layer.blur ? "mix-blend-multiply" : ""}`}
                   style={{
                     width: `calc(${w}px * var(--s))`, height: `calc(${h}px * var(--s))`,
                     top: `calc(${lane} * (100% - ${h}px * var(--s)))`,
@@ -60,8 +71,10 @@ export function HeroCollage() {
                     animationDelay: `${-(at % 1) * layer.duration}s`,
                     animationPlayState: state,
                   }}>
-                  <Image src={`/photos/field/${src}.webp`} alt="" fill sizes={`${Math.round(w * 2)}px`}
-                    className="object-cover" style={layer.blur ? { filter: `blur(${layer.blur}px)`, transform: "scale(1.12)" } : undefined} />
+                  {/* decoration: low priority so the hero photo (the LCP) gets the bandwidth first; blurred tiles don't need
+                      retina pixels or full quality (speed pass, 2026-11-03) */}
+                  {ready && <Image src={`/photos/field/${src}.webp`} alt="" fill sizes={`${Math.round(layer.blur ? w : w * 2)}px`} fetchPriority="low"
+                    quality={layer.blur ? 50 : 75} className="object-cover" style={layer.blur ? { filter: `blur(${layer.blur}px)`, transform: "scale(1.12)" } : undefined} />}
                   {/* film grain on the soft (blurred) layers only: static noise, overlay-blended inside the tile */}
                   {layer.blur > 0 && <svg className="absolute inset-0 size-full mix-blend-overlay"><rect width="100%" height="100%" filter="url(#hero-grain)" /></svg>}
                 </div>

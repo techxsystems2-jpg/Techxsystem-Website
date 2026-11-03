@@ -1,21 +1,35 @@
 import { cookies } from "next/headers";
 import { safeEqual, seal, unseal } from "./crypto";
 
-/* Admin sign-in for /admin (one shared password, ADMIN_PASSWORD). A signed, HTTP-only cookie for 12 hours. */
+/* Admin sign-in for /admin with an email and a password (owner, 2026-11-03: "simple email and password"):
+   ADMIN_EMAIL and ADMIN_PASSWORD in the environment. A signed, HTTP-only cookie for 12 hours carries the email, so
+   changing ADMIN_EMAIL signs everyone out. Tries are rate-limited in the sign-in action (app/admin/actions.ts). */
 export const ADMIN_COOKIE = "techx_admin";
 const TTL = 12 * 3600;
 
-export const adminConfigured = () => !!process.env.ADMIN_PASSWORD && !!process.env.APP_SECRET;
+const adminEmailSetting = () => (process.env.ADMIN_EMAIL ?? "").trim().toLowerCase();
 
-export async function isAdmin() {
-  if (!adminConfigured()) return false;
-  return !!unseal<{ a: 1 }>((await cookies()).get(ADMIN_COOKIE)?.value);
+export const adminConfigured = () => !!adminEmailSetting() && !!process.env.ADMIN_PASSWORD && !!process.env.APP_SECRET;
+
+/** The signed-in admin's email, or null. */
+export async function adminEmail(): Promise<string | null> {
+  if (!adminConfigured()) return null;
+  const s = unseal<{ e?: string }>((await cookies()).get(ADMIN_COOKIE)?.value, "admin-session");
+  return s?.e && s.e === adminEmailSetting() ? s.e : null;
 }
 
-export async function signIn(password: string) {
-  const expected = process.env.ADMIN_PASSWORD;
-  if (!expected || !safeEqual(password, expected)) return false;
-  (await cookies()).set(ADMIN_COOKIE, seal({ a: 1 }, TTL), { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: TTL });
+export async function isAdmin() {
+  return (await adminEmail()) !== null;
+}
+
+export async function signIn(email: string, password: string) {
+  const expectedEmail = adminEmailSetting(), expectedPassword = process.env.ADMIN_PASSWORD;
+  if (!expectedEmail || !expectedPassword) return false;
+  // both are always checked (constant time), so the answer doesn't reveal which one was wrong
+  const emailOk = safeEqual(email.trim().toLowerCase(), expectedEmail);
+  const passwordOk = safeEqual(password, expectedPassword);
+  if (!emailOk || !passwordOk) return false;
+  (await cookies()).set(ADMIN_COOKIE, seal({ e: expectedEmail }, TTL, "admin-session"), { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: TTL });
   return true;
 }
 

@@ -2,8 +2,8 @@ import Link from "next/link";
 import { buttonClass } from "@techx/ui/Button";
 import { ArrowIcon } from "@techx/ui/Icons";
 import { Words } from "@/features/home/Hero";
-import { ServiceArt } from "@/features/service-art/ServiceArt";
-import { services } from "@/lib/site";
+import { ServiceVisual } from "@/features/service-art/ServiceVisual";
+import type { Service } from "@/lib/content/types";
 import type { Slug } from "./data";
 import { ServiceTabs } from "./ServiceTabs";
 
@@ -11,8 +11,8 @@ import { ServiceTabs } from "./ServiceTabs";
    Revisions; on the right the service's own before/after film (the Home service card art, larger). The Home sky sits
    behind it like every other page hero. Below: tabs to the other five services (ServiceTabs). "See prices" jumps to the levels on this page when it
    has them, else to /pricing. */
-export function ServiceHero({ slug, lead, rest, lede, turnaround, pricesHref }: { slug: Slug; lead: string; rest: string; lede: string; turnaround: string; pricesHref: string }) {
-  const s = services.find((x) => x.slug === slug)!;
+export function ServiceHero({ service: s, lead, rest, lede, turnaround, pricesHref }: { service: Service; lead: string; rest: string; lede: string; turnaround: string; pricesHref: string }) {
+  const slug = s.slug as Slug;
   const leadWords = lead.split(" ").length;
   return (
     <section className="relative overflow-hidden pb-4 pt-20 md:pt-28">
@@ -49,9 +49,10 @@ export function ServiceHero({ slug, lead, rest, lede, turnaround, pricesHref }: 
             </dl>
           </div>
         </div>
+        {/* the photo is the page's LCP: it rises in place without the delayed fade (speed pass, 2026-11-03) */}
         <div className="rise">
-          <div className="rounded-tray bg-surface p-1.5 shadow-raised [--i:2]">
-            <ServiceArt slug={slug} />
+          <div className="rise-in-place rounded-tray bg-surface p-1.5 shadow-raised [--i:2]">
+            <ServiceVisual slug={s.slug} image={s.image} name={s.name} eager />
           </div>
         </div>
       </div>

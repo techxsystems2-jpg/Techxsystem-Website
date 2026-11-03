@@ -5,7 +5,7 @@ import { RevealGroup, RevealItem } from "@/features/motion/Reveal";
 import { Spotlight } from "@/features/motion/Spotlight";
 import { ContactArt, OptInArt, PricesArt, ProcessArt } from "@/features/illustrations/AnswerArt";
 import { EditingArt } from "@/features/illustrations/EditorScreen";
-import { site } from "@/lib/site";
+import { getSite } from "@/lib/content";
 import { MorphCycle } from "@/features/motion/MorphCycle";
 import { SectionHead } from "./SectionHead";
 
@@ -13,7 +13,8 @@ import { SectionHead } from "./SectionHead";
 const questions = ["Who edits my photos?", "When do I get them back?", "What does it cost?", "How do I get started?", "Who do I talk to?"];
 
 /** "Five answers, up front": the five things the site must never lose, each with a working illustration. */
-export function Answers() {
+export async function Answers() {
+  const site = await getSite();
   return (
     <section id="answers" className="wrap pt-28 md:pt-40">
       {/* The muted line morphs through the five questions photographers ask, one per card below, in their words (torph) */}
@@ -37,7 +38,7 @@ export function Answers() {
             Send ten photos free. No card, no contract. Judge us on your own shoot.
           </Answer>
           <Answer n="05" label="How to contact" href="/contact" more="All the ways to reach us" art={<ContactArt />}
-            detail={<>WhatsApp +91 96530 59304 · {site.contact.email}</>}>
+            detail={<>WhatsApp {site.contact.whatsapp} · {site.contact.email}</>}>
             Talk to an editor, not a ticket. WhatsApp, email or a call.
           </Answer>
         </div>
@@ -74,7 +75,7 @@ function Num({ n, label }: { n: string; label: string }) {
 /** The whole card is hoverable; the link itself stretches over it so the card is one target. */
 function More({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <Link href={href} className="mt-4 inline-flex items-center gap-1.5 text-small font-medium text-blue after:absolute after:inset-0 after:z-20 after:rounded-card">
+    <Link href={href} className="mt-4 inline-flex items-center gap-1.5 text-small font-medium text-blue-2 after:absolute after:inset-0 after:z-20 after:rounded-card">
       {children} <ArrowIcon size={14} className="transition-transform duration-200 group-hover/card:translate-x-[3px]" />
     </Link>
   );

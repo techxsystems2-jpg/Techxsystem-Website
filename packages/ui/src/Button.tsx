@@ -12,10 +12,11 @@ const variants: Record<ButtonVariant, string> = {
   secondary:
     "bg-[linear-gradient(180deg,#FFFFFF_0%,#F4F4F6_100%)] text-ink shadow-[inset_0_1px_0_#fff,inset_0_-2px_3px_rgb(10_10_11/0.05),0_0_0_1px_rgb(10_10_11/0.1),0_4px_10px_-6px_rgb(10_10_11/0.2)] hover:shadow-[inset_0_1px_0_#fff,inset_0_-2px_3px_rgb(10_10_11/0.05),0_0_0_1px_rgb(10_10_11/0.16),0_8px_16px_-8px_rgb(10_10_11/0.25)]",
   ghost: "text-ink hover:bg-sunk",
-  // WhatsApp chat buttons only (owner, 2026-11-02). WhatsApp's bright #25D366 at the top edge, deepening to #0E7F3E
-  // under the label so white text keeps ~5:1 contrast (#25D366 alone is 1.98:1). Same inner highlight + soft shadow as primary.
+  // WhatsApp chat buttons (owner, 2026-11-02; restyled 2026-11-03 after the impeccable critique, owner approved):
+  // the secondary button with WhatsApp's mark in green, so blue stays the only filled button on a page.
+  // Icon #13914A, not #25D366: the brand green is 1.98:1 on white, this one keeps the glyph above 3:1.
   whatsapp:
-    "bg-[linear-gradient(180deg,#25D366_0%,#13914A_45%,#0E7F3E_100%)] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.35),inset_0_-2px_4px_rgb(4_50_24/0.25),0_0_0_1px_rgb(14_110_54/0.9),0_6px_16px_-6px_rgb(37_211_102/0.55)] hover:brightness-[1.06] hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.4),inset_0_-2px_4px_rgb(4_50_24/0.25),0_0_0_1px_rgb(14_110_54/0.9),0_10px_22px_-8px_rgb(37_211_102/0.6)]",
+    "bg-[linear-gradient(180deg,#FFFFFF_0%,#F4F4F6_100%)] text-ink shadow-[inset_0_1px_0_#fff,inset_0_-2px_3px_rgb(10_10_11/0.05),0_0_0_1px_rgb(10_10_11/0.1),0_4px_10px_-6px_rgb(10_10_11/0.2)] hover:shadow-[inset_0_1px_0_#fff,inset_0_-2px_3px_rgb(10_10_11/0.05),0_0_0_1px_rgb(10_10_11/0.16),0_8px_16px_-8px_rgb(10_10_11/0.25)] [&>svg]:text-[#13914A]",
 };
 
 export type ButtonSize = "sm" | "md" | "lg";

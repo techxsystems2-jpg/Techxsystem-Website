@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "motion/react";
 import { Canvas } from "./Canvas";
-import { EditorScreen, useEditSteps } from "./EditorScreen";
+import { EditCloseUp, useEditSteps } from "./EditorScreen";
 
 /* How it works · one small illustration per step card (owner, 2026-11-02), on the same dotted canvas as the answer
    illustrations. Each acts out its step once when `run` changes (the row's left-to-right sequence, or a mouse hover),
@@ -29,12 +29,11 @@ const Icon = ({ d, size = 16 }: { d: string; size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={d} /></svg>
 );
 
-/** `big`: the How it works page's step rows, where the canvas is wider and taller, so the art is drawn a little larger (not 03: the editor window fits itself). */
-export function StepArt({ n, run, big = false }: { n: number; run: number; big?: boolean }) {
+export function StepArt({ n, run }: { n: number; run: number }) {
   const Art = [UploadArt, GuideArt, EditCheckArt, DownloadArt][n];
   return (
-    <Canvas className={big ? "h-[240px] sm:h-[300px]" : "h-[168px]"}>
-      <div aria-hidden="true" className={`relative grid size-full place-items-center ${big && n !== 2 ? "lg:scale-[1.15]" : ""}`}>
+    <Canvas className="h-[168px]">
+      <div aria-hidden="true" className="relative grid size-full place-items-center">
         <Art run={run} />
       </div>
     </Canvas>
@@ -45,7 +44,7 @@ function UploadArt({ run }: { run: number }) {
   return (
     <div className="relative w-[80%]">
       <div className="grid justify-items-center gap-1.5 rounded-xl border-[1.5px] border-dashed border-blue/40 bg-surface/90 px-3 py-3.5">
-        <span className="grid size-8 place-items-center rounded-lg bg-blue-tint text-blue"><Icon d={ICON.upload} /></span>
+        <span className="grid size-8 place-items-center rounded-lg bg-blue-tint text-blue-2"><Icon d={ICON.upload} /></span>
         <span className="text-[11.5px] font-medium">Drop brackets here</span>
         <span className="h-1 w-[70%] overflow-hidden rounded-full bg-line">
           <motion.span key={run} className="block h-full origin-left rounded-full bg-blue"
@@ -60,9 +59,9 @@ function UploadArt({ run }: { run: number }) {
           <i className="h-2.5 w-2 rounded-[2px] bg-[linear-gradient(135deg,#C9D6FF,#7FA2FF)]" />{f}
         </motion.span>
       ))}
-      <motion.p key={`done-${run}`} className="mt-2 text-center font-mono text-[10px] uppercase tracking-[0.04em] text-green"
+      <motion.p key={`done-${run}`} className="mt-2 text-center text-[11px] font-medium text-green"
         initial={from(run, { opacity: 0, transform: "translateY(4px)" })} animate={{ opacity: 1, transform: "translateY(0px)" }} transition={{ duration: 0.3, delay: 1.2 }}>
-        ✓ Brackets uploaded
+        ✓ 5 brackets uploaded
       </motion.p>
     </div>
   );
@@ -81,7 +80,7 @@ function GuideArt({ run }: { run: number }) {
   const stage = useStage(run, GUIDE_AT); // 0 typing · 1 pressing · 2 saved
   return (
     <div className="w-[88%] rounded-xl bg-surface p-2.5 shadow-hair">
-      <p className="flex items-center justify-between text-[11px] font-medium">Your style guide<span className="font-mono text-[8.5px] font-normal uppercase tracking-[0.04em] text-ink-3">{stage >= 2 ? "Saved" : "Draft"}</span></p>
+      <p className="flex items-center justify-between text-[11px] font-medium">Your style guide<span className={`text-[10px] font-normal ${stage >= 2 ? "text-green" : "text-ink-2"}`}>{stage >= 2 ? "Saved" : "Draft"}</span></p>
       {GUIDE.map(([k, v], i) => {
         const start = GUIDE_START[i];
         const n = Math.max(0, Math.min(v.length, typed - start));
@@ -96,7 +95,7 @@ function GuideArt({ run }: { run: number }) {
           </div>
         );
       })}
-      <motion.span className={`mt-2 flex h-6 items-center justify-center rounded-full text-[10px] font-medium transition-colors duration-300 ${stage >= 2 ? "bg-[#E7F6EE] text-green" : "bg-blue text-white"}`}
+      <motion.span className={`mt-2 flex h-6 items-center justify-center rounded-full text-[10px] font-medium transition-colors duration-300 ${stage >= 2 ? "bg-[#E7F6EE] text-green" : "bg-blue-2 text-white"}`}
         animate={stage === 1 ? { transform: ["scale(1)", "scale(0.93)", "scale(1)"] } : { transform: "scale(1)" }} transition={{ duration: 0.35 }}>
         {stage >= 2 ? "✓ Saved for every editor" : "Save style guide"}
       </motion.span>
@@ -104,13 +103,14 @@ function GuideArt({ run }: { run: number }) {
   );
 }
 
-/** 03 · Edit, then check: the photo editor window, layers landing one by one, then both checks (EditorScreen). */
+/** 03 · Edit, then check: the close-up from answer card 01 (photo + Layers panel), the fixes landing one by one, then
+    "Checked" (stageshow review, 2026-11-03: the whole editor window couldn't fit a 168px card without cutting the checks). */
 function EditCheckArt({ run }: { run: number }) {
   return <EditOnce key={run} run={run} />;
 }
 function EditOnce({ run }: { run: number }) {
   const k = useEditSteps(run > 0, false);
-  return <div className="h-[156px] w-full px-2.5"><EditorScreen k={k} variant="window" /></div>;
+  return <EditCloseUp k={k} small />;
 }
 
 /* 04 · Download and revise: the "your photos are ready" email lands, the cursor clicks Download all, it downloads,
@@ -122,12 +122,13 @@ function DownloadArt({ run }: { run: number }) {
   const mailIn = s >= 1, cursor = s >= 2 && s < 4, clicked = s >= 3, downloaded = s >= 4, revise = s >= 5;
   return (
     <div className="flex w-[90%] flex-col items-center gap-1.5">
+      {/* the mail is on screen from the first beat (it used to fade in from nothing, leaving an empty card) */}
       <motion.div className="w-full rounded-xl bg-surface p-2.5 shadow-hair" initial={false}
-        animate={{ opacity: mailIn ? 1 : 0, transform: mailIn ? "translateY(0px)" : "translateY(-10px)" }} transition={{ duration: 0.35, ease: OUT }}>
+        animate={{ transform: mailIn ? "translateY(0px)" : "translateY(-4px)" }} transition={{ duration: 0.35, ease: OUT }}>
         <div className="flex items-center gap-2">
-          <span className="grid size-6 shrink-0 place-items-center rounded-full bg-blue-tint text-blue"><Icon d={ICON.mail} size={12} /></span>
+          <span className="grid size-6 shrink-0 place-items-center rounded-full bg-blue-tint text-blue-2"><Icon d={ICON.mail} size={12} /></span>
           <div className="min-w-0 flex-1">
-            <p className="flex items-center justify-between text-[10px]"><b className="font-semibold">TechX Studio</b><span className="font-mono text-[8.5px] text-ink-3">7:58 AM</span></p>
+            <p className="flex items-center justify-between text-[10px]"><b className="font-semibold">TechX Studio</b><span className="text-[9.5px] tabular-nums text-ink-2">7:58 AM</span></p>
             <p className="truncate text-[10px] text-ink-2">Your photos are ready · 42 edited</p>
           </div>
         </div>
@@ -136,7 +137,7 @@ function DownloadArt({ run }: { run: number }) {
             <span key={t} className="relative h-7 w-9 shrink-0 overflow-hidden rounded-[4px]"><Image src={`/photos/${t}`} alt="" fill sizes="40px" className="object-cover" /></span>
           ))}
           <span className="relative ml-auto">
-            <motion.span className={`flex h-6 items-center gap-1 whitespace-nowrap rounded-full px-2.5 text-[9.5px] font-medium transition-colors duration-300 ${downloaded ? "bg-[#E7F6EE] text-green" : "bg-blue text-white"}`}
+            <motion.span className={`flex h-6 items-center gap-1 whitespace-nowrap rounded-full px-2.5 text-[9.5px] font-medium transition-colors duration-300 ${downloaded ? "bg-[#E7F6EE] text-green" : "bg-blue-2 text-white"}`}
               animate={s === 3 ? { transform: ["scale(1)", "scale(0.9)", "scale(1)"] } : { transform: "scale(1)" }} transition={{ duration: 0.3 }}>
               {downloaded ? "✓ Downloaded" : clicked ? "Downloading…" : <><Icon d={ICON.download} size={10} />Download all</>}
             </motion.span>

@@ -1,4 +1,5 @@
-import { services, site } from "@/lib/site";
+import type { Service, SiteData } from "@/lib/content/types";
+import { site } from "@/lib/site";
 
 /* Structured data (JSON-LD), server-rendered into the HTML (claude-seo:seo-schema, 2026-11-02). Facts come only from
    lib/site.ts. FAQPage is left out on purpose: Google retired FAQ rich results in May 2026. */
@@ -11,8 +12,8 @@ export function JsonLd({ data }: { data: object }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }} />;
 }
 
-/** Site-wide: the studio and the website. */
-export const siteSchema = {
+/** Site-wide: the studio and the website (live facts from the content store). */
+export const siteSchema = (live: SiteData) => ({
   "@context": "https://schema.org",
   "@graph": [
     {
@@ -24,17 +25,17 @@ export const siteSchema = {
       slogan: site.tagline,
       description: site.description,
       foundingDate: "2016",
-      email: site.contact.email,
-      telephone: site.contact.phone,
+      email: live.contact.email,
+      telephone: live.contact.phone,
       address: { "@type": "PostalAddress", addressCountry: "IN" },
       areaServed: ["US", "AU", "GB"],
       contactPoint: [
-        { "@type": "ContactPoint", contactType: "customer service", email: site.contact.email, telephone: site.contact.phone, availableLanguage: "en" },
+        { "@type": "ContactPoint", contactType: "customer service", email: live.contact.email, telephone: live.contact.phone, availableLanguage: "en" },
       ],
     },
     { "@type": "WebSite", "@id": abs("/#website"), url: site.url, name: site.name, inLanguage: "en", publisher: { "@id": ORG_ID } },
   ],
-};
+});
 
 /** "From $0.50 / image" → { price: 0.5, unit: "image" }. */
 function startingPrice(from: string) {
@@ -43,8 +44,7 @@ function startingPrice(from: string) {
 }
 
 /** A service page: the Service with its starting price, and the breadcrumb trail. */
-export function serviceSchema(slug: string, description: string) {
-  const s = services.find((x) => x.slug === slug)!;
+export function serviceSchema(s: Service, description: string) {
   const p = startingPrice(s.from);
   const url = abs(`/services/${s.slug}`);
   return {

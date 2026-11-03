@@ -2,7 +2,10 @@
   "name": "techx-website",
   "private": true,
   "packageManager": "npm@11.19.0",
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
@@ -10,6 +13,15 @@
     "typecheck": "turbo run typecheck",
     "guard:test": "python3 .claude/hooks/guard.py --test"
   },
-  "devDependencies": { "turbo": "2.11.9" },
-  "engines": { "node": ">=20" }
+  "devDependencies": {
+    "turbo": "2.11.9"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "overrides": {
+    "@vercel/cli-config": {
+      "zod": "^4.6.7"
+    }
+  }
 }

@@ -29,7 +29,7 @@ export function Compare() {
               <tr key={f} className="group border-t border-line transition-colors duration-200 hover:bg-page">
                 <th scope="row" className="px-6 py-[18px] font-medium">{f}</th>
                 <td className="bg-blue-tint/60 px-6 py-[18px]">
-                  {i < rows.length - 1 ? <span className="flex items-center gap-2 text-blue"><span className="size-2 rounded-full bg-blue transition-transform duration-200 group-hover:scale-125" />{t}</span> : <span className="font-medium">{t}</span>}
+                  {i < rows.length - 1 ? <span className="flex items-center gap-2 text-blue-2"><span className="size-2 rounded-full bg-blue transition-transform duration-200 group-hover:scale-125" />{t}</span> : <span className="font-medium">{t}</span>}
                 </td>
                 <td className="px-6 py-[18px] text-ink-2">{a}</td>
                 <td className="px-6 py-[18px] text-ink-2">{h}</td>

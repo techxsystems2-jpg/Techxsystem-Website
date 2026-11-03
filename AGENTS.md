@@ -34,6 +34,7 @@ Adding a feature: create `apps/web/features/<name>/` with a `CONTEXT.md` in the 
 | **Starting price** | **From $0.50 an image.** Always phrased as a starting price ("from"), never a fixed one |
 | Other rates | Figma (see `features/home/CONTEXT.md` §7 and `lib/site.ts`) |
 | **Content facts** (services, what each edit includes, process, testimonials, contacts) | **TechX's current site**, techxsystems.com (owner, 2026-11-02), captured in `docs/old-site-content.md`. Rephrase, never contradict or invent |
+| **Live, admin-edited content** (facts, prices, levels, services, testimonials, FAQs, timeline, team, Work gallery) | The admin panel at `/admin` (owner, 2026-11-03; `docs/admin.md`). Saved values override the defaults in `lib/content/types.ts`. Read content through `lib/content` (server) or `useSite()` / `useServices()` (client), never hard-code it again |
 
 **This repo is self-contained.** `/Users/gauravrana/projects/TechX System` is a separate project (the October 2026 proposal archive and its HTML prototype). Don't read from it or edit it for website work, and keep all of this website's context in this repo (owner, 2026-11-02).
 

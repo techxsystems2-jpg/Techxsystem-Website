@@ -4,50 +4,54 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Chip } from "@techx/ui/Chip";
-import { categories, portfolio, type Shot } from "./portfolio";
+import { countsOf, type Shot } from "./portfolio";
 import type { WorkCat } from "@/features/services/data";
 
 const PAGE = 24;
 
 /* Work gallery (Figma 29:155): filter chips with counts, the finished edits in a grid, "Show N more" in pages of 24.
    A photo opens full size in the viewer below (Esc closes, arrow keys or a swipe step through the current filter).
-   Tiles press in on pointer-down. Reduced motion: no slides or scaling. */
-export function Gallery() {
+   Tiles press in on pointer-down. Reduced motion: no slides or scaling.
+   Editorial rhythm (impeccable critique, owner approved 2026-11-03): under "All", every tenth photo and the one six
+   after it run two columns wide in a panoramic crop (32/13 keeps them one row tall), alternating left and right, and
+   the floor plans (line drawings, not photos) sit in their own small row under the photos. */
+const wideAt = (i: number) => i % 10 === 0 || i % 10 === 6;
+
+export function Gallery({ items: portfolio }: { items: Shot[] }) {
+  const categories = countsOf(portfolio);
   const [cat, setCat] = useState<WorkCat | "all">("all");
   const [shown, setShown] = useState(PAGE);
-  const [view, setView] = useState({ at: 0, on: false }); // `at` outlives `on`, so the viewer closes showing its photo
+  // `at` outlives `on`, so the viewer closes showing its photo; `set` says which row the photo came from
+  const [view, setView] = useState<{ at: number; on: boolean; set: "photos" | "plans" }>({ at: 0, on: false, set: "photos" });
   const reduce = useReducedMotion();
-  const list = cat === "all" ? portfolio : portfolio.filter((s) => s.cat === cat);
+  const all = cat === "all";
+  const list = all ? portfolio.filter((s) => s.cat !== "plan") : portfolio.filter((s) => s.cat === cat);
+  const plans = all ? portfolio.filter((s) => s.cat === "plan") : [];
   const visible = list.slice(0, shown);
   const more = Math.min(PAGE, list.length - shown);
+  const viewing = view.set === "plans" ? plans : visible;
 
   const pick = (c: WorkCat | "all") => { setCat(c); setShown(PAGE); };
 
   return (
     <>
       <div role="group" aria-label="Filter by category" className="flex flex-wrap justify-center gap-2">
-        <Chip selected={cat === "all"} onClick={() => pick("all")}>All · {portfolio.length}</Chip>
+        <Chip selected={all} onClick={() => pick("all")}>All · {portfolio.length}</Chip>
         {categories.map((c) => (
           <Chip key={c.key} selected={cat === c.key} onClick={() => pick(c.key)}>{c.label} · {c.count}</Chip>
         ))}
       </div>
 
-      <ul className="mt-10 grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3">
+      <ul className="mt-10 grid grid-flow-dense grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3">
         <AnimatePresence initial={false} mode="popLayout">
-          {visible.map((s, i) => (
-            <motion.li key={s.src} layout={!reduce} initial={reduce ? false : { opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={reduce ? undefined : { opacity: 0, scale: 0.97 }} transition={{ type: "spring", bounce: 0, duration: 0.4 }}>
-              <button type="button" data-src={s.src} onClick={() => setView({ at: i, on: true })} className="group block w-full rounded-card bg-surface p-1.5 text-left shadow-hair transition-[box-shadow,translate,scale] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-raised active:scale-[0.98] active:duration-100">
-                <span className={`relative block aspect-[16/13] overflow-hidden rounded-inner ${s.square ? "bg-white" : "bg-sunk"}`}>
-                  <Image src={s.src} alt={`${s.label} edit by TechX`} fill sizes="(min-width: 1024px) 390px, 50vw" className={`${s.square ? "object-contain p-3" : "object-cover"} transition-transform duration-300 ease-[var(--ease-brand)] group-hover:scale-[1.03]`} />
-                  <span className="absolute bottom-2 left-2 rounded-md bg-white/90 px-1.5 py-0.5 font-mono text-[10.5px] uppercase tracking-[0.04em] text-maroon backdrop-blur">After</span>
-                </span>
-                <span className="flex items-center justify-between px-1.5 pb-0.5 pt-2.5 font-mono text-[11px] uppercase tracking-[0.04em] text-ink-2">
-                  {s.label}
-                  <span className="text-ink-3 max-sm:hidden">View</span>
-                </span>
-              </button>
-            </motion.li>
-          ))}
+          {visible.map((s, i) => {
+            const wide = all && wideAt(i);
+            return (
+              <motion.li key={s.src} layout={!reduce} className={wide ? "col-span-2" : ""} initial={reduce ? false : { opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={reduce ? undefined : { opacity: 0, scale: 0.97 }} transition={{ type: "spring", bounce: 0, duration: 0.4 }}>
+                <Tile shot={s} wide={wide} onOpen={() => setView({ at: i, on: true, set: "photos" })} />
+              </motion.li>
+            );
+          })}
         </AnimatePresence>
       </ul>
 
@@ -59,8 +63,33 @@ export function Gallery() {
         </div>
       )}
 
-      <Viewer list={visible} at={view.at} on={view.on} onClose={() => setView((v) => ({ ...v, on: false }))} onStep={(d) => setView((v) => ({ ...v, at: (v.at + d + visible.length) % visible.length }))} />
+      {plans.length > 0 && (
+        <div className="mt-14">
+          <h2 className="font-mono text-label uppercase text-ink-2">Floor plans · {plans.length}</h2>
+          <ul className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4">
+            {plans.map((s, i) => (
+              <li key={s.src}><Tile shot={s} onOpen={() => setView({ at: i, on: true, set: "plans" })} /></li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <Viewer list={viewing} at={view.at} on={view.on} onClose={() => setView((v) => ({ ...v, on: false }))} onStep={(d) => setView((v) => ({ ...v, at: (v.at + d + viewing.length) % viewing.length }))} />
     </>
+  );
+}
+
+function Tile({ shot: s, wide = false, onOpen }: { shot: Shot; wide?: boolean; onOpen: () => void }) {
+  return (
+    <button type="button" data-src={s.src} onClick={onOpen} className="group block w-full rounded-card bg-surface p-1.5 text-left shadow-hair transition-[box-shadow,translate,scale] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-raised active:scale-[0.98] active:duration-100">
+      <span className={`relative block overflow-hidden rounded-inner outline-1 -outline-offset-1 outline-black/10 ${wide ? "aspect-[16/9] lg:aspect-[32/13]" : "aspect-[16/13]"} ${s.square ? "bg-white" : "bg-sunk"}`}>
+        <Image src={s.src} alt={`${s.label} edit by TechX`} fill sizes={wide ? "(min-width: 1024px) 790px, 100vw" : "(min-width: 1024px) 390px, 50vw"} className={`${s.square ? "object-contain p-3" : "object-cover"} transition-transform duration-300 ease-[var(--ease-brand)] group-hover:scale-[1.03]`} />
+      </span>
+      <span className="flex items-center justify-between px-1.5 pb-0.5 pt-2.5 font-mono text-[11px] uppercase tracking-[0.04em] text-ink-2">
+        {s.label}
+        <span className="text-ink-3 max-sm:hidden">View</span>
+      </span>
+    </button>
   );
 }
 

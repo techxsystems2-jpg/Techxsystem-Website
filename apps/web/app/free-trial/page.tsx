@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/content/seo";
 import { TrialForm } from "@/features/free-trial/TrialForm";
 import { Faq } from "@/features/home/Faq";
 import { Testimonials } from "@/features/home/Testimonials";
@@ -7,7 +8,7 @@ import { OptInArt } from "@/features/illustrations/AnswerArt";
 import { Reveal } from "@/features/motion/Reveal";
 import { Spotlight } from "@/features/motion/Spotlight";
 import { HeroBadge, POINT_ICONS, Pointers, SkyHero } from "@/features/site-shell/SkyHero";
-import { announcement, site } from "@/lib/site";
+import { getContent, getSite } from "@/lib/content";
 import { buttonClass } from "@techx/ui/Button";
 import { WhatsAppIcon } from "@techx/ui/Icons";
 
@@ -15,11 +16,13 @@ import { WhatsAppIcon } from "@techx/ui/Icons";
    2026-11-02): the shared SkyHero, then the form card beside a Home answer card (the "ten photos" illustration, maroon
    numbers for the three steps), the real client quotes from Home (Figma has placeholders) and "About the trial".
    No final CTA block: the page itself is the call to action. */
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("free-trial", {
   title: "Free trial: 10 photos edited free",
   description: "Send ten photos or brackets. No card, no contract. Edited by hand, checked twice and back within 24 hours.",
   alternates: { canonical: "/free-trial" },
-};
+});
+}
 
 // Figma ticks under the button, plus Home's "checked twice" pointer
 const pointers: { text: string; icon: ReactNode }[] = [
@@ -35,18 +38,13 @@ const steps = [
   ["You decide", "Request changes, set your style, or walk away."],
 ] as const;
 
-// Answer 1 from Figma; 2 from the Home FAQ (files accepted); 3 is an open claim to confirm (docs/OPEN_ITEMS.md).
-const faqs = [
-  ["What happens after the trial?", "Nothing, unless you send more. There's no subscription to cancel."],
-  ["Can I send brackets?", "Yes. Send every exposure (brackets of 3, 5 or 7 are all fine) in RAW (CR2, CR3, NEF, ARW, RAF), DNG, JPEG or TIFF. Ten photos means ten finished images, however many brackets each takes."],
-  ["Will you use my photos?", "No. Your files stay private. We only show a client's photos with their written permission."],
-] as const;
 
-export default function FreeTrial() {
+export default async function FreeTrial() {
+  const [site, faqs, quotes] = await Promise.all([getSite(), getContent("faqs"), getContent("testimonials")]);
   return (
     <>
       <SkyHero
-        badge={<HeroBadge><span className="size-2 rounded-full bg-blue" aria-hidden="true" />{announcement.text}</HeroBadge>}
+        badge={<HeroBadge><span className="size-2 rounded-full bg-blue" aria-hidden="true" />{site.announcement.text}</HeroBadge>}
         lead="Send ten photos." rest="Judge the result."
         lede={<>No card, no contract. If you like the edits, keep sending. If you don&rsquo;t, you&rsquo;ve lost nothing but two minutes.</>}>
         <Pointers items={pointers} className="[--i:3]" />
@@ -54,15 +52,17 @@ export default function FreeTrial() {
 
       {/* Two columns of equal height (owner, 2026-11-02): the cards stretch to the taller one; on the right the steps
           spread over the spare height and a WhatsApp line sits at the foot, so neither card ends early. */}
-      <section className="wrap mt-14 grid items-stretch gap-3 lg:grid-cols-[1.2fr_1fr]">
+      <section className="wrap mt-14 grid items-start gap-3 lg:grid-cols-[1.2fr_1fr]">
         <Reveal className="h-full"><TrialForm /></Reveal>
-        <Reveal delay={0.08} className="h-full">
+        {/* the steps keep their own spacing and the card stays beside the form as it scrolls (stageshow review,
+            2026-11-03: stretched to the form's height, the three steps were spread far apart) */}
+        <Reveal delay={0.08} className="lg:sticky lg:top-24">
           {/* a Home answer card: illustration on the dotted canvas, then the mono label and maroon-numbered steps */}
-          <Spotlight className="flex h-full flex-col">
+          <Spotlight className="flex flex-col">
             <OptInArt />
-            <div className="flex flex-1 flex-col px-4 pb-3 pt-6 md:px-5">
+            <div className="flex flex-col px-4 pb-3 pt-6 md:px-5">
               <p className="mb-1 font-mono text-label uppercase text-ink-2">How the trial works</p>
-              <ol className="flex flex-1 flex-col justify-around divide-y divide-line">
+              <ol className="flex flex-col divide-y divide-line">
                 {steps.map(([t, d], i) => (
                   <li key={t} className="flex gap-3.5 py-4">
                     <b className="pt-px font-mono text-label font-medium text-maroon">0{i + 1}</b>
@@ -85,8 +85,8 @@ export default function FreeTrial() {
         </Reveal>
       </section>
 
-      <Testimonials />
-      <Faq title="About the trial." lede="Still unsure? Message the studio on WhatsApp. An editor replies." faqs={faqs} />
+      <Testimonials quotes={quotes} />
+      <Faq title="About the trial." lede="Still unsure? Message the studio on WhatsApp. An editor replies." faqs={faqs.trial} />
     </>
   );
 }

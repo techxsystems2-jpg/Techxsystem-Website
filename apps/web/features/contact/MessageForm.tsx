@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { buttonClass } from "@techx/ui/Button";
 import { ArrowIcon } from "@techx/ui/Icons";
 import { Err, Field, inputClass } from "@/features/site-shell/FormField";
-import { site } from "@/lib/site";
+import { useSite } from "@/features/content/ContentProvider";
 import { TRIAL, validateContact, type ContactDetails } from "@/lib/trial";
 import { isApiError, postJson } from "@/lib/uploader";
 
@@ -19,6 +19,7 @@ const spring = { type: "spring", bounce: 0, duration: 0.45 } as const;
 const empty: ContactDetails = { name: "", email: "", message: "" };
 
 export function MessageForm() {
+  const site = useSite();
   const [d, setD] = useState<ContactDetails>(empty);
   const [errors, setErrors] = useState<Errors>({});
   const [tried, setTried] = useState(false);
@@ -77,7 +78,7 @@ export function MessageForm() {
                 <h2 className="mt-5 text-h4 tracking-[-0.015em]">Your message is ready to send.</h2>
                 <p className="mt-3 max-w-[400px] text-ink-2">
                   Our inbox is offline for a moment, so your mail app has opened with it written out. Press send there. If nothing opened, write to{" "}
-                  <a href={`mailto:${site.contact.email}`} className="font-medium text-ink underline underline-offset-4 hover:text-blue">{site.contact.email}</a>.
+                  <a href={`mailto:${site.contact.email}`} className="font-medium text-ink underline underline-offset-4 hover:text-blue-2">{site.contact.email}</a>.
                 </p>
               </>
             )}

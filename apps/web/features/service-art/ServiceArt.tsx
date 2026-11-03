@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type PointerEvent, type ReactElement, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type PointerEvent, type ReactElement, type ReactNode } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { useLoop } from "@/features/motion/useLoop";
@@ -17,12 +17,28 @@ import { useLoop } from "@/features/motion/useLoop";
 
 type Slug = "photo-editing" | "virtual-twilight" | "virtual-staging" | "drone-editing" | "floor-plans" | "video-editing";
 
-export function ServiceArt({ slug }: { slug: Slug }) {
+/** `eager`: the card is on screen when the page loads (the /services grid's first row, a service page's hero), so its
+    photos load straight away at high priority; elsewhere they stay lazy (speed pass, 2026-11-03: the first card's
+    photo was the Services page's LCP and was being lazy-loaded). */
+const Eager = createContext(false);
+/** Whether the card's photos may load: straight away when eager, otherwise once the card is within ~300px of the
+    screen. Chrome's own lazy loading starts far earlier on phones (1,250px+), so off-screen cards used to download
+    with the page and slow its LCP (speed pass, 2026-11-03). */
+const Show = createContext(true);
+
+export function ServiceArt({ slug, eager = false }: { slug: Slug; eager?: boolean }) {
   const { ref, play } = useLoop<HTMLDivElement>();
+  const [near, setNear] = useState(eager);
+  useEffect(() => {
+    if (near || !ref.current) return;
+    const io = new IntersectionObserver(([e]) => { if (e?.isIntersecting) { setNear(true); io.disconnect(); } }, { rootMargin: "300px 0px" });
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, [near, ref]);
   const Art = arts[slug];
   return (
     <div ref={ref} className="relative aspect-[3/2] overflow-hidden rounded-inner bg-sunk">
-      <Art play={play} />
+      <Eager value={eager}><Show value={near}><Art play={play} /></Show></Eager>
     </div>
   );
 }
@@ -49,12 +65,15 @@ function useSteps(n: number, play: boolean, ms = 1100, hold = 2400) {
 }
 
 function Photo({ src, style, className = "" }: { src: string; style?: React.CSSProperties; className?: string }) {
-  return <Image src={src} alt="" fill sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" className={`object-cover ${className}`} style={style} />;
+  const eager = useContext(Eager);
+  if (!useContext(Show)) return null;
+  return <Image src={src} alt="" fill sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" className={`object-cover ${className}`} style={style}
+    {...(eager ? { loading: "eager" as const, fetchPriority: "high" as const } : {})} />;
 }
 
 /** Corner labels: the edited side (left) light, the raw side (right) dark. */
 const Tag = ({ children, side }: { children: ReactNode; side: "l" | "r" }) => (
-  <span className={`pointer-events-none absolute top-3 z-10 rounded-md px-2 py-[3px] font-mono text-[10.5px] uppercase tracking-[0.04em] backdrop-blur ${side === "l" ? "left-3 bg-surface/90 text-ink" : "right-3 bg-ink/55 text-white"}`}>{children}</span>
+  <span className={`pointer-events-none absolute top-3 z-10 rounded-md px-2 py-[3px] text-[11.5px] font-medium backdrop-blur ${side === "l" ? "left-3 bg-surface/90 text-ink" : "right-3 bg-ink/75 text-white"}`}>{children}</span>
 );
 
 const Tick = () => (
@@ -179,7 +198,9 @@ function FloorArt({ play }: { play: boolean }) {
   const steps = ["Walls", "Rooms", "Sizes"] as const;
   const done = useSteps(steps.length, play);
   const plan = (style?: React.CSSProperties) => (
-    <div className="absolute inset-0 bg-white"><Photo src="/photos/tx-plan.jpg" className="!object-contain p-[4%] pb-[14%]" style={style} /></div>
+    // the plan spans most of the card and is cropped top and bottom like a document (stageshow review, 2026-11-03): small
+    // and centred, the "before" side was mostly blank paper
+    <div className="absolute inset-0 bg-white"><div className="absolute inset-x-[7%] bottom-[17%] top-[13%]"><Photo src="/photos/tx-plan.jpg" className="object-[center_40%]" style={style} /></div></div>
   );
   return (
     <>
@@ -212,15 +233,16 @@ function VideoArt({ play }: { play: boolean }) {
           </motion.div>
         </motion.div>
       </AnimatePresence>
-      <span className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-md bg-ink/55 px-2 py-[3px] font-mono text-[10.5px] uppercase tracking-[0.04em] text-white backdrop-blur">
+      <span className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-md bg-ink/55 px-2 py-[3px] text-[11.5px] font-medium tabular-nums text-white backdrop-blur">
         <motion.i className="size-1.5 rounded-full bg-[#FF4D4D]" animate={play ? { opacity: [1, 0.2, 1] } : { opacity: 1 }} transition={play ? { duration: 1.2, repeat: Infinity } : { duration: 0 }} />
         4K · 2:30
       </span>
       <AnimatePresence>
         {done >= 3 && (
-          <motion.span key="title" className="absolute inset-x-0 top-[34%] z-10 text-center font-display text-[20px] font-semibold tracking-[-0.02em] text-white [text-shadow:0_2px_12px_rgb(0_0_0/0.45)]"
+          <motion.span key="title" className="absolute inset-x-0 top-[30%] z-10 flex justify-center"
             initial={{ opacity: 0, transform: "translateY(6px)" }} animate={{ opacity: 1, transform: "translateY(0px)" }} exit={{ opacity: 0 }} transition={spring}>
-            Just listed
+            {/* on a dark backing: white over a bright frame failed contrast (a11y pass, 2026-11-03) */}
+            <span className="rounded-lg bg-ink/60 px-3 py-1 font-display text-[20px] font-semibold tracking-[-0.02em] text-white backdrop-blur-sm">Just listed</span>
           </motion.span>
         )}
       </AnimatePresence>

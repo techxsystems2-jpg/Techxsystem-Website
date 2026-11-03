@@ -48,14 +48,16 @@ export function Hero() {
             <ul className="mt-6 flex flex-wrap justify-center gap-x-7 gap-y-2.5">
               {pointers.map((p) => (
                 <li key={p.text} className="flex items-center gap-2 text-[14.5px] text-ink-2">
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0 text-blue">{p.icon}</svg>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0 text-blue-2">{p.icon}</svg>
                   {p.text}
                 </li>
               ))}
             </ul>
           </div>
-          <div className="mt-12 md:mt-16"><HeroStage /></div>
         </div>
+        {/* the photo tray is the page's LCP: it rises in without the delayed fade and blur, so it's drawn from the first
+            frame (speed pass, 2026-11-03; the fade held its paint back ~0.9 s on a phone) */}
+        <div className="rise-in-place mt-12 md:mt-16"><HeroStage /></div>
       </div>
     </section>
   );
@@ -73,9 +75,9 @@ export function Words({ text, from, className = "" }: { text: string; from: numb
     Border (owner, 2026-10-31): a light gradient that travels round the edge (`edge-flow`, globals.css). */
 function PromptBox() {
   return (
-    <Link href="/free-trial" className="edge-flow group relative mx-auto block max-w-[560px] rounded-[13.5px] p-[1.5px] text-left shadow-[0_12px_32px_-12px_rgb(10_10_11/0.22)] transition-shadow duration-300 hover:shadow-[0_16px_40px_-12px_rgb(48_116_254/0.3)]" aria-label="Try 10 photos free: upload brackets or paste a Dropbox link">
+    <Link href="/free-trial" className="edge-flow group relative mx-auto block max-w-[560px] rounded-[13.5px] p-[1.5px] text-left shadow-[0_12px_32px_-12px_rgb(10_10_11/0.22)] transition-shadow duration-300 hover:shadow-[0_16px_40px_-12px_rgb(48_116_254/0.3)]">
       <span className="block rounded-[12px] bg-white px-4 pb-3 pt-4">
-        <span className="block h-11 truncate text-[16px] text-ink-3">Paste a Dropbox link<span className="max-sm:hidden"> or drop your brackets</span>…</span>
+        <span className="block h-11 truncate text-[16px] text-ink-2/85">Paste a Dropbox link<span className="max-sm:hidden"> or drop your brackets</span>…</span>
         <span className="flex items-center gap-3">
           <span className="flex items-center gap-1.5 text-[14px] font-medium text-ink">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12.5l-8.6 8.6a5.5 5.5 0 01-7.8-7.8l9.2-9.2a3.7 3.7 0 015.2 5.2l-9.2 9.2a1.8 1.8 0 01-2.6-2.6l8.5-8.5" /></svg>

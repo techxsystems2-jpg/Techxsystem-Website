@@ -62,5 +62,5 @@ export const POINT_ICONS = {
 };
 
 export function PointIcon({ icon, size = 17, className = "" }: { icon: ReactNode; size?: number; className?: string }) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={`shrink-0 text-blue ${className}`}>{icon}</svg>;
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={`shrink-0 text-blue-2 ${className}`}>{icon}</svg>;
 }

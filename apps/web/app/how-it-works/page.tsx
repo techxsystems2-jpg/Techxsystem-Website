@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/content/seo";
 import Link from "next/link";
 import { buttonClass } from "@techx/ui/Button";
 import { ArrowIcon } from "@techx/ui/Icons";
@@ -13,11 +14,13 @@ import { HeroBadge, POINT_ICONS, Pointers, SkyHero } from "@/features/site-shell
    the four steps as rows with their illustrations → the overnight timeline (Home's, New York and India) → files we
    accept and ways to send → final CTA. "Ways to send" lists what the site really takes today (upload, Dropbox or Google
    Drive link); Figma's client portal and WeTransfer are open items (docs/OPEN_ITEMS.md). */
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("how-it-works", {
   title: "How it works: listing-ready by morning",
   description: "Four steps, and you only do the first. Upload your brackets, tell us your style once, we edit and check overnight, you download by morning. Revisions free.",
   alternates: { canonical: "/how-it-works" },
-};
+});
+}
 
 const pointers: { text: string; icon: ReactNode }[] = [
   { text: "Back in 12–24 hours", icon: POINT_ICONS.clock },

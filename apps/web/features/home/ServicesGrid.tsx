@@ -3,12 +3,13 @@ import { buttonClass } from "@techx/ui/Button";
 import { Eyebrow } from "@techx/ui/Eyebrow";
 import { ArrowIcon } from "@techx/ui/Icons";
 import { Reveal, RevealGroup, RevealItem } from "@/features/motion/Reveal";
-import { ServiceArt } from "@/features/service-art/ServiceArt";
-import { services } from "@/lib/site";
+import { ServiceVisual } from "@/features/service-art/ServiceVisual";
+import { getContent } from "@/lib/content";
 import { ScrollFill } from "@/features/motion/ScrollFill";
 
 /** Six services, each with its own short film of the edit, and its starting price. */
-export function ServicesGrid({ head = true }: { head?: boolean }) {
+export async function ServicesGrid({ head = true }: { head?: boolean }) {
+  const services = await getContent("services");
   return (
     <section id="services" className={`wrap ${head ? "pt-28 md:pt-40" : "pt-14"}`}>
       {head && <Reveal className="mb-12 flex flex-wrap items-end justify-between gap-8">
@@ -19,10 +20,10 @@ export function ServicesGrid({ head = true }: { head?: boolean }) {
         <Link href="/services" className={buttonClass("secondary")}>All services <ArrowIcon className="transition-transform duration-200 group-hover:translate-x-0.5" /></Link>
       </Reveal>}
       <RevealGroup as="ul" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {services.map((s) => (
+        {services.map((s, i) => (
           <RevealItem as="li" key={s.slug} className="flex">
             <Link href={`/services/${s.slug}`} className="group flex w-full flex-col rounded-card bg-surface p-2 shadow-hair transition-[box-shadow,translate,scale] duration-[320ms] hover:-translate-y-1 hover:shadow-raised active:scale-[0.99] active:duration-100">
-              <ServiceArt slug={s.slug} />
+              <ServiceVisual slug={s.slug} image={s.image} name={s.name} eager={!head && i === 0} /> {/* only the first card is on screen on a phone */}
               <div className="flex flex-1 flex-col px-3 pb-3 pt-4">
                 <h3 className="text-h4">{s.name}</h3>
                 <p className="mt-1 text-small text-ink-2">{s.line}</p>

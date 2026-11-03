@@ -18,19 +18,23 @@ export function safeEqual(a: string, b: string) {
   return timingSafeEqual(x, y);
 }
 
-/** A signed token carrying `data` until `ttlSeconds` from now. */
-export function seal(data: object, ttlSeconds: number) {
-  const body = Buffer.from(JSON.stringify({ d: data, e: Date.now() + ttlSeconds * 1000 })).toString("base64url");
+/** What a token is for. A token is only accepted for the purpose it was signed for, so an upload ticket handed to a
+    visitor can never stand in for an admin session or an OAuth state (security audit hardening, 2026-11-03). */
+export type TokenPurpose = "admin-session" | "trial-ticket" | "local-upload" | "oauth-state";
+
+/** A signed token carrying `data` until `ttlSeconds` from now, for one purpose. */
+export function seal(data: object, ttlSeconds: number, purpose: TokenPurpose) {
+  const body = Buffer.from(JSON.stringify({ d: data, e: Date.now() + ttlSeconds * 1000, p: purpose })).toString("base64url");
   return `${body}.${mac(body)}`;
 }
 
-export function unseal<T>(token: string | undefined | null): T | null {
+export function unseal<T>(token: string | undefined | null, purpose: TokenPurpose): T | null {
   if (!token) return null;
   const [body, sig] = token.split(".");
   if (!body || !sig || !safeEqual(sig, mac(body))) return null;
   try {
-    const { d, e } = JSON.parse(Buffer.from(body, "base64url").toString()) as { d: T; e: number };
-    return Date.now() < e ? d : null;
+    const { d, e, p } = JSON.parse(Buffer.from(body, "base64url").toString()) as { d: T; e: number; p?: string };
+    return p === purpose && Date.now() < e ? d : null;
   } catch {
     return null;
   }

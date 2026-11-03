@@ -6,7 +6,7 @@ import NumberFlow from "@number-flow/react";
 import { buttonClass } from "@techx/ui/Button";
 import { Chip } from "@techx/ui/Chip";
 import { ArrowIcon } from "@techx/ui/Icons";
-import { plans } from "@/features/home/Pricing";
+import type { Plan } from "@/lib/content/types";
 
 /* Monthly calculator (Figma 31:155): listings, photos per listing, level, twilights per listing → an estimated monthly
    cost and the cost per listing. Figma's defaults (20 × 30 at Signature + 1 twilight = $620, $31.00 a listing).
@@ -15,7 +15,7 @@ import { plans } from "@/features/home/Pricing";
 const TWILIGHT = 1;
 const usd = (digits: number) => ({ style: "currency", currency: "USD", minimumFractionDigits: digits, maximumFractionDigits: digits }) as const;
 
-export function Calculator() {
+export function Calculator({ plans }: { plans: Plan[] }) {
   const [listings, setListings] = useState(20);
   const [photos, setPhotos] = useState(30);
   const [level, setLevel] = useState(1);
@@ -48,8 +48,13 @@ export function Calculator() {
         <p className="mt-3 text-small text-ink-2">
           About <span className="tabular-nums text-ink"><NumberFlow value={perListing} format={usd(2)} locales="en-US" /></span> a listing
         </p>
-        <p className="mt-6 text-small text-ink-2">Starting rates. Your final rate depends on the edit and volume, and you&rsquo;ll see it before we start.</p>
-        <Link href="/free-trial" className={buttonClass("primary", "mt-auto w-full")}>Start free trial <ArrowIcon className="transition-transform duration-200 group-hover:translate-x-0.5" /></Link>
+        {/* how the total is made (stageshow review, 2026-11-03: this used to be an empty band above the button) */}
+        <dl className="mt-6 grid gap-2 border-t border-blue/15 pt-4 text-small">
+          <div className="flex justify-between gap-4"><dt className="text-ink-2">{(listings * photos).toLocaleString("en-US")} photos × {plans[level].price} ({plans[level].name})</dt><dd className="tabular-nums text-ink"><NumberFlow value={listings * photos * rate} format={usd(0)} locales="en-US" /></dd></div>
+          <div className="flex justify-between gap-4"><dt className="text-ink-2">{(listings * twilights).toLocaleString("en-US")} twilights × $1.00</dt><dd className="tabular-nums text-ink"><NumberFlow value={listings * twilights * TWILIGHT} format={usd(0)} locales="en-US" /></dd></div>
+        </dl>
+        <p className="mt-4 text-small text-ink-2">Starting rates. Your final rate depends on the edit and volume, and you&rsquo;ll see it before we start.</p>
+        <Link href="/free-trial" className={buttonClass("primary", "mt-auto w-full max-lg:mt-6")}>Start free trial <ArrowIcon className="transition-transform duration-200 group-hover:translate-x-0.5" /></Link>
       </div>
     </div>
   );

@@ -16,7 +16,7 @@ Read this file, `DESIGN.md` §1–6, and the files under **Uses**. Nothing else 
 - Values: A person checks every photo "Software helps us work fast. People decide when a photo is finished." · Your style, every time "One style guide per client, followed by every editor on every job." · Honest about the edit "We never change the property itself, and staged rooms are labelled."
 - Final CTA: "Meet the team on your next shoot." / "Ten photos, free."
 
-**Built:** 2013 → 2016 and Delhi first (Figma contradicts itself; matches the company brief); studio shown as "India" (owner); "Our own studio" for 2017; "A new site" for 2026 (staging unconfirmed). Studio photo: TechX's drone edit with a visible "studio photo to come" label. Portraits: initials with "Portrait to come". Real client quotes added before the CTA.
+**Built:** headline year 2016 (not Figma's 2013). Owner, 2026-11-03: TechX started in **Aligarh**, not Delhi, so the story says Aligarh and the timeline is Figma's as drawn (2016 Founded in Aligarh · 2017 Studio in Delhi · 2019 Video and floor plans · 2026 Virtual staging returns). Studio photo: TechX's drone edit with a visible "studio photo to come" label. Portraits: initials with "Portrait to come". Real client quotes added before the CTA.
 
 ## Status
 - [x] Copy transcribed from Figma (2026-11-02)

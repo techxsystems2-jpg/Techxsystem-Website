@@ -18,7 +18,7 @@
   --color-blue-tint: #EBF1FF;
   --color-maroon: #8E1F3F;     /* "After" labels, step numbers. Never on buttons */
   --color-maroon-tint: #F9EEF2;
-  --color-green: #1F9D55;
+  --color-green: #147A3A;      /* success; 5.4:1 on white, 4.9:1 on the green tint (was #1F9D55, 3.5:1: a11y pass 2026-11-03) */
   --color-error: #D93636;
   --color-warning: #D98A0B;
 

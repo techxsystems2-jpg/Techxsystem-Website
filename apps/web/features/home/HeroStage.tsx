@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 import { BeforeAfter } from "@/features/before-after/BeforeAfter";
 import { HeroCollage } from "./HeroCollage";
 import type { SceneName } from "@/features/before-after/Scenes";
@@ -16,18 +16,8 @@ const scenes: { id: SceneName; label: string; photo: string; alt: string }[] = [
 ];
 
 
-const KEY = "techx-collage";
-const subscribeCollage = (cb: () => void) => {
-  addEventListener(KEY, cb);
-  addEventListener("storage", cb);
-  return () => { removeEventListener(KEY, cb); removeEventListener("storage", cb); };
-};
-
 export function HeroStage() {
   const [i, setI] = useState(0);
-  // Temporary review switch for the collage (owner, 2026-10-31): on by default, remembered in this browser
-  const collage = useSyncExternalStore(subscribeCollage, () => localStorage.getItem(KEY) !== "off", () => true);
-  const toggleCollage = () => { localStorage.setItem(KEY, collage ? "off" : "on"); dispatchEvent(new Event(KEY)); };
 
   return (
     <div className="relative">
@@ -35,7 +25,8 @@ export function HeroStage() {
           a slow two-layer collage of TechX's own edits (HeroCollage) */}
       <div className="wrap">
         <div className="relative mx-auto max-w-[1180px]">
-        <div className={`transition-opacity duration-500 ${collage ? "opacity-100" : "opacity-0"}`}>{collage && <HeroCollage />}</div>
+        {/* collage always on: the review switch was removed before launch (owner, 2026-11-03) */}
+        <HeroCollage />
         <div className="relative z-10 rounded-tray bg-surface p-1 shadow-[0_0_0_1px_rgb(10_10_11/0.05),0_1px_2px_rgb(10_10_11/0.04),0_-10px_30px_-14px_rgb(48_116_254/0.12),0_18px_40px_-26px_rgb(10_10_11/0.10)]">
           <BeforeAfter scene={scenes[i]!.id} photo={scenes[i]!.photo} alt={scenes[i]!.alt} className="aspect-[16/10] rounded-[14px] md:aspect-[16/8.6]" />
           <div className="flex flex-wrap items-center justify-between gap-3 px-2 pb-1.5 pt-3">
@@ -47,15 +38,7 @@ export function HeroStage() {
                 </button>
               ))}
             </div>
-            <div className="flex items-center gap-4">
-              <button type="button" role="switch" aria-checked={collage} onClick={toggleCollage} className="flex min-h-11 items-center gap-2 font-mono text-label uppercase text-ink-2 hover:text-ink">
-                Collage
-                <span className={`relative h-5 w-9 rounded-full transition-colors duration-200 ${collage ? "bg-blue" : "bg-line-2"}`}>
-                  <span className={`absolute left-0.5 top-0.5 size-4 rounded-full bg-white shadow-hair transition-transform duration-200 ease-[var(--ease-brand)] ${collage ? "translate-x-4" : ""}`} />
-                </span>
-              </button>
-              <span className="font-mono text-label uppercase text-ink-2 max-sm:hidden">Sample listing · drag to compare</span>
-            </div>
+            <span className="font-mono text-label uppercase text-ink-2 max-sm:hidden">Sample listing · drag to compare</span>
           </div>
         </div>
         </div>

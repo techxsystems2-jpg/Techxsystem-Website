@@ -7,8 +7,18 @@
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body { -webkit-tap-highlight-color: transparent; }
 h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; }
+/* impeccable polish (2026-11-02): no one-word last lines in running text; browser surfaces in the brand's colours */
+p, li, figcaption, dd { text-wrap: pretty; }
+html { accent-color: var(--color-blue); caret-color: var(--color-blue); }
+::selection { background: var(--color-blue-tint); color: var(--color-ink); }
 section[id] { scroll-margin-top: 84px; }
+/* the admin panel (app/admin) brings its own chrome: the site header, spacer and footer (data-site-chrome) are hidden
+   there by CSS, so they can stay in every page's server HTML without flashing on the admin */
+body:has([data-admin]) [data-site-chrome] { display: none; }
+body:has([data-admin]) .sky-flow { background: none; }
 a, button, input, select { touch-action: manipulation; }
+/* mobile-native (2026-11-03): holding a finger on a control doesn't select its label; text in content stays selectable */
+button, [role="button"], [role="tab"] { -webkit-user-select: none; user-select: none; }
 :focus-visible { outline: 2px solid var(--color-blue); outline-offset: 3px; border-radius: 8px; }
 
 @utility wrap { width: 100%; max-width: 1200px; margin-inline: auto; padding-inline: 20px; @media (width >= 48rem) { padding-inline: 24px; } }
@@ -32,27 +42,6 @@ a, button, input, select { touch-action: manipulation; }
     linear-gradient(to bottom, #FFFFFF, #F5FAFF 30%, #FFFFFF 52%, #F5FAFF 74%, #EAF5FF);
 }
 
-/* Background switch (owner, 2026-11-02; BgToggle in the header): "white" drops the sky wash and the hero sky. */
-html[data-bg="white"] .sky-flow { background: #fff; }
-html[data-bg="white"] .hero-sky { display: none; }
-/* White background only: the final CTA panel carries the hero's sky (soft blue from the top, two light patches,
-   fading to white by the buttons) and a faint blue edge, so the last call to action is the one coloured surface. */
-html[data-bg="white"] .cta-panel {
-  background:
-    radial-gradient(55% 75% at 12% 0%, #B9DCFF, transparent 70%),
-    radial-gradient(50% 70% at 88% 4%, #C4E2FF, transparent 70%),
-    radial-gradient(70% 55% at 50% 100%, rgb(48 116 254 / 0.10), transparent 70%),
-    linear-gradient(180deg, #DCEEFF 0%, #EAF5FF 45%, #F6FAFF 80%, #FFFFFF 100%);
-  box-shadow: 0 0 0 1px rgb(48 116 254 / 0.22), 0 28px 70px -30px rgb(48 116 254 / 0.45);
-}
-
-/* Moving sky in the final CTA (CtaFx.tsx): White background only; drift stops under reduced motion. */
-.cta-fx { display: none; }
-html[data-bg="white"] .cta-fx { display: block; }
-@keyframes cta-drift-a { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(22%, 14%) scale(1.15); } }
-@keyframes cta-drift-b { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-20%, 16%) scale(1.12); } }
-@media (prefers-reduced-motion: reduce) { .cta-blob { animation: none !important; } }
-
 /* Raw bracket look for the stand-in scenes until real photos arrive */
 @utility raw { filter: saturate(.22) brightness(.82) contrast(.9); }
 html.lenis, html.lenis body { height: auto; }
@@ -66,12 +55,17 @@ html.lenis, html.lenis body { height: auto; }
 
 
 /* Hero headline: each word materialises (rise + sharpen), staggered. CSS, so it never waits for JavaScript. */
-@keyframes word-in { from { opacity: 0; transform: translateY(0.35em); filter: blur(12px); } }
+/* 0.01, not 0: identical to the eye, but the browser counts the headline as painted at first paint, not when the fade
+   ends (LCP; speed pass 2026-11-03). The approved hero animation is otherwise unchanged. */
+@keyframes word-in { from { opacity: 0.01; transform: translateY(0.35em); filter: blur(12px); } }
 .word { display: inline-block; animation: word-in 900ms var(--ease-brand) both; animation-delay: calc(120ms + var(--i) * 70ms); }
 
 /* Generic entrance for hero blocks */
-@keyframes rise { from { opacity: 0; transform: translateY(12px); filter: blur(6px); } }
+@keyframes rise { from { opacity: 0.01; transform: translateY(12px); filter: blur(6px); } }
+@keyframes rise-in-place { from { transform: translateY(12px); } }
 .rise > * { animation: rise 800ms var(--ease-brand) both; animation-delay: calc(500ms + var(--i, 0) * 90ms); }
+/* a .rise child that must be visible at once (the hero photo, the LCP): the same rise, no fade, no blur, no wait */
+.rise .rise-in-place { animation: rise-in-place 900ms var(--ease-brand) both; }
 
 /* Hero clouds: a slow sideways drift (one cycle per 30s, small travel) */
 @keyframes cloud { 50% { transform: translateX(40px); } }
@@ -117,3 +111,104 @@ html.lenis, html.lenis body { height: auto; }
   [class*="backdrop-blur"] { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
   .solid-bar { background: var(--color-page) !important; }
 }
+
+/* ── Admin panel only: shadcn/ui tokens (owner, 2026-11-03: "use the shadcn dashboard on the backend, not the
+   frontend"). The variables exist only inside [data-admin], so the website's own tokens (ink, page, surface, blue…)
+   are untouched; the names don't overlap. Neutral palette, as in shadcn's dashboard-01. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+[data-admin] {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  /* owner, 2026-11-03: the admin follows the site's theme. Actions in the brand blue (the darker #1E4FD6, 6.7:1 with
+     white text), focus in brand blue, a faint sky tint behind the white panels (the site's #EAF5FF sky, lightened) */
+  --primary: #1E4FD6;
+  --primary-foreground: #FFFFFF;
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.505 0 0);
+  --accent: #EEF4FF;
+  --accent-foreground: #0A0A0B;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: #3074FE;
+  --sidebar: #F4F8FE;
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: #1E4FD6;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #E6EEFC;
+  --sidebar-accent-foreground: #0A0A0B;
+  --sidebar-border: #E3E9F3;
+  --sidebar-ring: #3074FE;
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+}
+[data-admin] h1, [data-admin] h2, [data-admin] h3 { font-family: inherit; }
+/* shadcn parts (data-slot) draw their own focus ring; anything else in the admin keeps a neutral outline */
+[data-admin] :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 6px; }
+[data-admin] [data-slot]:focus-visible { outline: none; }
+/* shadcn sets every border to the border token once (Tailwind v4 defaults borders to currentColor); admin only, in the
+   base layer so border-* utilities still win */
+@layer base {
+  [data-admin] *, [data-admin] ::before, [data-admin] ::after, [data-admin]::backdrop { border-color: var(--border); }
+}
+
+/* Scroll reveals (features/motion/Reveal.tsx; speed pass 2026-11-03). A scroll-driven animation, not JavaScript: a
+   block already on screen at load is past its range and drawn finished at first paint; a block below rises in over
+   the first part of its entry. --reveal-lag starts a block later in the scroll (Reveal's `delay`); items in a group
+   step in one after another. No support, or reduced motion: everything simply shows. */
+/* rise and sharpen, no fade: a half-transparent block at the foot of the screen read as low-contrast text */
+@keyframes reveal-in { from { transform: translateY(28px); filter: blur(6px); } }
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry calc(0% + var(--reveal-lag, 0%)) entry calc(60% + var(--reveal-lag, 0%));
+    }
+    .reveal-group > .reveal:nth-child(2) { --reveal-lag: 6%; }
+    .reveal-group > .reveal:nth-child(3) { --reveal-lag: 12%; }
+    .reveal-group > .reveal:nth-child(n + 4) { --reveal-lag: 18%; }
+  }
+}
+
+/* Admin loading shimmer (features/admin/ui/skeleton.tsx): a light band sweeping across the placeholder */
+@keyframes admin-shimmer { from { background-position: 150% 0; } to { background-position: -50% 0; } }
+[data-admin] .admin-shimmer {
+  background: linear-gradient(90deg, var(--muted) 0%, var(--muted) 35%, color-mix(in oklab, var(--muted) 35%, white) 50%, var(--muted) 65%, var(--muted) 100%);
+  background-size: 250% 100%;
+  animation: admin-shimmer 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) { [data-admin] .admin-shimmer { animation: none; } }

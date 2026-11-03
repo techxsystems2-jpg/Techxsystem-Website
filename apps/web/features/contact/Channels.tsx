@@ -3,30 +3,29 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowIcon } from "@techx/ui/Icons";
-import { ContactArt } from "@/features/illustrations/AnswerArt";
 import { RevealGroup, RevealItem } from "@/features/motion/Reveal";
 import { Spotlight } from "@/features/motion/Spotlight";
-import { site } from "@/lib/site";
-import { CallArt, EmailArt } from "./ChannelArt";
+import { useSite } from "@/features/content/ContentProvider";
+import { CallScene, EmailScene, WhatsAppScene } from "./ContactScenes";
 
 /* Three ways in (Figma 34:155), built like the Home answer cards (owner, 2026-11-02: follow the Home design):
-   Spotlight card, a working illustration on the dotted canvas, a maroon number + mono label, one line, the number or
+   Spotlight card, the channel acted out on a real device (ContactScenes.tsx, owner 2026-11-03), a maroon number + mono label, one line, the number or
    address, and a blue link pinned to the foot so the links line up. WhatsApp first (fastest), then Email, then Call.
    Email's address has a copy button (people often write from another device); "Book a call" opens WhatsApp with the
    request typed, because US hours fall outside the studio day. */
-const { contact } = site;
-const BOOK = `${contact.whatsappUrl}?text=${encodeURIComponent("Hi TechX, I'd like to book a call.")}`;
 
 export function Channels() {
+  const { contact } = useSite();
+  const BOOK = `${contact.whatsappUrl}?text=${encodeURIComponent("Hi TechX, I'd like to book a call.")}`;
   return (
     <RevealGroup className="wrap mt-14 grid gap-3 md:grid-cols-2 lg:grid-cols-3 [&>*]:min-w-0">
-      <Channel n="01" label="WhatsApp" art={<ContactArt />} value={contact.whatsapp} href={contact.whatsappUrl} more="Open WhatsApp">
+      <Channel n="01" label="WhatsApp" art={<WhatsAppScene />} value={contact.whatsapp} href={contact.whatsappUrl} more="Open WhatsApp">
         The fastest way to reach the studio. An editor replies.
       </Channel>
-      <Channel n="02" label="Email" art={<EmailArt />} value={contact.email} copy href={`mailto:${contact.email}`} more="Write an email">
+      <Channel n="02" label="Email" art={<EmailScene />} value={contact.email} copy href={`mailto:${contact.email}`} more="Write an email">
         For quotes, invoices and anything with attachments.
       </Channel>
-      <Channel n="03" label="Call" art={<CallArt />} value={contact.phone} valueHref={contact.phoneUrl} href={BOOK} more="Book a call" className="md:col-span-2 lg:col-span-1">
+      <Channel n="03" label="Call" art={<CallScene />} value={contact.phone} valueHref={contact.phoneUrl} href={BOOK} more="Book a call" className="md:col-span-2 lg:col-span-1">
         Weekdays {contact.hours}. Book a call for US hours.
       </Channel>
     </RevealGroup>
@@ -45,11 +44,11 @@ function Channel({ n, label, art, value, valueHref, copy = false, href, more, cl
           <h2 className="text-h4 tracking-[-0.015em]">{children}</h2>
           {/* the value sits above the card-wide link (z-30) so it can be tapped or copied on its own */}
           <p className="relative z-30 mt-3 flex items-center gap-2 font-mono text-[13px] text-ink">
-            {valueHref ? <a href={valueHref} className="underline-offset-4 hover:text-blue hover:underline">{value}</a> : <span className="select-all">{value}</span>}
+            {valueHref ? <a href={valueHref} className="underline-offset-4 hover:text-blue-2 hover:underline">{value}</a> : <span className="select-all">{value}</span>}
             {copy && <CopyButton text={value} />}
           </p>
           <div className="mt-auto">
-            <a href={href} rel="noopener" className="mt-4 inline-flex items-center gap-1.5 text-small font-medium text-blue after:absolute after:inset-0 after:z-20 after:rounded-card">
+            <a href={href} rel="noopener" className="mt-4 inline-flex items-center gap-1.5 text-small font-medium text-blue-2 after:absolute after:inset-0 after:z-20 after:rounded-card">
               {more} <ArrowIcon size={14} className="transition-transform duration-200 group-hover/card:translate-x-[3px]" />
             </a>
           </div>

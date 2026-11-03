@@ -3,12 +3,76 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ],
+      "env": [
+        "DATABASE_URL",
+        "BLOB_READ_WRITE_TOKEN",
+        "UPSTASH_REDIS_REST_URL",
+        "UPSTASH_REDIS_REST_TOKEN",
+        "APP_SECRET",
+        "ADMIN_EMAIL",
+        "ADMIN_PASSWORD",
+        "NEXT_PUBLIC_SITE_URL",
+        "VERCEL",
+        "VERCEL_ENV",
+        "VERCEL_URL",
+        "RESEND_API_KEY",
+        "MAIL_FROM",
+        "MAIL_TO",
+        "MAIL_DAILY_CAP",
+        "MAIL_MONTHLY_CAP",
+        "DROPBOX_APP_KEY",
+        "DROPBOX_APP_SECRET",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET"
+      ],
+      "cache": false
     },
-    "lint": { "dependsOn": ["^lint"] },
-    "typecheck": { "dependsOn": ["^typecheck"] },
-    "dev": { "cache": false, "persistent": true }
+    "lint": {
+      "dependsOn": [
+        "^lint"
+      ]
+    },
+    "typecheck": {
+      "dependsOn": [
+        "^typecheck"
+      ]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "env": [
+        "DATABASE_URL",
+        "BLOB_READ_WRITE_TOKEN",
+        "UPSTASH_REDIS_REST_URL",
+        "UPSTASH_REDIS_REST_TOKEN",
+        "APP_SECRET",
+        "ADMIN_EMAIL",
+        "ADMIN_PASSWORD",
+        "NEXT_PUBLIC_SITE_URL",
+        "VERCEL",
+        "VERCEL_ENV",
+        "VERCEL_URL",
+        "RESEND_API_KEY",
+        "MAIL_FROM",
+        "MAIL_TO",
+        "MAIL_DAILY_CAP",
+        "MAIL_MONTHLY_CAP",
+        "DROPBOX_APP_KEY",
+        "DROPBOX_APP_SECRET",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET"
+      ]
+    }
   }
 }
