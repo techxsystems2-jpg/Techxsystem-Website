@@ -13,7 +13,7 @@ Read this file, `DESIGN.md` §1–6, and the files listed under **Uses**. Nothin
   house-and-camera tile inline → lede → Start free trial + See prices → proof row → **Expertise** (`Expertise.tsx`): four
   specialities with an auto-advancing progress line, driving the before/after in a "TechX Studio" editor window that tilts up on scroll.
 - The Figma prompt box and the "Virtual staging is back" badge were dropped from the hero ("New" tag now sits on Virtual staging).
-- Services cards each run their own film: `features/service-art`. Logo strip is a marquee.
+- Services cards each run their own film: `features/service-art`. Logo strip: eyebrow line only; placeholder logos removed (owner, 2026-11-14) until real ones arrive.
 - The owner will paste the remaining sections (answers, how it works, pricing, comparison, testimonials, FAQ).
 
 ## Sections and exact copy (top to bottom, from Figma)

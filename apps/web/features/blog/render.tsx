@@ -22,7 +22,7 @@ function inline(text: string, key = 0): ReactNode[] {
     else if (m[6]) {
       const href = safeHref(m[7]!);
       const outside = href?.startsWith("http");
-      out.push(href ? <a key={k++} href={href} {...(outside ? { target: "_blank", rel: "noopener nofollow" } : {})} className="text-blue-2 underline-offset-4 hover:underline">{m[6]}</a> : m[6]);
+      out.push(href ? <a key={k++} href={href} {...(outside ? { target: "_blank", rel: "noopener nofollow" } : {})} className="text-blue-2 underline decoration-blue-2/40 underline-offset-4 hover:decoration-blue-2">{m[6]}</a> : m[6]);
     }
     last = re.lastIndex;
   }
@@ -33,7 +33,7 @@ function inline(text: string, key = 0): ReactNode[] {
 export function PostBody({ body }: { body: string }) {
   const blocks = toBlocks(body);
   return (
-    <div className="grid gap-6 text-[18px] leading-[1.7] text-ink-2">
+    <div className="grid gap-5 text-[16px] leading-[1.7] text-ink">
       {blocks.map((b, i) => {
         const img = b.match(/^!\[([^\]]*)\]\(([^)\s]+)\)$/);
         if (img && allowedImage(img[2]!)) {
@@ -46,8 +46,8 @@ export function PostBody({ body }: { body: string }) {
             </figure>
           );
         }
-        if (b.startsWith("### ")) return <h3 key={i} className="mt-4 text-h4 text-ink">{inline(b.slice(4))}</h3>;
-        if (b.startsWith("## ")) return <h2 key={i} className="mt-6 text-h3 text-ink">{inline(b.slice(3))}</h2>;
+        if (b.startsWith("### ")) return <h3 key={i} className="mt-3 text-[18px] font-medium text-ink">{inline(b.slice(4))}</h3>;
+        if (b.startsWith("## ")) return <h2 key={i} className="mt-5 text-h4 text-ink">{inline(b.slice(3))}</h2>;
         if (b.split("\n").every((l) => l.startsWith("- ") || l.trim() === "-")) {
           const items = b.split("\n").map((l) => l.slice(2).trim()).filter(Boolean); // an empty "- " (still typing) is skipped
           return <ul key={i} className="grid list-disc gap-2 pl-6 marker:text-ink-3">{items.map((l, j) => <li key={j}>{inline(l)}</li>)}</ul>;

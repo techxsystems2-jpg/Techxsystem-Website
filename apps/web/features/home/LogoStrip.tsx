@@ -1,18 +1,14 @@
 import { Eyebrow } from "@techx/ui/Eyebrow";
 
-/** Client logos drift past in a slow marquee (pauses on hover). Placeholders until TechX sends logos with permission. */
+/** Who we edit for, under the hero. Placeholder client logos removed (owner, 2026-11-14) until TechX sends real ones with permission. */
 export function LogoStrip() {
-  const logos = Array.from({ length: 6 }, (_, i) => i);
   return (
-    <section className="wrap pt-20 text-center">
-      <Eyebrow>Editing for real estate photographers in the US, Australia and the UK</Eyebrow>
-      <div className="marquee-mask mt-6 overflow-hidden">
-        <ul className="marquee flex w-max gap-16">
-          {[...logos, ...logos].map((i, k) => (
-            <li key={k} aria-hidden={k >= logos.length} className="whitespace-nowrap text-[20px] font-semibold tracking-[-0.02em] text-line-2">Client logo</li>
-          ))}
-        </ul>
-      </div>
+    <section className="wrap pt-4 text-center md:pt-6">
+      {/* Only the three markets stand out: the one fact a visitor checks at a glance. */}
+      <Eyebrow>
+        Editing for real estate photographers in the <b className="font-semibold text-ink">US</b>,{" "}
+        <b className="font-semibold text-ink">Australia</b> and the <b className="font-semibold text-ink">UK</b>
+      </Eyebrow>
     </section>
   );
 }

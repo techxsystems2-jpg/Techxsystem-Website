@@ -81,12 +81,6 @@ html.lenis, html.lenis body { height: auto; }
 @keyframes float { 50% { transform: translateY(-6px); } }
 .float { animation: float 6s ease-in-out infinite; }
 
-/* Logo marquee */
-@keyframes marquee { to { transform: translateX(-50%); } }
-.marquee { animation: marquee 38s linear infinite; }
-.marquee-mask { mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
-@media (hover: hover) { .marquee-mask:hover .marquee { animation-play-state: paused; } }
-
 /* Rotating brand edge for highlighted surfaces */
 @property --a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 @keyframes turn { to { --a: 360deg; } }

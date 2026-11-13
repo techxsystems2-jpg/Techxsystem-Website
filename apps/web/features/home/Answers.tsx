@@ -16,7 +16,7 @@ const questions = ["Who edits my photos?", "When do I get them back?", "What doe
 export async function Answers() {
   const site = await getSite();
   return (
-    <section id="answers" className="wrap pt-28 md:pt-40">
+    <section id="answers" className="wrap pt-20 md:pt-28">
       {/* The muted line morphs through the five questions photographers ask, one per card below, in their words (torph) */}
       <SectionHead center label="Before you decide" lead="Five answers, up front." rest={<span className="block min-h-[1.08em]"><MorphCycle items={questions} /></span>} />
       {/* Compact bento (owner, 2026-11-02, after a reference): three cards over two, every card with its own animation.

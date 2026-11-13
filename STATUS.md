@@ -1,7 +1,7 @@
 # STATUS.md
 
 **Phase:** Build. Every page in Figma is built: Home, Services (index + 6-service template), Work, How it works, Pricing, About, Contact, Free trial, 404. Header and hero approved; the rest awaits owner review.
-**Last updated:** 2026-11-03
+**Last updated:** 2026-11-14
 
 ## Resume here (read this first)
 - **This repo is self-contained** (owner, 2026-11-02): all website context lives here. The `TechX System` folder elsewhere in `projects/` is a separate project; don't read or edit it for website work. Content facts: `docs/old-site-content.md`; decisions: `docs/decisions-log.md`.
@@ -27,7 +27,7 @@
 ## Next steps
 1. Owner review, page by page (header and hero approved; everything else waits).
 2. Promo film: owner watches `video/overnight-15s/draft.mp4` → changes → sound → 4K60 final.
-3. Next run (owner): hero trust badge (flags arrive without popping from nothing, the 4.9 source, the shine plays once) and the logo strip placeholders (/lab).
+3. Next run (owner): hero trust badge (flags arrive without popping from nothing, the 4.9 source, the shine plays once).
 4. From TechX: raw/edited pairs (Work, sliders), portraits + studio photo (About), logos, staging details, what Luxury includes, permission for the 87 edits and the quotes.
 5. Pages still missing from the footer: Blog, FAQ, TechX vs AI editors, Shoot guides, Client login, legal (Privacy, Terms, Refunds).
 6. Before production: the email alert for new trials, upload keys (Dropbox / Google), Vercel env vars (docs/admin.md "Before going live"). Security audit done 2026-11-03 (Log).
@@ -37,8 +37,18 @@
 - **Before every production deploy (owner, 2026-11-02):** run Cloudflare's security audit skill (github.com/cloudflare/security-audit-skill) and `security-review`, and report the results before the owner ships. Installed by the owner (2026-11-02) as the `security-audit` skill. Read its files before its first run.
 - Uploads: owner to create the Dropbox app and/or Google OAuth client, Upstash, and set env vars (docs/uploads.md). Email alert to the studio when a trial arrives: not built.
 - Turnaround: 10–16 h vs 12–24 h. Trust figures 500+ / 4.9 to confirm. WhatsApp number. Client portal ("Log in"). Replace sample photos with TechX's real pairs.
+- Lint is a no-op (eslint 4 pinned in apps/web/package.json); fix?
 
 ## Log
+**2026-11-14 · Blog post restyled after Vercel's changelog posts (owner)**
+- `app/blog/[slug]/page.tsx`: sans breadcrumb "Blog / first tag", title at text-h2, byline (author or TechX Systems), date + read time in a sticky right rail on desktop (a meta row on phones), excerpt no longer shown (still the meta description). `features/blog/render.tsx`: body 16px text-ink (was 18px ink-2), h2 at text-h4, h3 18px, links always underlined (still blue, AGENTS.md §3.3).
+- Not taken: dark theme (light only), author avatars (no photos), code blocks, "Copy" menu. PostBody also renders /privacy, /terms, /refunds (TextPage) and the admin preview, so they get the same body type. Checked: typecheck, build, blog post at desktop + narrow on :4310; legal pages not looked at.
+**2026-11-14 · Home: placeholder client logos removed**
+- Owner asked to remove the "Client logo" placeholders and fix the spacing. `features/home/LogoStrip.tsx` now holds only the eyebrow "Editing for real estate photographers in the US, Australia and the UK", tucked under the hero (pt-4 / md:pt-6, was pt-20 + mt-6 marquee). Unused marquee CSS removed from `app/globals.css`; `features/home/CONTEXT.md` updated.
+- Then (owner: gap under the line too big): `features/home/Answers.tsx` top padding pt-28 md:pt-40 → pt-20 md:pt-28.
+- Then (owner: highlight the line, not too much): only US, Australia, UK in `text-ink` semibold; rest stays `text-ink-2`.
+- Checked: typecheck and build clean; desktop + 390px screenshots on :4310.
+- Found: `npm run lint` does nothing. apps/web/package.json pins `eslint` ^4.0.0 and `eslint-config-next` ^0.2.4, so `eslint` with no path prints its help and lints no files. Owner to decide on a fix (ESLint 9 + eslint-config-next 16).
 **2026-11-04 · Pre-production security check (security-audit guidance mode + security-review)**
 - security-audit (scoped to changes since 2026-11-03): no confirmed findings. No secrets in tracked files (4 pattern hits were lockfile/icon/font base64); only .env.example tracked; npm audit --omit=dev 0; /admin/contacts is per-request (prebuilt shell holds only the public support@ address).
 - security-review (subagent over `git diff HEAD` + new files): no candidate vulnerabilities (contacts SQL parameterised, isAdmin before data, https-only trial link, Drive query escaped, ?cat never rendered).
