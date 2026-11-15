@@ -49,6 +49,7 @@
 
 ## Log
 **2026-11-15 · Maintenance mode (owner request)**
+- Mobile pass (owner): the illustrated Channels cards are replaced by a compact list of tap-to-contact rows with icons (WhatsApp +91 96530 59304, support@ and mazhar.khan53@ emails, studio hours); the Site facts WhatsApp (+91 74176 20537) and phone (+91 571 297 6655) are left out at the owner's request. The StudioCard is desktop only. At 390px the page is about 2,800px tall, down from 5,000, with no sideways scroll (Playwright, true 390 viewport).
 - Admin → Site facts → "Under maintenance" toggle (`facts.maintenance`, default off; lib/content/types.ts, fields.ts).
 - `apps/web/proxy.ts` now runs on every public page (matcher skips api/, admin, _next/, files). When the switch is on, visitors get `/maintenance` with a real **503** + `Retry-After: 3600`. The page HTML is fetched and re-sent by the proxy, because a rewrite always sends 200. The switch is read at most every 10 s per instance. A signed-in admin (valid session cookie, `sessionEmail()` in lib/server/admin.ts) still sees the real site. `/api/contact` keeps working. The blog 404 check is unchanged and lives in the same proxy.
 - `app/maintenance/page.tsx`: logo, notice, both emails (support@ from Site facts + mazhar.khan53@yahoo.in hard-coded per owner; plus a second WhatsApp, +91 96530 59304 → wa.me/919653059304, hard-coded per owner), WhatsApp/Email/Call cards, message form, studio hours, offices. noindex. Header, footer and trial bar are hidden via `data-maintenance` (globals.css, layout.tsx).
