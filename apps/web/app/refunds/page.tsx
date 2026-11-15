@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { TextPage } from "@/features/site-shell/TextPage";
+import { JsonLd, breadcrumbSchema } from "@/lib/schema";
 
 /* Refunds (owner, 2026-11-04). Built from what the site already promises: billed only for delivered photos, free
    revisions, a free trial. No money-back promise is made that TechX hasn't stated. Have it reviewed. */
@@ -22,5 +23,5 @@ Email support@techxsystems.com with the order and the images, and tell us what's
 Your first 10 photos are edited free, with no card, so you can judge our work before you send a paid order.`;
 
 export default function Refunds() {
-  return <TextPage badge="Updated 4 November 2026" lead="Refunds." rest="You pay for what we deliver." lede="Billing at month end, free revisions, and a free trial before any paid order." body={body} />;
+  return <><JsonLd data={breadcrumbSchema("/refunds")} /><TextPage badge="Updated 4 November 2026" lead="Refunds." rest="You pay for what we deliver." lede="Billing at month end, free revisions, and a free trial before any paid order." body={body} /></>;
 }

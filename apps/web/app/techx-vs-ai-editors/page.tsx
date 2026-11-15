@@ -6,6 +6,7 @@ import { Compare } from "@/features/home/Compare";
 import { Reveal } from "@/features/motion/Reveal";
 import { FinalCta } from "@/features/site-shell/FinalCta";
 import { HeroBadge, SkyHero } from "@/features/site-shell/SkyHero";
+import { JsonLd, breadcrumbSchema } from "@/lib/schema";
 
 /* TechX vs AI editors (owner, 2026-11-04). The comparison table is Home's (features/home/Compare.tsx); the two cards
    say plainly when an app is enough and when a team pays off. Facts only: what TechX's edits include (old site list),
@@ -30,6 +31,7 @@ const cards = [
 export default function VsAi() {
   return (
     <>
+      <JsonLd data={breadcrumbSchema("/techx-vs-ai-editors")} />
       <SkyHero
         badge={<HeroBadge><span className="size-2 rounded-full bg-blue" aria-hidden="true" />From $0.50 an image</HeroBadge>}
         lead="TechX vs AI editors."

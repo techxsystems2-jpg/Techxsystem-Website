@@ -14,7 +14,7 @@ html { accent-color: var(--color-blue); caret-color: var(--color-blue); }
 section[id] { scroll-margin-top: 84px; }
 /* the admin panel (app/admin) brings its own chrome: the site header, spacer and footer (data-site-chrome) are hidden
    there by CSS, so they can stay in every page's server HTML without flashing on the admin */
-body:has([data-admin]) [data-site-chrome] { display: none; }
+body:has([data-admin], [data-maintenance]) [data-site-chrome] { display: none; }
 body:has([data-admin]) .sky-flow { background: none; }
 a, button, input, select { touch-action: manipulation; }
 /* mobile-native (2026-11-03): holding a finger on a control doesn't select its label; text in content stays selectable */

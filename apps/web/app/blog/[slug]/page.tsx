@@ -1,17 +1,16 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PostBody } from "@/features/blog/render";
 import { FinalCta } from "@/features/site-shell/FinalCta";
-import { JsonLd } from "@/lib/schema";
+import { JsonLd, breadcrumbSchema, postSchema } from "@/lib/schema";
 import { postDate, publishedPost, publishedPosts, readingMinutes } from "@/lib/content/blog";
 import { withSeo } from "@/lib/content/seo";
 import { site } from "@/lib/site";
 
 /* One blog post (owner, 2026-11-03). Published posts are prebuilt; posts published later render on their first visit
-   (Suspense) and stay cached until the next edit. BlogPosting structured data for search. */
+   and stay cached until the next edit. BlogPosting structured data for search (lib/schema.tsx). */
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
@@ -31,33 +30,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }, p.seo);
 }
 
-export default function PostPage({ params }: Props) {
-  return (
-    <Suspense fallback={<div className="wrap min-h-[80svh] pt-36" aria-busy="true" />}>
-      <Post params={params} />
-    </Suspense>
-  );
-}
-
-async function Post({ params }: Props) {
+// Unknown slugs get their real 404 status in proxy.ts (the layout's header Suspense starts the stream before this
+// page runs); notFound() here covers a database outage, where the proxy lets the request through.
+export default async function PostPage({ params }: Props) {
   const p = await publishedPost((await params).slug);
   if (!p) notFound();
-  const url = new URL(`/blog/${p.slug}`, site.url).toString();
   return (
     <>
-      <JsonLd data={{
-        "@context": "https://schema.org",
-        "@type": "BlogPosting",
-        headline: p.title,
-        description: p.excerpt,
-        datePublished: p.date,
-        author: p.author ? { "@type": "Person", name: p.author } : { "@type": "Organization", name: site.name },
-        publisher: { "@id": new URL("/#organization", site.url).toString() },
-        mainEntityOfPage: url,
-        url,
-        ...(p.cover ? { image: new URL(p.cover, site.url).toString() } : {}),
-        ...(p.tags.length ? { keywords: p.tags.join(", ") } : {}),
-      }} />
+      <JsonLd data={postSchema(p)} />
+      <JsonLd data={breadcrumbSchema("/blog", [p.title, `/blog/${p.slug}`])} />
       {/* Layout after Vercel's changelog posts (owner, 2026-11-14): plain header, meta in a right rail on desktop. */}
       <article className="wrap grid max-w-[1000px] gap-x-16 pt-24 md:pt-32 lg:grid-cols-[minmax(0,680px)_1fr]">
         <header>

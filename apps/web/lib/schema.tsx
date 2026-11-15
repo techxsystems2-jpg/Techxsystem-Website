@@ -1,5 +1,5 @@
-import type { Service, SiteData } from "@/lib/content/types";
-import { site } from "@/lib/site";
+import type { Post, Service, SiteData } from "@/lib/content/types";
+import { footer, legal, nav, site } from "@/lib/site";
 
 /* Structured data (JSON-LD), server-rendered into the HTML (claude-seo:seo-schema, 2026-11-02). Facts come only from
    lib/site.ts. FAQPage is left out on purpose: Google retired FAQ rich results in May 2026. */
@@ -41,6 +41,43 @@ export const siteSchema = (live: SiteData) => ({
   ],
 });
 
+// Page names as the nav and footer show them, so a renamed link renames its breadcrumb too.
+const LABELS = new Map([...nav, ...footer.flatMap((g) => g.links), ...legal].flatMap((l) => (l.href ? [[l.href, l.label] as const] : [])));
+/** A page's name: its nav or footer label, or one made from its address (/how-it-works → "How it works"). */
+const pageName = (path: string) => LABELS.get(path) ?? (path.split("/").pop() ?? "").replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase());
+
+/** Home › page (› sub-page) trail (SEO audit, 2026-11-14). Pass a page's path, or [name, path] for a page with its
+    own title (a post, a service). */
+export const breadcrumbSchema = (...trail: (string | [name: string, path: string])[]) => ({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: ["/", ...trail]
+    .map((t) => (typeof t === "string" ? [t === "/" ? "Home" : pageName(t), t] : t))
+    .map(([name, path], i) => ({ "@type": "ListItem", position: i + 1, name, item: abs(path!) })),
+});
+
+/** One blog post. A post without a named person is written by the studio, not a Person called "TechX Systems". */
+export const postSchema = (p: Post) => {
+  const url = abs(`/blog/${p.slug}`);
+  const person = p.author && p.author !== site.name;
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${url}#article`,
+    headline: p.title,
+    description: p.excerpt,
+    datePublished: p.date,
+    // no dateModified: posts keep no edit date yet, and repeating datePublished would claim it was never edited
+    image: [abs(p.cover || "/opengraph-image")],
+    author: person ? { "@type": "Person", name: p.author } : { "@type": "Organization", "@id": ORG_ID, name: site.name },
+    publisher: { "@id": ORG_ID },
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    isPartOf: { "@type": "Blog", url: abs("/blog"), name: `${site.name} blog` },
+    url,
+    ...(p.tags.length ? { keywords: p.tags.join(", ") } : {}),
+  };
+};
+
 /** "From $0.50 / image" → { price: 0.5, unit: "image" }. */
 function startingPrice(from: string) {
   const m = from.match(/\$([\d.]+)\s*\/\s*(\w+)/);
@@ -73,14 +110,7 @@ export function serviceSchema(s: Service, description: string) {
           },
         }),
       },
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: abs("/") },
-          { "@type": "ListItem", position: 2, name: "Services", item: abs("/services") },
-          { "@type": "ListItem", position: 3, name: s.name, item: url },
-        ],
-      },
+      { "@type": "BreadcrumbList", itemListElement: breadcrumbSchema("/services", [s.name, `/services/${s.slug}`]).itemListElement },
     ],
   };
 }

@@ -37,7 +37,25 @@ const csp = [
   ...(process.env.VERCEL ? ["upgrade-insecure-requests"] : []),
 ].join("; ");
 
+// The old IIS site's pages (SEO audit, 2026-11-14: techxsystems.com-audit/findings/sitemap.md). Each goes straight
+// to its new page with a 301 so rankings carry over. IIS ignored case, so "About-Us.ASPX" must match too: every letter
+// becomes [aA]. Keep these for at least 12 months after launch. Old blog-post URLs aren't listed yet (blog.aspx).
+// /web-designing.aspx is left to 404: no matching service, and a 301 to an unrelated page counts as a soft 404.
+const OLD_PAGES: [string, string][] = [
+  ["index", "/"], ["default", "/"], ["about-us", "/about"], ["contact-us", "/contact"], ["pricing", "/pricing"], ["blog", "/blog"],
+  ["interior", "/services/photo-editing"], ["exterior", "/services/photo-editing"],
+  ["real-estate-photo-enhancement", "/services/photo-editing"],
+  ["twillight-and-day-to-dusk", "/services/virtual-twilight"], ["virtual-twilight", "/services/virtual-twilight"],
+  ["drone", "/services/drone-editing"],
+  ["floor-plan", "/services/floor-plans"], ["floor-plan-conversion-in-2d-and-3d", "/services/floor-plans"],
+  ["video-editing", "/services/video-editing"], ["yacht", "/work?cat=yacht"],
+];
+const anyCase = (s: string) => s.replace(/[a-z]/g, (c) => `[${c}${c.toUpperCase()}]`);
+
 const nextConfig: NextConfig = {
+  async redirects() {
+    return OLD_PAGES.map(([old, to]) => ({ source: `/:old(${anyCase(old)}\\.${anyCase("aspx")})`, destination: to, statusCode: 301 }));
+  },
   // Every page is static until forms arrive; Cache Components keeps it that way by default.
   cacheComponents: true,
   partialPrefetching: true,

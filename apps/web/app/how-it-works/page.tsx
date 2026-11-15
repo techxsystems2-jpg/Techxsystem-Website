@@ -9,6 +9,7 @@ import { StepRows } from "@/features/how-it-works/StepRows";
 import { Reveal } from "@/features/motion/Reveal";
 import { FinalCta } from "@/features/site-shell/FinalCta";
 import { HeroBadge, POINT_ICONS, Pointers, SkyHero } from "@/features/site-shell/SkyHero";
+import { JsonLd, breadcrumbSchema } from "@/lib/schema";
 
 /* How it works (Figma node 30:155; copy in features/how-it-works/CONTEXT.md), in the shared page design: SkyHero →
    the four steps as rows with their illustrations → the overnight timeline (Home's, New York and India) → files we
@@ -42,6 +43,7 @@ const ways: [string, ReactNode][] = [
 export default function HowItWorksPage() {
   return (
     <>
+      <JsonLd data={breadcrumbSchema("/how-it-works")} />
       <SkyHero
         badge={<HeroBadge><span className="size-2 rounded-full bg-maroon" aria-hidden="true" />Four steps · you do the first</HeroBadge>}
         lead="From shoot to listing,"

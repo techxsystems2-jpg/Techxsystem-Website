@@ -9,6 +9,7 @@ import { HeroBadge, SkyHero } from "@/features/site-shell/SkyHero";
 import { Gallery } from "@/features/work/Gallery";
 import { toShots } from "@/features/work/portfolio";
 import { getContent } from "@/lib/content";
+import { JsonLd, breadcrumbSchema } from "@/lib/schema";
 
 /* Work (Figma node 29:155; copy in features/work/CONTEXT.md), in the shared page design: SkyHero, the filterable
    gallery of TechX's 87 finished edits, final CTA. Figma's headline promises before/after pairs and credits named
@@ -27,6 +28,7 @@ export default async function Work() {
   const portfolio = toShots(work, cats);
   return (
     <>
+      <JsonLd data={breadcrumbSchema("/work")} />
       <SkyHero
         badge={<HeroBadge><span className="size-2 rounded-full bg-maroon" aria-hidden="true" />{portfolio.length} finished edits</HeroBadge>}
         lead="The work."

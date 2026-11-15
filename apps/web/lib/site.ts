@@ -62,6 +62,9 @@ export const services = [
 ] as const;
 
 /** Footer, as in Figma. Links without a route yet render as plain text until the page exists. */
+/** Legal row under the footer. */
+export const legal = [{ href: "/privacy", label: "Privacy" }, { href: "/terms", label: "Terms" }, { href: "/refunds", label: "Refunds" }];
+
 export const footer: { title: string; links: { label: string; href?: string }[] }[] = [
   { title: "Services", links: services.map((s) => ({ href: `/services/${s.slug}`, label: s.short })) },
   { title: "Company", links: [{ href: "/about", label: "About" }, { href: "/work", label: "Work" }, { href: "/pricing", label: "Pricing" }, { href: "/about#reviews", label: "Reviews" }] },

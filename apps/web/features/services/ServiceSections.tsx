@@ -18,7 +18,7 @@ export function Fixes({ lead, rest, items, note }: { lead: string; rest: string;
           <RevealItem as="li" key={t} className="bg-surface p-6 md:p-7">
             <span className="font-mono text-label text-maroon">{String(i + 1).padStart(2, "0")}</span>
             <h3 className="mt-5 text-[17px] font-medium tracking-[-0.01em]">{t}</h3>
-            <p className="mt-1.5 text-small text-ink-2">{d}</p>
+            <p className="mt-1.5 text-body text-ink-2">{d}</p>
           </RevealItem>
         ))}
       </RevealGroup>
@@ -43,7 +43,7 @@ export async function RecentWork({ cats }: { cats: string[] }) {
         {shots.map((s) => (
           <RevealItem as="li" key={s.src} className="rounded-card bg-surface p-1.5 shadow-hair">
             <div className={`relative aspect-[16/13] overflow-hidden rounded-inner outline-1 -outline-offset-1 outline-black/10 ${s.square ? "bg-white" : "bg-sunk"}`}>
-              <Image src={s.src} alt={`${s.label} edit by TechX`} fill sizes="(min-width: 640px) 390px, 100vw" className={s.square ? "object-contain p-3" : "object-cover"} />
+              <Image src={s.src} alt={s.alt} fill sizes="(min-width: 640px) 390px, 100vw" className={s.square ? "object-contain p-3" : "object-cover"} />
             </div>
             <p className="px-1.5 pb-0.5 pt-2.5 font-mono text-[11px] uppercase tracking-[0.04em] text-ink-2">{s.label}</p>
           </RevealItem>

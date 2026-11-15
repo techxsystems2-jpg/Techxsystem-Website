@@ -58,7 +58,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             <main id="main">{children}</main>
             <div data-site-chrome><SiteFooter /></div>
           </div>
-          <Suspense fallback={null}><StickyTrialBar /></Suspense>
+          <div data-site-chrome><Suspense fallback={null}><StickyTrialBar /></Suspense></div>
         </MotionRoot>
         </ContentProvider>
       </body>

@@ -32,7 +32,7 @@ export async function WorkBand() {
             <li key={s.src} className={i === 0 ? "col-span-2 lg:row-span-2" : ""}>
               <Link href={`/work?cat=${s.cat}`} className="group block h-full rounded-card bg-surface p-1.5 shadow-hair transition-[box-shadow,translate,scale] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-raised active:scale-[0.99]">
                 <span className={`relative block h-full overflow-hidden rounded-inner bg-sunk outline-1 -outline-offset-1 outline-black/10 ${i === 0 ? "aspect-[16/13] lg:aspect-auto" : "aspect-[16/13]"}`}>
-                  <Image src={s.src} alt={`${s.label} edit by TechX`} fill sizes={i === 0 ? "(min-width: 1024px) 590px, 100vw" : "(min-width: 1024px) 290px, 50vw"} className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]" />
+                  <Image src={s.src} alt={s.alt} fill sizes={i === 0 ? "(min-width: 1024px) 590px, 100vw" : "(min-width: 1024px) 290px, 50vw"} className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]" />
                   <span className="absolute bottom-2.5 left-2.5 rounded-md bg-ink/70 px-2 py-1 font-mono text-[11px] uppercase tracking-[0.04em] text-white backdrop-blur-sm">{s.label}</span>
                 </span>
               </Link>

@@ -7,6 +7,7 @@ import { getContent } from "@/lib/content";
 import { Reveal, RevealGroup, RevealItem } from "@/features/motion/Reveal";
 import { FinalCta } from "@/features/site-shell/FinalCta";
 import { HeroBadge, SkyHero } from "@/features/site-shell/SkyHero";
+import { JsonLd, breadcrumbSchema } from "@/lib/schema";
 
 /* About (Figma node 33:155; copy in features/about/CONTEXT.md), in the shared page design. The timeline is Figma's:
    founded in Aligarh in 2016, studio in Delhi in 2017 (owner, 2026-11-03: TechX started in Aligarh, not Delhi). The
@@ -27,6 +28,7 @@ export default async function About() {
   const showTeam = team.length > 0 && team.every((m) => m.photo);
   return (
     <>
+      <JsonLd data={breadcrumbSchema("/about")} />
       <SkyHero
         badge={<HeroBadge><span className="size-2 rounded-full bg-maroon" aria-hidden="true" />About TechX · since 2016</HeroBadge>}
         lead="Started by two people."

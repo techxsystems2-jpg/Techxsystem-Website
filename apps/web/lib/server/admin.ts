@@ -17,7 +17,13 @@ export async function adminEmail(): Promise<string | null> {
   if (!adminConfigured()) return null;
   // request time only: the session check reads the clock (expiry), which a prefetch prerender must not do
   await connection();
-  const s = unseal<{ e?: string }>((await cookies()).get(ADMIN_COOKIE)?.value, "admin-session");
+  return sessionEmail((await cookies()).get(ADMIN_COOKIE)?.value);
+}
+
+/** The admin email a session cookie value carries, if it is valid, unexpired and still the configured admin. */
+export function sessionEmail(cookie: string | undefined): string | null {
+  if (!adminConfigured()) return null;
+  const s = unseal<{ e?: string }>(cookie, "admin-session");
   return s?.e && s.e === adminEmailSetting() ? s.e : null;
 }
 

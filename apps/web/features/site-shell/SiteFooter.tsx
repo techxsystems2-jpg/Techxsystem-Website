@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
 import { getContent } from "@/lib/content";
-import { footer } from "@/lib/site";
+import { footer, legal } from "@/lib/site";
 
 /** Lists every service, so it doubles as a sitemap. */
 export async function SiteFooter() {
@@ -43,8 +43,8 @@ export async function SiteFooter() {
             </a>
           </span>
           <nav aria-label="Legal" className="flex gap-4">
-            {[["/privacy", "Privacy"], ["/terms", "Terms"], ["/refunds", "Refunds"]].map(([href, label]) => (
-              <Link key={href} href={href!} className="text-ink-2 underline-offset-4 transition-colors duration-150 hover:text-ink hover:underline">{label}</Link>
+            {legal.map(({ href, label }) => (
+              <Link key={href} href={href} className="text-ink-2 underline-offset-4 transition-colors duration-150 hover:text-ink hover:underline">{label}</Link>
             ))}
           </nav>
         </div>

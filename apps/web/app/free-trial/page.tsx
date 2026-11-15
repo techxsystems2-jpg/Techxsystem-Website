@@ -11,6 +11,7 @@ import { HeroBadge, POINT_ICONS, Pointers, SkyHero } from "@/features/site-shell
 import { getContent, getSite } from "@/lib/content";
 import { buttonClass } from "@techx/ui/Button";
 import { WhatsAppIcon } from "@techx/ui/Icons";
+import { JsonLd, breadcrumbSchema } from "@/lib/schema";
 
 /* Free trial (Figma node 32:155; copy in features/free-trial/CONTEXT.md), in the design every page uses (owner,
    2026-11-02): the shared SkyHero, then the form card beside a Home answer card (the "ten photos" illustration, maroon
@@ -43,6 +44,7 @@ export default async function FreeTrial() {
   const [site, faqs, quotes] = await Promise.all([getSite(), getContent("faqs"), getContent("testimonials")]);
   return (
     <>
+      <JsonLd data={breadcrumbSchema("/free-trial")} />
       <SkyHero
         badge={<HeroBadge><span className="size-2 rounded-full bg-blue" aria-hidden="true" />{site.announcement.text}</HeroBadge>}
         lead="Send ten photos." rest="Judge the result."

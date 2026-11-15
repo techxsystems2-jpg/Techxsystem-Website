@@ -10,6 +10,7 @@ import { ServicesGrid } from "@/features/home/ServicesGrid";
 import { FinalCta } from "@/features/site-shell/FinalCta";
 import { HeroBadge, POINT_ICONS, Pointers, SkyHero } from "@/features/site-shell/SkyHero";
 import { getContent, getSite } from "@/lib/content";
+import { JsonLd, breadcrumbSchema } from "@/lib/schema";
 
 /* Services index. Not designed in Figma (only the per-service template, 28:155), so it's assembled from Home's
    verified parts in the shared page design: SkyHero, the six service cards (each opens its template page),
@@ -33,6 +34,7 @@ export default async function Services() {
   const [site, services, faqs] = await Promise.all([getSite(), getContent("services"), getContent("faqs")]);
   return (
     <>
+      <JsonLd data={breadcrumbSchema("/services")} />
       <SkyHero
         badge={<HeroBadge><span className="size-2 rounded-full bg-blue" aria-hidden="true" />{services.length} services · from {site.startingPrice} an image</HeroBadge>}
         lead="One team for every edit."

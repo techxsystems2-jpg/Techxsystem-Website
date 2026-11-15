@@ -25,8 +25,11 @@ const Eager = createContext(false);
     screen. Chrome's own lazy loading starts far earlier on phones (1,250px+), so off-screen cards used to download
     with the page and slow its LCP (speed pass, 2026-11-03). */
 const Show = createContext(true);
+// image width hint: a Home card by default; the service page hero passes its wider column
+const SIZES = "(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw";
+const Sizes = createContext(SIZES);
 
-export function ServiceArt({ slug, eager = false }: { slug: Slug; eager?: boolean }) {
+export function ServiceArt({ slug, eager = false, sizes }: { slug: Slug; eager?: boolean; sizes?: string }) {
   const { ref, play } = useLoop<HTMLDivElement>();
   const [near, setNear] = useState(eager);
   useEffect(() => {
@@ -38,7 +41,7 @@ export function ServiceArt({ slug, eager = false }: { slug: Slug; eager?: boolea
   const Art = arts[slug];
   return (
     <div ref={ref} className="relative aspect-[3/2] overflow-hidden rounded-inner bg-sunk">
-      <Eager value={eager}><Show value={near}><Art play={play} /></Show></Eager>
+      <Eager value={eager}><Show value={near}><Sizes value={sizes ?? SIZES}><Art play={play} /></Sizes></Show></Eager>
     </div>
   );
 }
@@ -67,8 +70,9 @@ function useSteps(n: number, play: boolean, ms = 1100, hold = 2400) {
 
 function Photo({ src, style, className = "" }: { src: string; style?: React.CSSProperties; className?: string }) {
   const eager = useContext(Eager);
+  const sizes = useContext(Sizes);
   if (!useContext(Show)) return null;
-  return <Image src={src} alt="" fill sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" className={`object-cover ${className}`} style={style}
+  return <Image src={src} alt="" fill sizes={sizes} className={`object-cover ${className}`} style={style}
     {...(eager ? { loading: "eager" as const, fetchPriority: "high" as const } : {})} />;
 }
 

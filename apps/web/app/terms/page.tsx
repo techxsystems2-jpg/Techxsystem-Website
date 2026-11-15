@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { TextPage } from "@/features/site-shell/TextPage";
+import { JsonLd, breadcrumbSchema } from "@/lib/schema";
 
 /* Terms (owner, 2026-11-04). Only what the site already promises: starting prices confirmed before work, free
    revisions, billing at month end for delivered photos, the free trial. Plain-language draft: have it reviewed. */
@@ -34,5 +35,5 @@ You confirm you have the right to send us the photos for editing. We use them on
 If these terms change, we'll update this page and the date at the top.`;
 
 export default function Terms() {
-  return <TextPage badge="Updated 4 November 2026" lead="Terms." rest="How ordering works." lede="Starting prices, free revisions, and a bill at month end for the photos we delivered." body={body} />;
+  return <><JsonLd data={breadcrumbSchema("/terms")} /><TextPage badge="Updated 4 November 2026" lead="Terms." rest="How ordering works." lede="Starting prices, free revisions, and a bill at month end for the photos we delivered." body={body} /></>;
 }

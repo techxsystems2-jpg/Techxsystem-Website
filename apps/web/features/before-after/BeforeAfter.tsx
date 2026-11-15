@@ -48,7 +48,9 @@ export function BeforeAfter({ scene, className = "", labels = true, photo, befor
         <motion.div key={scene} className="absolute inset-0" initial={{ opacity: 0, scale: 1.04 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
           {photo ? <Image src={photo} alt={alt} fill loading="eager" fetchPriority="high" sizes="(min-width: 1200px) 1180px, 100vw" className="object-cover" /> : <Scene name={scene} uid={`ba-a-${scene}`} />}
           <motion.div className="absolute inset-0" style={{ clipPath: clip }}>
-            {photo ? <Image src={before ?? photo} alt="" fill sizes="(min-width: 1200px) 1180px, 100vw" className={`object-cover ${before ? "" : "[filter:brightness(.68)_contrast(.78)_saturate(.5)_sepia(.08)]"}`} /> : <Scene name={scene} uid={`ba-r-${scene}`} className="raw" />}
+            {/* eager too: it covers half the hero photo, so the browser can report it as the LCP; with no `before` it is
+                the same file and size, so this costs no second download */}
+            {photo ? <Image src={before ?? photo} alt="" fill loading="eager" sizes="(min-width: 1200px) 1180px, 100vw" className={`object-cover ${before ? "" : "[filter:brightness(.68)_contrast(.78)_saturate(.5)_sepia(.08)]"}`} /> : <Scene name={scene} uid={`ba-r-${scene}`} className="raw" />}
           </motion.div>
         </motion.div>
       </AnimatePresence>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { TextPage } from "@/features/site-shell/TextPage";
+import { JsonLd, breadcrumbSchema } from "@/lib/schema";
 
 /* Privacy (owner, 2026-11-04): Google Analytics and Search Console track how the site is used, and that information
    is used for marketing only. Everything else states what the site already does (forms, uploads, email alerts).
@@ -41,5 +42,5 @@ Email support@techxsystems.com to ask what we hold about you, to correct it, or 
 If this policy changes, we'll update this page and the date at the top.`;
 
 export default function Privacy() {
-  return <TextPage badge="Updated 4 November 2026" lead="Privacy." rest="What we collect, and why." lede="Plain answers: what you send us, what our analytics see, and what we do with both." body={body} />;
+  return <><JsonLd data={breadcrumbSchema("/privacy")} /><TextPage badge="Updated 4 November 2026" lead="Privacy." rest="What we collect, and why." lede="Plain answers: what you send us, what our analytics see, and what we do with both." body={body} /></>;
 }

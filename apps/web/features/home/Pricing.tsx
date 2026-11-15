@@ -36,7 +36,7 @@ export async function Pricing({ head = true }: { head?: boolean }) {
                   <span className="text-h4">{p.name}</span>
                   {p.featured && <span className="rounded-md bg-surface px-2 py-[3px] font-mono text-[11px] uppercase tracking-[0.04em] text-blue-2">Most chosen</span>}
                 </p>
-                <p className="mt-2 text-small text-ink-2">{p.who}</p>
+                <p className="mt-2 text-body text-ink-2">{p.who}</p>
               </div>
               <div className="flex flex-1 flex-col px-6 pb-6 pt-7">
                 <p className="flex items-baseline gap-2">
@@ -51,7 +51,7 @@ export async function Pricing({ head = true }: { head?: boolean }) {
                 <p className="mt-7 font-mono text-[11px] uppercase tracking-[0.06em] text-ink-2">{p.label}:</p>
                 <ul className="mt-5 space-y-3.5">
                   {p.items.map((f) => (
-                    <li key={f} className="flex items-center gap-3 text-small text-ink"><Tick className={p.featured ? "text-blue-2" : "text-ink-3"} />{f}</li>
+                    <li key={f} className="flex items-center gap-3 text-body text-ink"><Tick className={p.featured ? "text-blue-2" : "text-ink-3"} />{f}</li>
                   ))}
                 </ul>
               </div>
@@ -65,18 +65,18 @@ export async function Pricing({ head = true }: { head?: boolean }) {
         <RevealItem className="grid gap-2 rounded-card bg-surface p-2 shadow-hair lg:grid-cols-[minmax(0,380px)_1fr]">
           <div className="flex flex-col rounded-inner bg-[linear-gradient(180deg,#F6F9FF_0%,#FFFFFF_100%)] p-6 shadow-hair">
             <h3 className="text-h4">Bulk editing</h3>
-            <p className="mt-2 text-small text-ink-2">For studios and teams sending 500+ photos a month. Pricing built around your volume.</p>
+            <p className="mt-2 text-body text-ink-2">For studios and teams sending 500+ photos a month. Pricing built around your volume.</p>
             <Link href="/contact" className={buttonClass("secondary", "mt-6 w-full")}>Talk to the studio <ArrowIcon className="transition-transform duration-200 group-hover:translate-x-0.5" /></Link>
           </div>
           <ul className="grid content-center gap-x-10 gap-y-3.5 px-6 py-6 sm:grid-cols-2 md:px-10">
             {bulk.map((f) => (
-              <li key={f} className="flex items-center gap-3 text-small text-ink"><Tick className="text-ink-3" />{f}</li>
+              <li key={f} className="flex items-center gap-3 text-body text-ink"><Tick className="text-ink-3" />{f}</li>
             ))}
           </ul>
         </RevealItem>
       </RevealGroup>
 
-      <p className="mt-6 text-center text-small text-ink-2">Prices are starting rates. Your final rate depends on the edit and volume, and you&rsquo;ll see it before we start.</p>
+      <p className="mt-6 text-center text-body text-ink-2">Prices are starting rates. Your final rate depends on the edit and volume, and you&rsquo;ll see it before we start.</p>
     </section>
   );
 }

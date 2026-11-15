@@ -32,8 +32,9 @@ export type Section = { key: ContentKey; title: string; blurb: string; field: Fi
 export const SECTIONS: Section[] = [
   {
     key: "facts", title: "Site facts", pages: ["Every page"],
-    blurb: "The starting price, contact details, trust figures and the announcement bar. These show up across the whole site.",
+    blurb: "Maintenance mode, the starting price, contact details, trust figures and the announcement bar. These show up across the whole site.",
     field: { type: "object", fields: [
+      { key: "maintenance", label: "Under maintenance", help: "On: visitors see the maintenance page with your contact details and the message form, instead of the site. You still see the full site while signed in here. Changes apply within about 10 seconds.", field: { type: "toggle" } },
       { key: "startingPrice", label: "Starting price", help: "Always shown as a starting price: \"from $0.50 an image\".", field: t(12, "$0.50") },
       { key: "trust", label: "Trust badge (home hero)", field: { type: "object", fields: [
         { key: "clients", label: "Clients served", field: { type: "number", min: 0, max: 100000, step: 1 } },
@@ -162,6 +163,7 @@ export const SECTIONS: Section[] = [
       { key: "src", label: "Photo", field: { type: "image" } },
       { key: "cat", label: "Category", field: { type: "select", source: "categories", options: WORK_CATEGORIES.map((c) => ({ value: c.key, label: c.label })) } },
       { key: "label", label: "Label (optional)", field: t(40) },
+      { key: "alt", label: "Description (optional)", help: "What the photo shows, for Google and screen readers, e.g. \"Kitchen with a white island and pendant lights\".", field: t(140) },
     ] } },
   },
   {

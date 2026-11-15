@@ -12,6 +12,7 @@ import { Calculator } from "@/features/pricing/Calculator";
 import { FinalCta } from "@/features/site-shell/FinalCta";
 import { HeroBadge, SkyHero } from "@/features/site-shell/SkyHero";
 import { getContent, getSite } from "@/lib/content";
+import { JsonLd, breadcrumbSchema } from "@/lib/schema";
 
 /* Pricing (Figma node 31:155; copy in features/pricing/CONTEXT.md), in the shared page design: SkyHero → the three
    levels and bulk row (Home's Pricing) → calculator → how billing works → the full price list → questions → final CTA.
@@ -38,6 +39,7 @@ export default async function PricingPage() {
   const [site, services, { plans }, faqs] = await Promise.all([getSite(), getContent("services"), getContent("pricing"), getContent("faqs")]);
   return (
     <>
+      <JsonLd data={breadcrumbSchema("/pricing")} />
       <SkyHero
         badge={<HeroBadge><span className="size-2 rounded-full bg-blue" aria-hidden="true" />From {site.startingPrice} an image · first 10 free</HeroBadge>}
         lead="Pay for what we deliver."
@@ -63,7 +65,7 @@ export default async function PricingPage() {
                 <span className="grid size-7 shrink-0 place-items-center rounded-full bg-sunk font-mono text-[12px] text-maroon">{i + 1}</span>
                 <span>
                   <span className="block text-[17px] font-medium tracking-[-0.01em]">{t}</span>
-                  <span className="mt-0.5 block text-small text-ink-2">{d}</span>
+                  <span className="mt-0.5 block text-body text-ink-2">{d}</span>
                 </span>
               </RevealItem>
             ))}
@@ -93,14 +95,14 @@ export default async function PricingPage() {
                   <td className="px-5 py-5 tabular-nums text-ink-2">{s.from}</td>
                   <td className="px-5 py-5 tabular-nums text-ink-2">{s.turnaround}</td>
                   <td className="px-5 py-5 text-right">
-                    <Link href={`/services/${s.slug}`} aria-label={`${s.name} details`} className="inline-grid size-9 place-items-center rounded-full text-ink-3 transition-colors duration-200 hover:bg-blue hover:text-white"><ArrowIcon size={14} /></Link>
+                    <Link href={`/services/${s.slug}`} aria-label={`${s.name} details`} className="inline-grid size-9 place-items-center rounded-full text-ink-2 transition-colors duration-200 hover:bg-blue hover:text-white"><ArrowIcon size={14} /></Link>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </Reveal>
-        <p className="mt-4 text-small text-ink-2">Prices in USD. Starting prices: the final rate depends on the type and volume of work, and we confirm it before we start. Revisions are always free.</p>
+        <p className="mt-4 text-body text-ink-2">Prices in USD. Starting prices: the final rate depends on the type and volume of work, and we confirm it before we start. Revisions are always free.</p>
       </section>
 
       <Faq title="Questions about pricing" lede="Still unsure? Message the studio on WhatsApp. An editor replies." faqs={faqs.pricing} />

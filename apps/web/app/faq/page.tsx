@@ -3,6 +3,7 @@ import { Faq } from "@/features/home/Faq";
 import { FinalCta } from "@/features/site-shell/FinalCta";
 import { HeroBadge, SkyHero } from "@/features/site-shell/SkyHero";
 import { getContent } from "@/lib/content";
+import { JsonLd, breadcrumbSchema } from "@/lib/schema";
 
 /* FAQ (owner, 2026-11-04): every question from the site in one place, grouped the way people ask them. The answers
    are the ones edited in the admin (Questions), so this page and the other pages never disagree. */
@@ -17,6 +18,7 @@ export default async function FaqPage() {
   const count = faqs.home.length + faqs.pricing.length + faqs.contact.length + faqs.trial.length;
   return (
     <>
+      <JsonLd data={breadcrumbSchema("/faq")} />
       <SkyHero
         badge={<HeroBadge><span className="size-2 rounded-full bg-blue" aria-hidden="true" />{count} questions</HeroBadge>}
         lead="Questions, answered."

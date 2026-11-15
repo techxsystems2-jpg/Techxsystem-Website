@@ -32,14 +32,54 @@
 5. Pages still missing from the footer: Blog, FAQ, TechX vs AI editors, Shoot guides, Client login, legal (Privacy, Terms, Refunds).
 6. Before production: the email alert for new trials, upload keys (Dropbox / Google), Vercel env vars (docs/admin.md "Before going live"). Security audit done 2026-11-03 (Log).
 7. Admin panel phase 2: every page's headings and text blocks.
+8. Before domain cutover (SEO audit 2026-11-14, `techxsystems.com-audit/ACTION-PLAN.md`): add a noindex header for non-production Vercel environments.
+9. Before domain cutover: add 301 redirects in `next.config.ts` for the 16 old `.aspx` URLs (map in `techxsystems.com-audit/ACTION-PLAN.md`).
+10. Before domain cutover: set `NEXT_PUBLIC_SITE_URL=https://www.techxsystems.com` in Vercel Production.
+11. Fix the blog soft 404: an unknown slug returns 200.
 
 ## Open questions (full list in docs/OPEN_ITEMS.md)
 - **Before every production deploy (owner, 2026-11-02):** run Cloudflare's security audit skill (github.com/cloudflare/security-audit-skill) and `security-review`, and report the results before the owner ships. Installed by the owner (2026-11-02) as the `security-audit` skill. Read its files before its first run.
 - Uploads: owner to create the Dropbox app and/or Google OAuth client, Upstash, and set env vars (docs/uploads.md). Email alert to the studio when a trial arrives: not built.
 - Turnaround: 10–16 h vs 12–24 h. Trust figures 500+ / 4.9 to confirm. WhatsApp number. Client portal ("Log in"). Replace sample photos with TechX's real pairs.
 - Lint is a no-op (eslint 4 pinned in apps/web/package.json); fix?
+- SEO audit (owner): grant claude-service-agency@webogon-automation.iam.gserviceaccount.com access to Search Console and GA4 for techxsystems.com (the audit had no Google baseline).
+- Virtual-staging page still shows placeholder copy and an unconfirmed $8/room.
+- Confirm "500+ clients", the "4.9 rating", and the competitor "$0.22–0.50" figure.
+- Bulk plan says "24/7 support", but support hours are 9 AM–7 PM IST. Which is right?
 
 ## Log
+**2026-11-15 · Maintenance mode (owner request)**
+- Admin → Site facts → "Under maintenance" toggle (`facts.maintenance`, default off; lib/content/types.ts, fields.ts).
+- `apps/web/proxy.ts` now runs on every public page (matcher skips api/, admin, _next/, files). When the switch is on, visitors get `/maintenance` with a real **503** + `Retry-After: 3600`. The page HTML is fetched and re-sent by the proxy, because a rewrite always sends 200. The switch is read at most every 10 s per instance. A signed-in admin (valid session cookie, `sessionEmail()` in lib/server/admin.ts) still sees the real site. `/api/contact` keeps working. The blog 404 check is unchanged and lives in the same proxy.
+- `app/maintenance/page.tsx`: logo, notice, both emails (support@ from Site facts + mazhar.khan53@yahoo.in hard-coded per owner; plus a second WhatsApp, +91 96530 59304 → wa.me/919653059304, hard-coded per owner), WhatsApp/Email/Call cards, message form, studio hours, offices. noindex. Header, footer and trial bar are hidden via `data-maintenance` (globals.css, layout.tsx).
+- Verified: build, typecheck; off: / 200, /blog/nope 404; forced on (temporary local build, reverted): pages 503 with the notice, /maintenance 200, /admin 200, /api/contact reachable. The database switch itself was not flipped. Lint is still broken (eslint 4 pin).
+**2026-11-14 · SEO audit, second batch (alt text, contrast, 16px text)**
+- Alt text: `features/work/portfolio.ts` DESCRIBED holds a plain description of each of the 87 original photos (written from a contact sheet of the files); `toShots` gives every shot an `alt`: the admin's new "Description (optional)" field on Work gallery photos (lib/content/fields.ts), else the built-in description, else the old "<Label> edit by TechX". Work page, viewer, Home WorkBand and service Recent work use it. /work: 0 generic alts left. Nothing written to the database.
+- Contrast: Work tile "View" and the /pricing table arrow links text-ink-3 → text-ink-2.
+- 16px body text: sentences on pricing cards (who, includes, bulk, footnote), /pricing steps and footnote, calculator notes, service "what's included" descriptions: text-small → text-body. Labels, mono tags and numbers unchanged. Checked /services/photo-editing at 1440 and /pricing at 500.
+- Sitemap lastmod: not done (pushback). Only services and posts have an edit time (DB updated_at); passing it through the content types would make the admin's change check (`same()`, `versionOf`) see every row as edited unless the editor strips it, and static pages have no honest date. Google ignores lastmod it can't trust, so none is better than invented.
+- Not changed: the light-grey second half of headlines (text-ink-3, ~2.6:1) is the design system's two-tone headline; the audit flagged it on /pricing. Owner's call.
+**2026-11-14 · Service pages: Home-style hero + services sidebar (owner)**
+- Owner picked "sidebar + centred hero". From xl (1280px): a sticky services list in a left column (`ServiceList` in features/services/ServiceTabs.tsx, "All services" link + the six, current one in ink), the page in the right column (app/services/[slug]/page.tsx: outer `xl:wrap` grid, inner sections' `.wrap` flattened with `xl:[&_.wrap]`). At 1024 the price cards were too tight beside it, so below 1280 the sideways tabs row stays under the hero as before.
+- `ServiceHero`: centred like Home (breadcrumb, H1, lede, buttons, From/Turnaround/Revisions), the service film below at up to 880px wide. Sky moved to `ServiceSky`, full width behind both columns. `ServiceVisual`/`ServiceArt` take a `sizes` hint so the wide hero image isn't served at card size (Home cards unchanged).
+- Checked: typecheck, build; screenshots at 1440, 1280, 1024, 500 (reduced motion for end states). Sticky scrolling not checked in a real browser.
+- Then (owner: make the list more prominent): a full-height divider on the sidebar column, then darkened to `border-line-2` (owner: too faint). "All services" label inset px-3 so it lines up with the service names (was 12px left of them). Divider is now a `before:` line starting at top-28 (owner: it ran up through the see-through header and crossed the logo).
+**2026-11-14 · SEO audit, first batch (techxsystems.com-audit/)**
+- Redirects (`next.config.ts` OLD_PAGES): the 16 old `.aspx` pages 301 straight to their new page, any letter case (IIS ignored case). Tested on :4310: all 301, one hop, final 200; `/About-Us.ASPX` works; unknown `.aspx` 404. Old blog-post URLs not added (owner to list them from blog.aspx).
+- Breadcrumb JSON-LD (`breadcrumbSchema` in lib/schema.tsx) on /services, /work, /how-it-works, /pricing, /about, /contact, /free-trial, /blog, /faq, /techx-vs-ai-editors, /privacy, /terms, /refunds and each blog post (service pages already had one).
+- BlogPosting (`postSchema`): author is the Organization unless a named person is set, plus @id, dateModified (= date; posts keep no edit date), image (cover or /opengraph-image), WebPage mainEntityOfPage, isPartOf Blog.
+- Blog unknown slug: lookup moved out of Suspense; now shows the 404 page with noindex, but the status is still 200 (root layout's header Suspense starts the stream first). True 404 would need a proxy.ts DB check: not done.
+- `/code-review` (medium) follow-ups: author carries @type + name with the @id; dateModified dropped (no real edit date); Blog stub has no dangling @id; service breadcrumb uses breadcrumbSchema; /default.aspx → / added; /web-designing.aspx now 404s (no matching service; a 301 to /services counts as a soft 404). Retested: 16 redirects one hop, web-designing 404. Left: hand-typed breadcrumb labels, literal slugs in OLD_PAGES (more code than the risk).
+- Real 404 for unknown blog posts (owner asked): `apps/web/proxy.ts` (matcher /blog/:slug) reads the post with `readItem` and rewrites missing/unpublished ones to /404, so the status is 404; answers kept 60 s per instance (map cleared at 500); database errors let the request through. Tested: /blog/nope 404 (Googlebot too), the real post 200. A malformed address (/blog/%E0%A4%A) returns 500 with or without the proxy: Next's own behaviour on every dynamic route.
+- Breadcrumb names are no longer typed per page (owner asked): `breadcrumbSchema("/pricing")` takes the name from `nav`, `footer` or the new `legal` list in lib/site.ts (SiteFooter now reads `legal`); a page in none of them gets a name from its address. Posts and services pass [title, path]. Checked all 15 trails on :4310.
+- Google Schema Markup Validator (validator.schema.org, markup sent from the local build): blog post, /services/photo-editing, /pricing: 0 errors, 0 warnings. The Rich Results Test itself was not run: the Chrome extension wasn't connected and that test has no API; run it on the next preview deploy URL.
+- Not done, by decision: staging noindex (owner); hero LCP (the hero photo is already eager + fetchPriority high; the deferred tiles are decoration on purpose; the remaining cost is the approved hero entrance animation); "24/7 support" (the old site, our facts source, says 24/7 support: owner to say which is true).
+**2026-11-14 · Full SEO audit of staging (claude-seo, 11 checks)**
+- Audited staging https://techxsystem-website-web.vercel.app as if it were www.techxsystems.com. Health score 76/100. No source code changed.
+- Files: `techxsystems.com-audit/` (FULL-AUDIT-REPORT.md, ACTION-PLAN.md, audit-data.json, findings/, screenshots/). Untracked, not in git.
+- Checked: audit only (11 specialist checks); no typecheck, lint or build (no code changed).
+- Next: the four pre-cutover items in Next steps (8–11). Owner to answer the Open questions (Search Console/GA4 access, facts and prices).
+**2026-11-14 · Blog post restyled after Vercel's changelog posts (owner)**
 **2026-11-14 · Blog post restyled after Vercel's changelog posts (owner)**
 - `app/blog/[slug]/page.tsx`: sans breadcrumb "Blog / first tag", title at text-h2, byline (author or TechX Systems), date + read time in a sticky right rail on desktop (a meta row on phones), excerpt no longer shown (still the meta description). `features/blog/render.tsx`: body 16px text-ink (was 18px ink-2), h2 at text-h4, h3 18px, links always underlined (still blue, AGENTS.md §3.3).
 - Not taken: dark theme (light only), author avatars (no photos), code blocks, "Copy" menu. PostBody also renders /privacy, /terms, /refunds (TextPage) and the admin preview, so they get the same body type. Checked: typecheck, build, blog post at desktop + narrow on :4310; legal pages not looked at.

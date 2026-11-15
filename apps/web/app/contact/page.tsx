@@ -10,6 +10,7 @@ import { SectionHead } from "@/features/home/SectionHead";
 import { Reveal } from "@/features/motion/Reveal";
 import { FinalCta } from "@/features/site-shell/FinalCta";
 import { getContent, getSite } from "@/lib/content";
+import { JsonLd, breadcrumbSchema } from "@/lib/schema";
 
 /* Contact (Figma node 34:155; copy in features/contact/CONTEXT.md). Built in the Home design language (owner,
    2026-11-02): the Home hero's sky and word-by-word headline, the answer-card bento with working illustrations,
@@ -28,6 +29,7 @@ export default async function Contact() {
   const [{ contact }, site] = await Promise.all([getContent("faqs"), getSite()]);
   return (
     <>
+      <JsonLd data={breadcrumbSchema("/contact")} />
       <ContactHero />
       <Channels />
 

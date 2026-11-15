@@ -13,6 +13,8 @@ export type Facts = {
   contact: { whatsapp: string; email: string; phone: string; studio: string; hours: string };
   offices: Office[];
   announcement: { text: string; short: string };
+  /** On: every public page shows the maintenance page (proxy.ts); the admin and the contact form keep working. */
+  maintenance: boolean;
 };
 /** A service and everything its page (/services/<slug>) shows. The six built-in slugs keep their animated cards;
     a service added in the admin uses its photo instead. */
@@ -91,6 +93,7 @@ export const DEFAULTS: ContentMap = {
     contact: { whatsapp: siteDefaults.contact.whatsapp, email: siteDefaults.contact.email, phone: siteDefaults.contact.phone, studio: siteDefaults.contact.studio, hours: siteDefaults.contact.hours },
     offices: siteDefaults.offices.map((o) => ({ ...o, address: [...o.address], phones: [...o.phones] })),
     announcement: { text: announcement.text, short: announcement.short },
+    maintenance: false,
   },
   pricing: {
     plans: [

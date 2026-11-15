@@ -6,6 +6,7 @@ import { FinalCta } from "@/features/site-shell/FinalCta";
 import { HeroBadge, SkyHero } from "@/features/site-shell/SkyHero";
 import { postDate, publishedPosts, readingMinutes } from "@/lib/content/blog";
 import { pageMetadata } from "@/lib/content/seo";
+import { JsonLd, breadcrumbSchema } from "@/lib/schema";
 
 /* Blog index (owner, 2026-11-03). Posts are written in the admin (Blog); only published ones show, newest first.
    Before the first post: an honest empty state, no invented articles. */
@@ -21,6 +22,7 @@ export default async function Blog() {
   const posts = await publishedPosts();
   return (
     <>
+      <JsonLd data={breadcrumbSchema("/blog")} />
       <SkyHero
         badge={<HeroBadge><span className="size-2 rounded-full bg-blue" aria-hidden="true" />From the studio</HeroBadge>}
         lead="The TechX blog."

@@ -69,7 +69,7 @@ export function Calculator({ plans }: { plans: Plan[] }) {
           </span>
           <span className="text-small text-ink-2">a month</span>
         </p>
-        <p className="mt-2 text-small text-ink-2">
+        <p className="mt-2 text-body text-ink-2">
           About <span className="tabular-nums text-ink"><NumberFlow value={perListing} format={usd(2)} locales="en-US" /></span> a listing
         </p>
 
@@ -82,7 +82,7 @@ export function Calculator({ plans }: { plans: Plan[] }) {
             <dd className="font-mono text-[15px] font-medium tabular-nums text-ink"><NumberFlow value={total} format={usd(0)} locales="en-US" /></dd>
           </div>
         </dl>
-        <p className="mt-4 text-small leading-[1.6] text-ink-2">Starting rates. Your final rate depends on the edit and volume, and you&rsquo;ll see it before we start.</p>
+        <p className="mt-4 text-body text-ink-2">Starting rates. Your final rate depends on the edit and volume, and you&rsquo;ll see it before we start.</p>
 
         <div className="mt-auto pt-7">
           <Link href="/free-trial" className={buttonClass("primary", "w-full")}>Start free trial <ArrowIcon className="transition-transform duration-200 group-hover:translate-x-0.5" /></Link>
