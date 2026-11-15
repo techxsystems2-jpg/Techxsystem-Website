@@ -44,7 +44,7 @@ function Channel({ n, label, art, value, valueHref, copy = false, href, more, cl
           <h2 className="text-h4 tracking-[-0.015em]">{children}</h2>
           {/* the value sits above the card-wide link (z-30) so it can be tapped or copied on its own */}
           <p className="relative z-30 mt-3 flex items-center gap-2 font-mono text-[13px] text-ink">
-            {valueHref ? <a href={valueHref} className="underline-offset-4 hover:text-blue-2 hover:underline">{value}</a> : <span className="select-all">{value}</span>}
+            {valueHref ? <a href={valueHref} className="tap underline-offset-4 hover:text-blue-2 hover:underline">{value}</a> : <span className="select-all">{value}</span>}
             {copy && <CopyButton text={value} />}
           </p>
           <div className="mt-auto">

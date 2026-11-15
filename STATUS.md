@@ -48,6 +48,10 @@
 - Bulk plan says "24/7 support", but support hours are 9 AM–7 PM IST. Which is right?
 
 ## Log
+**2026-11-15 · Bombadil UI test + tap targets**
+- Bombadil 0.7.10 added as an apps/web dev dependency. Ran it headed (headless Chrome dies after ~30 s on this Mac, even on a blank page) against a local build with DB, mail and storage env blanked: 4 min desktop + 4 min 390px, ~3,800 actions, 24 pages. Result: 0 violations, 0 console errors or exceptions, every page 200, heap stable.
+- A Playwright sweep of every page found no sideways scroll, nothing off-screen and no broken images; it did find small tap targets. Fix: a new `tap` utility (globals.css) adds an invisible 44px tap area centred on a link. Applied to the footer legal and credit links, the FinalCta phone and email links, the Contact Call-card number, the service breadcrumb "Services" link and the /pricing table service links (`inline-block`, so a wrapped name keeps its full width; the "Most ordered" badge now wraps under "Photo editing & HDR" instead of the name breaking). All of these were measured at 44px tall.
+- Still under 44px (awaiting the owner, partly the approved header): header logo (24px), "Start free trial" (32px), menu button (40px), 34px scene/category tabs, Contact copy button (28px), the /pricing calculator input (32px).
 **2026-11-15 · Maintenance mode (owner request)**
 - Mobile pass (owner): the illustrated Channels cards are replaced by a compact list of tap-to-contact rows with icons (WhatsApp +91 96530 59304, support@ and mazhar.khan53@ emails, studio hours); the Site facts WhatsApp (+91 74176 20537) and phone (+91 571 297 6655) are left out at the owner's request. The StudioCard is desktop only. At 390px the page is about 2,800px tall, down from 5,000, with no sideways scroll (Playwright, true 390 viewport).
 - Admin → Site facts → "Under maintenance" toggle (`facts.maintenance`, default off; lib/content/types.ts, fields.ts).

@@ -38,13 +38,13 @@ export async function SiteFooter() {
           {/* studio credit (owner, 2026-11-02) */}
           <span>
             Designed &amp; developed by{" "}
-            <a href="https://www.pixelcaption.com/" target="_blank" rel="noopener" className="text-ink-2 underline-offset-4 transition-colors duration-150 hover:text-ink hover:underline">
+            <a href="https://www.pixelcaption.com/" target="_blank" rel="noopener" className="tap text-ink-2 underline-offset-4 transition-colors duration-150 hover:text-ink hover:underline">
               Pixel Caption<span className="sr-only"> (opens in a new tab)</span>
             </a>
           </span>
           <nav aria-label="Legal" className="flex gap-4">
             {legal.map(({ href, label }) => (
-              <Link key={href} href={href} className="text-ink-2 underline-offset-4 transition-colors duration-150 hover:text-ink hover:underline">{label}</Link>
+              <Link key={href} href={href} className="tap text-ink-2 underline-offset-4 transition-colors duration-150 hover:text-ink hover:underline">{label}</Link>
             ))}
           </nav>
         </div>

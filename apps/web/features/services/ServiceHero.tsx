@@ -18,7 +18,7 @@ export function ServiceHero({ service: s, lead, rest, lede, turnaround, pricesHr
     <section className="wrap relative pb-4 pt-20 text-center md:pt-28">
       <nav aria-label="Breadcrumb" className="rise">
         <ol className="flex items-center justify-center gap-2 font-mono text-label uppercase text-ink-2 [--i:0]">
-          <li><Link href="/services" className="hover:text-ink">Services</Link></li>
+          <li><Link href="/services" className="tap hover:text-ink">Services</Link></li>
           <li aria-hidden="true">/</li>
           <li aria-current="page" className="text-ink">{s.name}</li>
         </ol>

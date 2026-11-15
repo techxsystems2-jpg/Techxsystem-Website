@@ -89,7 +89,7 @@ export default async function PricingPage() {
               {services.map((s) => (
                 <tr key={s.slug} className="group border-b border-line last:border-b-0">
                   <th scope="row" className="px-5 py-5 font-medium md:px-6">
-                    <Link href={`/services/${s.slug}`} className="hover:text-blue-2">{s.name}</Link>
+                    <Link href={`/services/${s.slug}`} className="tap inline-block hover:text-blue-2">{s.name}</Link>
                     {s.tag && <span className={`ml-3 rounded-md px-1.5 py-0.5 align-middle font-mono text-[10.5px] uppercase tracking-[0.04em] ${/^new$/i.test(s.tag) ? "bg-blue-tint text-blue-2" : "bg-sunk text-ink-2"}`}>{s.tag}</span>}
                   </th>
                   <td className="px-5 py-5 tabular-nums text-ink-2">{s.from}</td>

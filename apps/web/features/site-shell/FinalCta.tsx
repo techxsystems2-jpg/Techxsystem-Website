@@ -38,7 +38,7 @@ export async function FinalCta({ lead = "You capture the media.", rest = "Send u
                 <div>
                   <p className="font-mono text-label uppercase text-ink-2">{k}</p>
                   <p className="mt-1 text-[15px] font-medium">
-                    {href ? <a href={href} rel="noopener" className="underline-offset-4 hover:text-blue-2 hover:underline">{v}</a> : v}
+                    {href ? <a href={href} rel="noopener" className="tap underline-offset-4 hover:text-blue-2 hover:underline">{v}</a> : v}
                   </p>
                 </div>
               </li>
