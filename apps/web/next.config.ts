@@ -73,6 +73,7 @@ const nextConfig: NextConfig = {
   // admin photo uploads arrive already shrunk in the browser (≤ 4 MB, features/admin/ImageField.tsx)
   experimental: {
     serverActions: { bodySizeLimit: "4mb" },
+    agentUpgrade: "security",
     // inlineCss was tried and measured (2026-11-03): it copies the 123 KB stylesheet into the page three times (style tag
     // + twice in the RSC payload), doubling the HTML, and Lighthouse LCP got worse (Home 3.7 → 4.0 s, Services 4.1 →
     // 4.8 s). Left off; the stylesheets are long-cached files instead.
