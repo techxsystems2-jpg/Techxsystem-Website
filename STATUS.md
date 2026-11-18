@@ -1,7 +1,7 @@
 # STATUS.md
 
 **Phase:** Build. Every page in Figma is built: Home, Services (index + 6-service template), Work, How it works, Pricing, About, Contact, Free trial, 404. Header and hero approved; the rest awaits owner review.
-**Last updated:** 2026-11-14
+**Last updated:** 2026-11-19
 
 ## Resume here (read this first)
 - **This repo is self-contained** (owner, 2026-11-02): all website context lives here. The `TechX System` folder elsewhere in `projects/` is a separate project; don't read or edit it for website work. Content facts: `docs/old-site-content.md`; decisions: `docs/decisions-log.md`.
@@ -48,6 +48,10 @@
 - Bulk plan says "24/7 support", but support hours are 9 AM–7 PM IST. Which is right?
 
 ## Log
+**2026-11-19 · Next.js 16.4.2 → 16.4.6 (security advisory)**
+- `next` pinned to 16.4.6 in apps/web; `experimental.agentUpgrade: "security"` added to next.config.ts. Typecheck, tests, build and a `next start` smoke test passed (commit ded17a4).
+- Gotcha: this shell exports `NODE_ENV=development`, which makes `next build` fail prerendering `/_global-error` (`useContext` of null). Build with `NODE_ENV=production` (or unset it).
+- Known gap: `npm run lint` runs ESLint v4.0.0 with no args, so it prints help and lints nothing (pre-existing).
 **2026-11-15 · Bombadil UI test + tap targets**
 - Bombadil 0.7.10 added as an apps/web dev dependency. Ran it headed (headless Chrome dies after ~30 s on this Mac, even on a blank page) against a local build with DB, mail and storage env blanked: 4 min desktop + 4 min 390px, ~3,800 actions, 24 pages. Result: 0 violations, 0 console errors or exceptions, every page 200, heap stable.
 - A Playwright sweep of every page found no sideways scroll, nothing off-screen and no broken images; it did find small tap targets. Fix: a new `tap` utility (globals.css) adds an invisible 44px tap area centred on a link. Applied to the footer legal and credit links, the FinalCta phone and email links, the Contact Call-card number, the service breadcrumb "Services" link and the /pricing table service links (`inline-block`, so a wrapped name keeps its full width; the "Most ordered" badge now wraps under "Photo editing & HDR" instead of the name breaking). All of these were measured at 44px tall.
