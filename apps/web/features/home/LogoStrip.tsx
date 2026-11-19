@@ -6,7 +6,7 @@ export function LogoStrip() {
     <section className="wrap pt-4 text-center md:pt-6">
       {/* Only the three markets stand out: the one fact a visitor checks at a glance. */}
       <Eyebrow>
-        Editing for real estate photographers in the <b className="font-semibold text-ink">US</b>,{" "}
+        Editing for real estate photographers, realtors and marketing agencies in the <b className="font-semibold text-ink">US</b>,{" "}
         <b className="font-semibold text-ink">Australia</b> and the <b className="font-semibold text-ink">UK</b>
       </Eyebrow>
     </section>

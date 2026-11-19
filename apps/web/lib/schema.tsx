@@ -21,10 +21,10 @@ export const siteSchema = (live: SiteData) => ({
       "@id": ORG_ID,
       name: site.name,
       url: site.url,
-      logo: abs("/icon.svg"),
+      logo: abs("/brand/logo.png"),
       slogan: site.tagline,
       description: site.description,
-      foundingDate: "2016",
+      foundingDate: "2012",
       email: live.contact.email,
       telephone: live.contact.phone,
       // every office from the admin (Site facts → Offices); the first is the head office
@@ -32,6 +32,7 @@ export const siteSchema = (live: SiteData) => ({
         ? live.offices.map((o) => ({ "@type": "PostalAddress", name: `${o.label}, ${o.city}`, streetAddress: o.address.join(", "), addressLocality: o.city, addressCountry: o.country }))
         : { "@type": "PostalAddress", addressCountry: "IN" },
       areaServed: ["US", "AU", "GB"],
+      ...(live.social.length && { sameAs: live.social.map((s) => s.href) }),
       contactPoint: [
         { "@type": "ContactPoint", contactType: "customer service", email: live.contact.email, telephone: live.contact.phone, availableLanguage: "en" },
         ...live.offices.flatMap((o) => o.phones.map((p) => ({ "@type": "ContactPoint", contactType: "customer service", telephone: p, areaServed: o.country === "IN" ? undefined : o.country, availableLanguage: "en", name: `${o.label}, ${o.city}` }))),

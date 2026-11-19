@@ -13,22 +13,26 @@ const blobStore = /^vercel_blob_rw_([a-z0-9]+)_/i.exec(process.env.BLOB_READ_WRI
 // - images: this site, data:/blob: (local previews) and our own Blob store.
 // - connections: this site plus the two places a free-trial upload goes straight from the browser (Dropbox's upload
 //   host, Google Drive's resumable upload host; lib/server/destinations.ts).
+// - analytics: Google Tag Manager and the Google Analytics hosts its tags send to (owner, 2026-11-19).
+// - frames: YouTube's privacy-enhanced player, only after a visitor clicks a video (features/services/VideoCard.tsx).
 // - Vercel preview deployments add the Vercel toolbar (vercel.live); production never does.
 const dev = process.env.NODE_ENV === "development";
 const preview = process.env.VERCEL_ENV === "preview";
 const blobHost = blobStore ? ` https://${blobStore}.public.blob.vercel-storage.com` : "";
 const live = preview ? " https://vercel.live" : "";
+const gtm = "https://*.googletagmanager.com";
+const ga = "https://*.google-analytics.com https://*.analytics.google.com";
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""}${live}`,
+  `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""} ${gtm}${live}`,
   `style-src 'self' 'unsafe-inline'${live}`,
-  `img-src 'self' data: blob:${blobHost}${live} ${preview ? "https://vercel.com" : ""}`.trim(),
+  `img-src 'self' data: blob: ${gtm} ${ga}${blobHost}${live} ${preview ? "https://vercel.com" : ""}`.trim(),
   `font-src 'self'${live} ${preview ? "https://assets.vercel.com" : ""}`.trim(),
-  `connect-src 'self' https://content.dropboxapi.com https://www.googleapis.com${live}${preview ? " wss://ws-us3.pusher.com" : ""}`,
+  `connect-src 'self' https://content.dropboxapi.com https://www.googleapis.com ${gtm} ${ga}${live}${preview ? " wss://ws-us3.pusher.com" : ""}`,
   "media-src 'self' blob:",
   "worker-src 'self' blob:",
   "manifest-src 'self'",
-  `frame-src ${preview ? "https://vercel.live" : "'none'"}`,
+  `frame-src https://www.youtube-nocookie.com${live}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -68,7 +72,8 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 2678400,
     qualities: [50, 75], // 50 for the blurred hero collage tiles, 75 everywhere else
     // photos uploaded from the admin panel live in Vercel Blob (lib/server/media.ts)
-    remotePatterns: blobStore ? [{ protocol: "https", hostname: `${blobStore}.public.blob.vercel-storage.com` }] : [],
+    // plus YouTube's video stills for Video editing's Recent work (features/services/VideoCard.tsx)
+    remotePatterns: [{ protocol: "https", hostname: "i.ytimg.com", pathname: "/vi/**" }, ...(blobStore ? [{ protocol: "https" as const, hostname: `${blobStore}.public.blob.vercel-storage.com` }] : [])],
   },
   // admin photo uploads arrive already shrunk in the browser (≤ 4 MB, features/admin/ImageField.tsx)
   experimental: {

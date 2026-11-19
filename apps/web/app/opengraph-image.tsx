@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { getSite } from "@/lib/content";
 import { site as fixed } from "@/lib/site";
@@ -10,15 +12,12 @@ export const contentType = "image/png";
 
 export default async function OpenGraphImage() {
   const site = await getSite();
+  const mark = `data:image/png;base64,${(await readFile(join(process.cwd(), "public/brand/mark.png"))).toString("base64")}`;
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 72, background: "linear-gradient(180deg,#D2ECFF 0%,#EAF5FF 45%,#FFFFFF 100%)", color: "#0A0A0B", fontFamily: "sans-serif" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 30, fontWeight: 600 }}>
-          <svg width="52" height="48" viewBox="0 0 26 24">
-            <path d="M2 10L13 2L24 10" fill="none" stroke="#8E1F3F" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" />
-            <rect x="5" y="10" width="16" height="12" rx="2.5" fill="none" stroke="#2F5BEA" strokeWidth="1.9" />
-            <circle cx="13" cy="16" r="3.2" fill="none" stroke="#2F5BEA" strokeWidth="1.9" />
-          </svg>
+          <img src={mark} width={72} height={48} alt="" />
           <span>TechX</span><span style={{ color: "#8A8F98" }}>Systems</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", fontSize: 84, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1.04 }}>

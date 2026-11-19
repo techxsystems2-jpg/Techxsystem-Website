@@ -38,16 +38,38 @@
 11. Fix the blog soft 404: an unknown slug returns 200.
 
 ## Open questions (full list in docs/OPEN_ITEMS.md)
+- $0.25 front-exterior rate not on Pricing yet. Luxury still lists flambient by hand.
 - **Before every production deploy (owner, 2026-11-02):** run Cloudflare's security audit skill (github.com/cloudflare/security-audit-skill) and `security-review`, and report the results before the owner ships. Installed by the owner (2026-11-02) as the `security-audit` skill. Read its files before its first run.
 - Uploads: owner to create the Dropbox app and/or Google OAuth client, Upstash, and set env vars (docs/uploads.md). Email alert to the studio when a trial arrives: not built.
 - Turnaround: 10–16 h vs 12–24 h. Trust figures 500+ / 4.9 to confirm. WhatsApp number. Client portal ("Log in"). Replace sample photos with TechX's real pairs.
-- Lint is a no-op (eslint 4 pinned in apps/web/package.json); fix?
 - SEO audit (owner): grant claude-service-agency@webogon-automation.iam.gserviceaccount.com access to Search Console and GA4 for techxsystems.com (the audit had no Google baseline).
 - Virtual-staging page still shows placeholder copy and an unconfirmed $8/room.
 - Confirm "500+ clients", the "4.9 rating", and the competitor "$0.22–0.50" figure.
-- Bulk plan says "24/7 support", but support hours are 9 AM–7 PM IST. Which is right?
 
 ## Log
+**2026-11-19 · Logo, lint, admin text, service pages**
+- Logo (owner's Dropbox file): `public/brand/logo.png` (full lockup: footer, schema logo), `public/brand/mark.png` (the symbol: `Mark` in @techx/ui, header at 30px, share image), `app/icon.png` + `app/apple-icon.png` replace icon.svg / apple-icon.tsx.
+- Lint now real: eslint 9 + eslint-config-next 16.4.6, `apps/web/eslint.config.mjs` (core-web-vitals + typescript). Clean.
+- Saved /admin content updated in the database: Timeline 2016→2012, Essential "HDR or flambient blending of your frames", Photo editing name/line/lede/"Nine fixes"/Flambient fix (backups in session scratchpad).
+- Service art: photo editing, twilight, drone use the real raw/final pairs. Service hero adds "See our work" (#work / #videos). Service pages end with `FinalCta contact` (primary: Send us a message → /contact#message).
+- Work gallery tiles and lightbox: shimmer until each photo loads, then fade in.
+
+**2026-11-19 · Real photos from the studio Dropbox**
+- Hero: five TechX before/after pairs (`public/photos/hero/`), tabs HDR · Flambient · Twilight · Day to dusk · Drone/aerial; shimmer placeholder while photos load (`shimmer` utility).
+- Work: +295 finals (`public/photos/work/`), new filters HDR, Flambient, Day to dusk; saved Work list now 382 (database; backups of the old list in the session scratchpad). The HDR and Flambient option pages show their own filter under Recent work.
+- Not in code defaults (`features/work/portfolio.ts` still lists the old 87): resetting Work in /admin would drop the new photos.
+- Also today: social links (Site facts → Social media, hidden while blank), Google Tag Manager GTM-PH69GKXH, trial upload-report email, services sidebar sub-list.
+- **Lint is not running:** apps/web/package.json pins eslint ^4.0.0 / eslint-config-next ^0.2.4 (since 90c7a0f). Owner to approve going back to eslint ^9 / eslint-config-next 16.4.6.
+
+**2026-11-19 · Owner's change list (Google Doc) + HDR/Flambient pages + video work**
+- Copy and facts: line under the hero "photographers, realtors and marketing agencies"; hero sub "HDR/Flambient … drone/aerial"; WhatsApp +91 73034 43810 everywhere (maintenance page now reads it from Site facts); hours "Mon–Sat, 9 AM – 10 PM IST", closed Sunday, support 24/7 (studio clock follows); founded 2012.
+- Home: "Day to dusk" hero tab (tx-twi2.jpg); Answers 02 plays New York then Sydney; Answers 03 front exterior counts $1.00 → $0.25.
+- Photo editing: renamed "Photo editing: HDR/Flambient", Flambient fix added; new sub-pages `/services/photo-editing/hdr` and `/flambient` (`app/services/[slug]/[option]`, content `features/services/options.ts`, list `photoOptions` in lib/site.ts); shared body `features/services/ServicePage.tsx`; indented sub-list in the Services menu.
+- Video editing: Recent work from TechX's YouTube channel (`VideoWork.tsx`, click-to-load `VideoCard.tsx`); CSP frame-src youtube-nocookie.com, images allow i.ytimg.com.
+- Saved Site facts updated in the database (owner approved): WhatsApp, hours and the head office phone now +91 73034 43810 / "Mon–Sat, 9 AM – 10 PM IST" (backup of the old row in the session scratchpad). Live site picks it up on the next deploy or any /admin save of Site facts. Timeline (2016), Pricing ("HDR merging") and Services (Photo editing copy) are still the old saved values: owner to update in /admin.
+- Forms: contact and trial alerts go to MAIL_TO, or support@techxsystems.com when it's unset. New: a second trial email with the upload report when the upload finishes (`completeSubmission`).
+- typecheck, lint, build pass. Not screenshotted (Chrome extension not connected); owner checking on :4310.
+
 **2026-11-19 · Next.js 16.4.2 → 16.4.6 (security advisory)**
 - `next` pinned to 16.4.6 in apps/web; `experimental.agentUpgrade: "security"` added to next.config.ts. Typecheck, tests, build and a `next start` smoke test passed (commit ded17a4).
 - Gotcha: this shell exports `NODE_ENV=development`, which makes `next build` fail prerendering `/_global-error` (`useContext` of null). Build with `NODE_ENV=production` (or unset it).

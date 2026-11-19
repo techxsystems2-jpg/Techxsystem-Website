@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import Image from "next/image";
+import Image, { type ImageProps } from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Chip } from "@techx/ui/Chip";
 import { countsOf, type Shot } from "./portfolio";
@@ -88,11 +88,23 @@ export function Gallery({ items: portfolio, cats }: { items: Shot[]; cats: WorkC
   );
 }
 
+/** A photo with a shimmer until it has loaded, then a quick fade in (owner, 2026-11-19). The shimmer goes away on load,
+    so it never shows through the empty bands around an object-contain photo. */
+function LoadingImage({ className = "", alt, ...p }: ImageProps) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <>
+      {!loaded && <span aria-hidden="true" className="shimmer absolute inset-0 bg-sunk" />}
+      <Image {...p} alt={alt} onLoad={() => setLoaded(true)} className={`${className} ${loaded ? "opacity-100" : "opacity-0"}`} />
+    </>
+  );
+}
+
 function Tile({ shot: s, wide = false, onOpen }: { shot: Shot; wide?: boolean; onOpen: () => void }) {
   return (
     <button type="button" data-src={s.src} onClick={onOpen} className="group block w-full rounded-card bg-surface p-1.5 text-left shadow-hair transition-[box-shadow,translate,scale] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-raised active:scale-[0.98] active:duration-100">
       <span className={`relative block overflow-hidden rounded-inner outline-1 -outline-offset-1 outline-black/10 ${wide ? "aspect-[16/9] lg:aspect-[32/13]" : "aspect-[16/13]"} ${s.square ? "bg-white" : "bg-sunk"}`}>
-        <Image src={s.src} alt={s.alt} fill sizes={wide ? "(min-width: 1024px) 790px, 100vw" : "(min-width: 1024px) 390px, 50vw"} className={`${s.square ? "object-contain p-3" : "object-cover"} transition-transform duration-300 ease-[var(--ease-brand)] group-hover:scale-[1.03]`} />
+        <LoadingImage src={s.src} alt={s.alt} fill sizes={wide ? "(min-width: 1024px) 790px, 100vw" : "(min-width: 1024px) 390px, 50vw"} className={`${s.square ? "object-contain p-3" : "object-cover"} transition-[opacity,transform,translate,scale] duration-300 ease-[var(--ease-brand)] group-hover:scale-[1.03]`} />
       </span>
       <span className="flex items-center justify-between px-1.5 pb-0.5 pt-2.5 font-mono text-[11px] uppercase tracking-[0.04em] text-ink-2">
         {s.label}
@@ -183,7 +195,7 @@ function Viewer({ list, at, on, onClose, onStep }: { list: Shot[]; at: number; o
                   else if (land > w / 4) step(-1);
                 }}
               >
-                <Image src={shot.src} alt={shot.alt} fill sizes="94vw" draggable={false} className="pointer-events-none select-none object-contain" />
+                <LoadingImage src={shot.src} alt={shot.alt} fill sizes="94vw" draggable={false} className="pointer-events-none select-none object-contain transition-opacity duration-300" />
               </motion.div>
             </AnimatePresence>
           </div>

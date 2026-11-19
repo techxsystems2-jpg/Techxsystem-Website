@@ -37,6 +37,7 @@ export function StudioCard() {
         )}
         <dl className="mt-4 divide-y divide-line text-small">
           <Row k="Studio hours" v={site.contact.hours} />
+          <Row k="Support" v="24/7 on WhatsApp" />
           {cities.map((c) => (
             <Row key={c.name} k={c.name} v={clock ? `${fmt(todayAt(clock.now, STUDIO_OPEN_UTC), c.tz)} – ${fmt(todayAt(clock.now, STUDIO_CLOSE_UTC), c.tz)}` : null} />
           ))}

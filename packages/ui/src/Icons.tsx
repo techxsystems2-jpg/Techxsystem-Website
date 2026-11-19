@@ -19,14 +19,10 @@ export function CheckIcon({ size = 16, className = "" }: P) {
 }
 
 /** The TechX mark: maroon roof over a blue camera. A logo refresh is still to be agreed with the client. */
-export function Mark({ className = "" }: { className?: string }) {
-  return (
-    <svg width="26" height="24" viewBox="0 0 26 24" aria-hidden="true" className={className}>
-      <path d="M2 10L13 2L24 10" fill="none" stroke="#8E1F3F" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" />
-      <rect x="5" y="10" width="16" height="12" rx="2.5" fill="none" stroke="#2F5BEA" strokeWidth="1.9" />
-      <circle cx="13" cy="16" r="3.2" fill="none" stroke="#2F5BEA" strokeWidth="1.9" />
-    </svg>
-  );
+/** The TechX mark (owner's logo, 2026-11-19): the camera-and-house symbol cut from the full logo, public/brand/mark.png. */
+export function Mark({ className = "", height = 24 }: { className?: string; height?: number }) {
+  // eslint-disable-next-line @next/next/no-img-element -- 14 KB brand mark, same file everywhere; no resizing needed
+  return <img src="/brand/mark.png" width={Math.round(height * 1.5)} height={height} alt="" aria-hidden="true" className={`shrink-0 object-contain ${className}`} />;
 }
 
 /** WhatsApp's own logo (brand mark, from Simple Icons, CC0). A filled glyph, not the outline style: brand marks stay as drawn. */

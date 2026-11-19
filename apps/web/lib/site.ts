@@ -13,21 +13,21 @@ export const site = {
   // Hero trust badge (owner, 2026-10-30). Both figures to confirm with TechX before launch (docs/OPEN_ITEMS.md).
   trust: { clients: 120, rating: 4.9 }, // owner, 2026-11-04: 120+ clients
   contact: {
-    // Figma shows two WhatsApp numbers (final CTA: 74176 20537, Home answer card: 96530 59304). Confirm which one.
-    whatsapp: "+91 74176 20537",
-    whatsappUrl: "https://wa.me/917417620537",
+    // owner, 2026-11-19: one WhatsApp number everywhere (replaces Figma's 74176 20537 and 96530 59304).
+    whatsapp: "+91 73034 43810",
+    whatsappUrl: "https://wa.me/917303443810",
     email: "support@techxsystems.com",
     // Studio landline from the old site's head office (+91 0571 2976655). Figma writes it "0571 297 6655"; shown in the
     // international form so callers in the US, UK and Australia can dial it as written.
     phone: "+91 571 297 6655",
     phoneUrl: "tel:+915712976655",
     studio: "India",
-    hours: "9 AM – 7 PM IST", // confirm
+    hours: "Mon–Sat, 9 AM – 10 PM IST", // owner, 2026-11-19: closed Sunday; support answers 24/7
   },
   // Offices and their numbers, from TechX's current site (docs/old-site-content.md; owner, 2026-11-03: show them on
   // Contact). Phones in international form so callers abroad can dial them as written.
   offices: [
-    { label: "Head office", city: "Aligarh", country: "IN", address: ["Street No. 1, Dhaurra", "Aligarh, Uttar Pradesh 202002"], phones: ["+91 571 297 6655", "+91 74176 20537"] },
+    { label: "Head office", city: "Aligarh", country: "IN", address: ["Street No. 1, Dhaurra", "Aligarh, Uttar Pradesh 202002"], phones: ["+91 571 297 6655", "+91 73034 43810"] },
     { label: "Branch office", city: "New Delhi", country: "IN", address: ["G-35, 3rd Floor, Abul Fazal Enclave 2", "Shaheen Bagh, Okhla, New Delhi 110025"], phones: ["+91 96530 59304", "+91 89239 90537"] },
     { label: "London office", city: "London", country: "GB", address: ["118 Pall Mall, St James's", "London SW1Y 5EA"], phones: ["+44 7838 388450"] },
   ],
@@ -53,12 +53,18 @@ export const nav = [
 
 /** Every service shows its starting price (information map rule 2). Copy from the Figma Home service cards. */
 export const services = [
-  { slug: "photo-editing", name: "Photo editing & HDR", short: "Photo editing", line: "Brackets blended, windows pulled, skies swapped, verticals straight.", from: "From $0.50 / image", scene: "int" },
+  { slug: "photo-editing", name: "Photo editing: HDR/Flambient", short: "Photo editing", line: "HDR or flambient blends, windows pulled, skies swapped, verticals straight.", from: "From $0.50 / image", scene: "int" },
   { slug: "virtual-twilight", name: "Virtual twilight", short: "Virtual twilight", line: "Daytime exteriors turned to dusk, with every light on.", from: "From $1.00 / image", scene: "twi" },
   { slug: "virtual-staging", name: "Virtual staging", short: "Virtual staging", line: "Empty rooms furnished in the style buyers expect.", from: "From $8 / room", scene: "int" }, // confirm price
   { slug: "drone-editing", name: "Drone & aerial", short: "Drone & aerial", line: "Aerials colour-matched to the ground set, with sky swaps and lot lines.", from: "From $0.50 / image", scene: "aer" },
   { slug: "floor-plans", name: "Floor plans", short: "Floor plans", line: "Your sketch or old plan redrawn as a clean 2D or 3D floor plan.", from: "From $5 / floor", scene: "plan" },
   { slug: "video-editing", name: "Video editing", short: "Video", line: "Two- to three-minute property tours with music and titles.", from: "From $25 / video", scene: "ext" },
+] as const;
+
+/** Photo editing's two options, each with its own page under /services/photo-editing/ (owner, 2026-11-19). */
+export const photoOptions = [
+  { slug: "hdr", label: "HDR editing" },
+  { slug: "flambient", label: "Flambient editing" },
 ] as const;
 
 /** Footer, as in Figma. Links without a route yet render as plain text until the page exists. */

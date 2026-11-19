@@ -1,7 +1,7 @@
 import { services } from "@/lib/site";
 
 /* Per-service page content for the Services template (Figma node 28:155; copy in CONTEXT.md).
-   Only Photo editing & HDR is designed in Figma; the other five reuse its layout with facts from TechX's current site
+   Only Photo editing (HDR / Flambient) is designed in Figma; the other five reuse its layout with facts from TechX's current site
    (docs/old-site-content.md) and the Figma price list (turnarounds). Nothing here may go beyond those sources.
    `work` names the portfolio category shown under "Recent work" (public/photos/work); none for staging and video,
    which have no TechX samples yet. */
@@ -25,13 +25,14 @@ export const details: Record<Slug, Detail> = {
   "photo-editing": {
     lead: "Bright, straight, true to life.",
     rest: "Photo editing by hand.",
-    lede: "Every bracket blended, every window pulled, every vertical straightened. Then a second editor checks the set before it reaches you.",
+    lede: "HDR brackets or flambient frames, blended by hand. Every window pulled, every vertical straightened. Then a second editor checks the set before it reaches you.",
     turnaround: "10–16 hours",
     fixes: {
-      lead: "Eight fixes, done by hand.",
+      lead: "Nine fixes, done by hand.",
       rest: "Pick the level that covers what your shoot needs.",
       items: [
         ["HDR blending", "Brackets merged with natural highlights and shadows."],
+        ["Flambient blending", "Flash and ambient frames blended for true colour and clean, even light."],
         ["Window pulls", "The view outside shows clearly, without grey haze."],
         ["Lens correction", "Verticals straightened, barrel distortion removed."],
         ["Colour correction", "White balance matched across the whole set."],

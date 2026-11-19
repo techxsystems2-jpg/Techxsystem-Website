@@ -31,7 +31,7 @@ export function Hero() {
         <div className="rise">
           <p className="mx-auto max-w-[560px] text-[17px] leading-[1.6] tracking-[-0.01em] text-ink-2 md:text-[18px] [--i:2]">
             {/* first screen (owner, 2026-11-04: "clearly state what we do and how"): the category first, in ink */}
-            <b className="font-medium text-ink">Real estate photo editing</b> by people, not presets. HDR, twilight, virtual staging and drone, from $0.50 an image.
+            <b className="font-medium text-ink">Real estate photo editing</b> by people, not presets. HDR/Flambient, twilight, virtual staging and drone/aerial, from $0.50 an image.
           </p>
         </div>
       </div>

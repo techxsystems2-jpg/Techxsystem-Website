@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite();
   return pageMetadata("services", {
   title: "Real estate photo editing services",
-  description: `Photo editing and HDR, virtual twilight, staging, drone, floor plans and video from one studio. From ${site.startingPrice} an image. Try 10 photos free.`,
+  description: `Photo editing (HDR and flambient), virtual twilight, staging, drone, floor plans and video from one studio. From ${site.startingPrice} an image. Try 10 photos free.`,
   alternates: { canonical: "/services" },
   });
 }

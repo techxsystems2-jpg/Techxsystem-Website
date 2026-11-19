@@ -40,7 +40,7 @@ function PhoneShot({ story, dark = false, wallpaper, children }: { story: ReactN
 }
 
 const Avatar = ({ size = 36 }: { size?: number }) => (
-  <span className="grid shrink-0 place-items-center rounded-full bg-ink" style={{ width: size, height: size }}><Mark className="scale-[0.7] brightness-0 invert" /></span>
+  <span className="grid shrink-0 place-items-center rounded-full bg-ink" style={{ width: size, height: size }}><Mark height={Math.round(size * 0.42)} className="brightness-0 invert" /></span>
 );
 
 /* ── 01 · WhatsApp on a phone ─────────────────────────────────────────────────────────────────────────────────── */
@@ -160,7 +160,7 @@ export function CallScene() {
   const sheet = s >= 4;
   return (
     <div ref={ref}>
-      <PhoneShot dark wallpaper="linear-gradient(180deg,#2A2D34 0%,#15161A 60%)" story={<Story steps={["Call the studio directly", "Weekdays, 9 AM – 7 PM IST", "Or book a call for US hours"]} at={s <= 1 ? 0 : s <= 3 ? 1 : 2} />}>
+      <PhoneShot dark wallpaper="linear-gradient(180deg,#2A2D34 0%,#15161A 60%)" story={<Story steps={["Call the studio directly", "Mon–Sat, 9 AM – 10 PM IST", "Or book a call for US hours"]} at={s <= 1 ? 0 : s <= 3 ? 1 : 2} />}>
         <div className="flex flex-col items-center pt-6 text-center text-white">
           <span className="relative grid place-items-center">
             {/* rings while it rings */}
@@ -169,7 +169,7 @@ export function CallScene() {
                 animate={s === 1 ? { opacity: [0.6, 0], transform: ["scale(1)", `scale(${1.5 + r * 0.35})`] } : { opacity: 0, transform: "scale(1)" }}
                 transition={s === 1 ? { duration: 1.2, repeat: Infinity, delay: r * 0.4, ease: OUT } : { duration: 0.2 }} />
             ))}
-            <span className="grid size-[88px] place-items-center rounded-full bg-white"><Mark className="scale-[1.7]" /></span>
+            <span className="grid size-[88px] place-items-center rounded-full bg-white"><Mark height={40} /></span>
           </span>
           <p className="mt-4 text-[28px] font-medium leading-[1.2] tracking-[-0.01em]">TechX studio</p>
           <p className="mt-1 text-[17px] leading-[1.35] tabular-nums text-white/70">{site.contact.phone}</p>

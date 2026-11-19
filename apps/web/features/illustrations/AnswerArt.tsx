@@ -54,16 +54,19 @@ const Thumb = ({ name, raw = false, sizes = "140px" }: { name: string; raw?: boo
    The shoot leaves New York in the evening and lands in the studio inbox while India sleeps; at 9 AM IST the team reads
    the notes and edits; every image is checked twice (the editor, then the QC assigned to the account); the finished set
    flies back and New York wakes up to it. Both clocks run the whole way, so the time difference explains itself.
-   New York times are the Figma ones (EDT); IST = ET + 9:30. Figma's "5:42 AM IST" read as New York time (OPEN_ITEMS). */
+   New York times are the Figma ones (EDT); IST = ET + 9:30. Figma's "5:42 AM IST" read as New York time (OPEN_ITEMS).
+   owner, 2026-11-19: the same night plays twice, New York then Sydney. Sydney's times are AEDT (IST + 5:30), so its
+   shoot lands while the studio is open and is edited that evening, India time. */
 const PROCESS_MS = [2400, 3000, 1600, 1600, 3200] as const;
-const PROCESS_STORY = [
-  "7:02 PM: you upload before bed",
-  "9:10 AM IST: we read your notes",
-  "Check 1: your editor reviews it",
-  "Check 2: your QC signs it off",
-  "7:58 AM: your photos are ready",
-];
-const CLOCKS = [["7:02 PM", "4:32 AM"], ["11:40 PM", "9:10 AM"], ["3:50 AM", "1:20 PM"], ["5:42 AM", "3:12 PM"], ["7:58 AM", "5:28 PM"]] as const;
+const PLACES = [
+  { city: "New York", zone: "ET", inbox: "Arrives overnight. Opened at 9 AM.", indiaNight: [0],
+    story: ["7:02 PM: you upload before bed", "9:10 AM IST: we read your notes", "Check 1: your editor reviews it", "Check 2: your QC signs it off", "7:58 AM: your photos are ready"],
+    clocks: [["7:02 PM", "4:32 AM"], ["11:40 PM", "9:10 AM"], ["3:50 AM", "1:20 PM"], ["5:42 AM", "3:12 PM"], ["7:58 AM", "5:28 PM"]] },
+  { city: "Sydney", zone: "AET", inbox: "Arrives in studio hours. Opened at once.", indiaNight: [4],
+    story: ["7:02 PM: you upload before bed", "2:10 PM IST: we read your notes", "Check 1: your editor reviews it", "Check 2: your QC signs it off", "6:58 AM: your photos are ready"],
+    clocks: [["7:02 PM", "1:32 PM"], ["7:40 PM", "2:10 PM"], ["11:50 PM", "6:20 PM"], ["1:30 AM", "8:00 PM"], ["6:58 AM", "1:28 AM"]] },
+] as const;
+const PROCESS_ALL_MS = [...PROCESS_MS, ...PROCESS_MS];
 const NIGHT = "bg-[linear-gradient(160deg,#1B2356,#2C2F66_60%,#3E3478)]";
 const swap = { initial: { opacity: 0, y: 6 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -6 }, transition: { type: "spring", bounce: 0, duration: 0.35 } } as const;
 const Moon = () => <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 1.5a6.5 6.5 0 104 11.2A5.8 5.8 0 0110.5 1.5z" fill="#C9D4FF" /></svg>;
@@ -71,13 +74,15 @@ const Sun = () => <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="t
 
 export function ProcessArt() {
   const { ref, play } = useLoop<HTMLDivElement>();
-  const s = useSequence(PROCESS_MS.length, PROCESS_MS, play);
+  const step = useSequence(PROCESS_ALL_MS.length, PROCESS_ALL_MS, play);
+  const place = PLACES[step < PROCESS_MS.length ? 0 : 1];
+  const s = step % PROCESS_MS.length;
   const nyNight = s < 4;
-  const inNight = s === 0;
+  const inNight = (place.indiaNight as readonly number[]).includes(s);
   const arc = "M78 40 Q174 -14 270 40";
   return (
     <div ref={ref}>
-      <Canvas className="h-[292px]" story={<Story steps={PROCESS_STORY} at={s} />}>
+      <Canvas className="h-[292px]" story={<Story steps={[...place.story]} at={s} />}>
         <Shot w={348} h={206} mode="fit">
         <div className="relative h-[206px] w-[348px]">
           {/* the route between the two places, and the shoot travelling it: out at 0, back at 4 */}
@@ -92,8 +97,8 @@ export function ProcessArt() {
             </motion.div>
           )}
 
-          {/* New York: the photographer */}
-          <Place className="left-0" city="New York" zone="ET" time={CLOCKS[s]![0]} night={nyNight}>
+          {/* the photographer: New York, then Sydney */}
+          <Place className="left-0" city={place.city} zone={place.zone} time={place.clocks[s]![0]} night={nyNight}>
             <AnimatePresence mode="wait" initial={false}>
               {s === 0 && (
                 <motion.div key="up" {...swap}>
@@ -126,7 +131,7 @@ export function ProcessArt() {
           </Place>
 
           {/* India: the studio */}
-          <Place className="right-0" city="India" zone="IST" time={CLOCKS[s]![1]} night={inNight}>
+          <Place className="right-0" city="India" zone="IST" time={place.clocks[s]![1]} night={inNight}>
             <AnimatePresence mode="wait" initial={false}>
               {s === 0 && (
                 <motion.div key="inbox" {...swap}>
@@ -135,7 +140,7 @@ export function ProcessArt() {
                     <p className="text-[11px] font-medium">Studio inbox</p>
                     <motion.span className="ml-auto rounded-full bg-blue px-1.5 text-[10px] font-medium text-white" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ ...pop, delay: 2.1 }}>1 new</motion.span>
                   </motion.div>
-                  <p className="mt-2 text-[9.5px] text-white/60">Arrives overnight. Opened at 9 AM.</p>
+                  <p className={`mt-2 text-[9.5px] ${inNight ? "text-white/60" : "text-ink-2"}`}>{place.inbox}</p>
                 </motion.div>
               )}
               {s >= 1 && (
@@ -170,7 +175,9 @@ function Place({ city, zone, time, night, className, children }: { city: string;
       <div className={`relative p-2.5 transition-colors duration-700 ${night ? "text-white" : "text-ink"}`}>
         <div className="flex items-center gap-1.5">
           {night ? <Moon /> : <Sun />}
-          <span className="text-[11px] font-semibold">{city}</span>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.span key={city} {...swap} className="text-[11px] font-semibold">{city}</motion.span>
+          </AnimatePresence>
         </div>
         <p className="mt-1 font-mono text-[17px] font-medium tabular-nums tracking-[-0.02em]">
           {time} <span className={`text-[9px] ${night ? "text-white/60" : "text-ink-2"}`}>{zone}</span>
@@ -184,10 +191,11 @@ function Place({ city, zone, time, night, className, children }: { city: string;
 /* 03 · Our prices, as a live invoice (owner, 2026-10-31): one listing, four photos, a level picked for each. The total
    counts up as each level lands, then the invoice is stamped "billed after delivery". Mixing levels, the running total
    and pay-for-what-we-deliver all read on one screen. Rates from Figma / the old site's price list. */
-const PRICE_MS = [1300, 1300, 1300, 1300, 2800] as const;
-const PRICE_STORY = ["Pick a level for each photo", "Mix levels in one order", "Twilight from $1.00 an image", "Luxury for hand-masked blends", "Billed only after delivery"];
+// owner, 2026-11-19: the front exterior lands at $1.00, then drops to its own rate, from $0.25 (step 1)
+const PRICE_MS = [1100, 1500, 1300, 1300, 1300, 2800] as const;
+const PRICE_STORY = ["Pick a level for each photo", "Front exteriors from $0.25", "Mix levels in one order", "Twilight from $1.00 an image", "Luxury for hand-masked blends", "Billed only after delivery"];
 const lines = [
-  { photo: "tx-ext.jpg", name: "Front exterior", level: "Signature", price: 1 },
+  { photo: "tx-ext.jpg", name: "Front exterior", level: "Exterior", price: 0.25 },
   { photo: "tx-int.jpg", name: "Main bathroom", level: "Essential", price: 0.5 },
   { photo: "tx-twi.jpg", name: "Pool deck", level: "Twilight", price: 1 },
   { photo: "tx-aer.jpg", name: "Aerial", level: "Luxury", price: 1.5 },
@@ -197,8 +205,11 @@ const usd = { style: "currency", currency: "USD", minimumFractionDigits: 2 } as 
 export function PricesArt() {
   const { ref, play } = useLoop<HTMLDivElement>();
   const s = useSequence(PRICE_MS.length, PRICE_MS, play);
-  const priced = Math.min(s + 1, 4);
-  const total = lines.slice(0, priced).reduce((t, l) => t + l.price, 0);
+  const row = Math.max(s - 1, 0); // the row being priced; steps 0 and 1 are both the front exterior
+  const done = s === PRICE_MS.length - 1;
+  const priced = Math.min(row + 1, 4);
+  const price = (i: number) => (i === 0 && s === 0 ? 1 : lines[i]!.price); // $1.00 before the exterior rate lands
+  const total = lines.slice(0, priced).reduce((t, _, i) => t + price(i), 0);
   return (
     <div ref={ref}>
       <Canvas className="h-[292px]" story={<Story steps={PRICE_STORY} at={s} />}>
@@ -206,13 +217,13 @@ export function PricesArt() {
         <div className={`relative w-[300px] rounded-xl bg-surface p-3 ${SHADOW_HERO}`}>
           <div className="mb-2 flex items-center justify-between px-0.5">
             <span className="text-[11.5px] font-medium text-ink-2">Your listing</span>
-            <span className="text-[11px] text-ink-2">4 photos · {s === 4 ? "billed after delivery" : "draft"}</span>
+            <span className="text-[11px] text-ink-2">4 photos · {done ? "billed after delivery" : "draft"}</span>
           </div>
           <div className="space-y-1">
             {lines.map((l, i) => {
               const on = i < priced;
               return (
-                <div key={l.name} className={`relative flex items-center gap-2 rounded-lg px-1 py-1 transition-colors duration-300 ${i === s ? "bg-blue-tint/60" : ""}`}>
+                <div key={l.name} className={`relative flex items-center gap-2 rounded-lg px-1 py-1 transition-colors duration-300 ${i === row && !done ? "bg-blue-tint/60" : ""}`}>
                   <span className="relative h-7 w-10 shrink-0 overflow-hidden rounded-md"><Thumb name={l.photo} raw={!on} sizes="48px" /></span>
                   <span className="min-w-0 flex-1 truncate text-[11.5px] font-medium text-ink">{l.name}</span>
                   <AnimatePresence initial={false}>
@@ -221,8 +232,8 @@ export function PricesArt() {
                         initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={pop}>{l.level}</motion.span>
                     )}
                   </AnimatePresence>
-                  <span className={`w-11 text-right font-mono text-[11px] tabular-nums ${on ? "text-ink" : "text-ink-3"}`}>{on ? `$${l.price.toFixed(2)}` : "—"}</span>
-                  {i === s && s < 4 && (
+                  <span className={`w-11 text-right font-mono text-[11px] tabular-nums ${on ? "text-ink" : "text-ink-3"}`}>{on ? <NumberFlow value={price(i)} format={usd} locales="en-US" /> : "—"}</span>
+                  {i === row && !done && (
                     <motion.span className="pointer-events-none absolute right-12 top-3 z-10" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={spring}>
                       <svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 1l4.5 11 1.6-4.4L11.5 6z" fill="#3074FE" stroke="#fff" strokeWidth="1.2" strokeLinejoin="round" /></svg>
                     </motion.span>
@@ -327,7 +338,7 @@ export function ContactArt() {
         <Shot w={320} h={226} mode="fit" max={0.96}>
         <div className={`w-[320px] overflow-hidden rounded-xl bg-surface/80 backdrop-blur ${SHADOW_HERO}`}>
           <div className="flex items-center gap-2 border-b border-line bg-surface px-3 py-2">
-            <span className="grid size-7 place-items-center rounded-full bg-ink"><Mark className="scale-[0.55] brightness-0 invert" /></span>
+            <span className="grid size-7 place-items-center rounded-full bg-ink"><Mark height={12} className="brightness-0 invert" /></span>
             <span className="grid leading-tight">
               <span className="text-[12px] font-semibold text-ink">TechX studio</span>
               <span className="flex items-center gap-1 text-[10.5px] text-ink-2"><span className="size-1.5 rounded-full bg-green" />{s === 1 ? "Editor typing…" : "Editor online"}</span>

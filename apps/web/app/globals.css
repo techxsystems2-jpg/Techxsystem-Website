@@ -46,6 +46,13 @@ button, [role="button"], [role="tab"] { -webkit-user-select: none; user-select: 
 }
 
 /* Raw bracket look for the stand-in scenes until real photos arrive */
+/* shimmer: a light band sweeping across a placeholder while a photo loads (owner, 2026-11-19). It sits behind the
+   photo, so the photo covers it the moment it paints; transform only, and reduced motion leaves it still. */
+@utility shimmer {
+  overflow: hidden;
+  &::after { content: ""; position: absolute; inset: 0; translate: -100% 0; background: linear-gradient(100deg, transparent 20%, rgb(255 255 255 / 0.55) 50%, transparent 80%); animation: shimmer 1.4s ease-in-out infinite; }
+}
+@keyframes shimmer { to { translate: 100% 0; } }
 @utility raw { filter: saturate(.22) brightness(.82) contrast(.9); }
 html.lenis, html.lenis body { height: auto; }
 

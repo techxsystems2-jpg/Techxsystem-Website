@@ -26,3 +26,13 @@ From the old site's portfolio (techxsystems.com/img/portfolio/…), TechX's own 
 - Service cards also use `tx-plan.jpg` ← Floor-Plan/1.jpg and `tx-twi2.jpg` ← Twilight-and-Day-to-Dusk/3.jpg (spare, not yet used).
 - Hero photo field (`public/photos/field/f01–f18.webp`): 18 old-site portfolio images, resized to 560px wide, WebP q72, metadata stripped (688 KB total, from ~10 MB). f01–f06 Exterior/2,3,5,7,9,12 · f07–f12 Interior/2,3,6,8,10,14 · f13–f15 Twilight-and-Day-to-Dusk/2,4,6 · f16–f18 Drone/3,5,8.
 - Work gallery (`public/photos/work/`, 2026-11-02): all 87 old-site portfolio images (techxsystems.com/img/portfolio/<Category>/<n>.jpg), WebP q76, metadata stripped, 800 px wide (6.5 MB total). Names: `ext-1…18` Exterior · `int-1…33` Interior · `twi-1…8` Twilight-and-Day-to-Dusk · `aer-1…15` Drone · `yacht-1…10` Yacht · `plan-1…3` Floor-Plan. Also the About page's stand-in studio photo (`aer-2`). Confirm web use with TechX.
+
+## Hero before/after pairs (owner, 2026-11-19)
+TechX's own work, from the studio's Dropbox ("Hero Section image"), resized to 1920 px WebP in `apps/web/public/photos/hero/`:
+HDR (0L5A5354), Flambient (0L5A5271), Twilight (CA_39533CalleAnita_0313 raw → _0314 final), Day to dusk (SON02277 raw → SON02275 final; 1% white border trimmed from the final, raw cropped to match), Drone (DJI_20260831142402_0013_D; raw DNG converted with macOS sips).
+
+## Work gallery: TechX finals from the studio Dropbox (owner, 2026-11-19)
+295 finished edits, 1600 px WebP in `apps/web/public/photos/work/`: hdr-1…121, flam-1…122, dusk-1…5, aer-16…51, twi-9…19.
+Picked by folder: only files inside a "Final" folder; "Raw"/"RAW" folders skipped. Sets with no Final/Raw folder
+(HDR/3, Flambiant/2, Flambiant/samples, Twilight) were checked by eye on contact sheets: all finished edits.
+Duplicates dropped by file name (Flambiant/samples ⊂ Flambiant/2; Drone/Final/New folder = Drone/Final).

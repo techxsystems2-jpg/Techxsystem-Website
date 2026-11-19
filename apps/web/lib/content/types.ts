@@ -12,6 +12,8 @@ export type Facts = {
   trust: { clients: number; rating: number };
   contact: { whatsapp: string; email: string; phone: string; studio: string; hours: string };
   offices: Office[];
+  /** Profile links (owner, 2026-11-19); a blank one isn't shown. */
+  social: { facebook: string; instagram: string; linkedin: string; youtube: string };
   announcement: { text: string; short: string };
   /** On: every public page shows the maintenance page (proxy.ts); the admin and the contact form keep working. */
   maintenance: boolean;
@@ -92,13 +94,14 @@ export const DEFAULTS: ContentMap = {
     trust: { ...siteDefaults.trust },
     contact: { whatsapp: siteDefaults.contact.whatsapp, email: siteDefaults.contact.email, phone: siteDefaults.contact.phone, studio: siteDefaults.contact.studio, hours: siteDefaults.contact.hours },
     offices: siteDefaults.offices.map((o) => ({ ...o, address: [...o.address], phones: [...o.phones] })),
+    social: { facebook: "", instagram: "", linkedin: "", youtube: "" }, // owner, 2026-11-19: links to come
     announcement: { text: announcement.text, short: announcement.short },
     maintenance: false,
   },
   pricing: {
     plans: [
       { name: "Essential", who: "For everyday listings. Clean, bright and true to life.", price: "$0.50", label: "Essential includes", featured: false,
-        items: ["HDR merging of your brackets", "Lens and perspective correction", "Colour, white balance and exposure", "Noise reduction", "Resizing for your listing", "Back in 10–16 hours", "Free revisions"] },
+        items: ["HDR or flambient blending of your frames", "Lens and perspective correction", "Colour, white balance and exposure", "Noise reduction", "Resizing for your listing", "Back in 10–16 hours", "Free revisions"] },
       { name: "Signature", who: "For listings that need to stand out. Skies, lawns and windows fixed.", price: "$1.00", label: "Everything in Essential, plus", featured: true,
         items: ["Window enhancement", "Sky replacement", "Grass replacement", "Fire in fireplaces", "TV screen fill", "Flash and reflection removal", "A saved style guide"] },
       { name: "Luxury", who: "For high-end homes that need hand-finished detail.", price: "$1.50", label: "Everything in Signature, plus", featured: false,
@@ -156,7 +159,7 @@ export const DEFAULTS: ContentMap = {
     ]),
   },
   timeline: [
-    { year: "2016", title: "Founded in Aligarh", text: "Two people, one client list, real estate first." },
+    { year: "2012", title: "Founded in Aligarh", text: "Two people, one client list, real estate first." },
     { year: "2017", title: "Studio in Delhi", text: "A dedicated team and a second-check process." },
     { year: "2019", title: "Video and floor plans", text: "One studio for everything a listing needs." },
     { year: "2026", title: "Virtual staging returns", text: "A new site and a free trial for every photographer." },
@@ -182,6 +185,8 @@ export const DEFAULTS: ContentMap = {
 export const WORK_CATEGORIES = categories.map((c) => ({ key: c.key, label: c.label }));
 
 /** The full site facts in the shape components have always used (`site.contact.whatsappUrl` and so on). */
+const SOCIAL = { facebook: "Facebook", instagram: "Instagram", linkedin: "LinkedIn", youtube: "YouTube" } as const;
+
 export function siteFrom(f: Facts) {
   const digits = (s: string) => s.replace(/[^\d]/g, "");
   return {
@@ -189,6 +194,8 @@ export function siteFrom(f: Facts) {
     startingPrice: f.startingPrice,
     trust: f.trust,
     offices: f.offices,
+    // only full https links are shown, so a half-typed or odd value never becomes a link
+    social: (["facebook", "instagram", "linkedin", "youtube"] as const).flatMap((k) => (/^https:\/\/\S+$/.test(f.social?.[k] ?? "") ? [{ name: SOCIAL[k], href: f.social[k] }] : [])),
     contact: { ...f.contact, whatsappUrl: `https://wa.me/${digits(f.contact.whatsapp)}`, phoneUrl: `tel:+${digits(f.contact.phone)}` },
     announcement: { ...announcement, text: f.announcement.text, short: f.announcement.short },
   };

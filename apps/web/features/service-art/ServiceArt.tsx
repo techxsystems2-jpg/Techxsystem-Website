@@ -7,8 +7,8 @@ import { useLoop } from "@/features/motion/useLoop";
 
 /* One card per service, the whole edit on one screen (owner, 2026-10-31): after on the left, before on the right, and
    the fixes ticking off along the bottom. Each tick pushes the divider right, so the after grows as the work is done.
-   Photos are TechX's own finished edits from the old site's portfolio (docs/PHOTO_CREDITS.md); the "before" is a
-   filter over the same frame until real pairs arrive. Staging keeps the stock pair (no TechX staging samples yet).
+   Photo editing, twilight and drone show TechX's real raw and final pairs (owner's Dropbox, 2026-11-19; public/photos/hero,
+   docs/PHOTO_CREDITS.md). Staging keeps the stock pair and floor plans a filter (no TechX samples of either yet).
    Loops only while on screen; off screen or under reduced motion it rests on a 50/50 split with every fix ticked.
    Transform, opacity and clip-path only.
    Interactive (owner, 2026-11-02): with a mouse the divider follows the pointer while hovering the photo and the loop
@@ -142,15 +142,13 @@ function Split({ before, after, done, n, play, overlay }: { before: ReactNode; a
   );
 }
 
-const RAW = { filter: "brightness(.62) contrast(.78) saturate(.5) sepia(.1)" };
-
 function HdrArt({ play }: { play: boolean }) {
   const steps = ["Merge", "Windows", "Sky", "Verticals"] as const;
   const done = useSteps(steps.length, play);
   return (
     <>
-      <Split n={steps.length} done={done} play={play} before={<Photo src="/photos/tx-ext.jpg" style={RAW} />} after={<Photo src="/photos/tx-ext.jpg" />} />
-      <Tag side="l">HDR edit</Tag><Tag side="r">3 brackets</Tag>
+      <Split n={steps.length} done={done} play={play} before={<Photo src="/photos/hero/hdr-before.webp" />} after={<Photo src="/photos/hero/hdr-after.webp" />} />
+      <Tag side="l">HDR/Flambient</Tag><Tag side="r">Raw</Tag>
       <Steps items={steps} done={done} />
     </>
   );
@@ -162,8 +160,8 @@ function TwilightArt({ play }: { play: boolean }) {
   return (
     <>
       <Split n={steps.length} done={done} play={play}
-        before={<Photo src="/photos/tx-twi.jpg" style={{ filter: "brightness(1.55) saturate(.25) contrast(.75) hue-rotate(-10deg)" }} />}
-        after={<Photo src="/photos/tx-twi.jpg" />} />
+        before={<Photo src="/photos/hero/twilight-before.webp" />}
+        after={<Photo src="/photos/hero/twilight-after.webp" />} />
       <Tag side="l">Dusk</Tag><Tag side="r">Day</Tag>
       <Steps items={steps} done={done} />
     </>
@@ -183,16 +181,11 @@ function StagingArt({ play }: { play: boolean }) {
 }
 
 function DroneArt({ play }: { play: boolean }) {
-  const steps = ["Colour match", "Sky", "Lot lines"] as const;
+  const steps = ["Colour match", "Sky"] as const;
   const done = useSteps(steps.length, play);
-  // the lot outline, drawn once "Lot lines" is done
-  const lines = (
-    <motion.span className="absolute left-[52%] top-[30%] h-[34%] w-[26%] rotate-[8deg] rounded-sm border-2 border-dashed border-white bg-white/10 shadow-[0_0_0_1px_rgb(0_0_0/0.15)]"
-      initial={false} animate={{ opacity: done >= 3 ? 1 : 0, transform: done >= 3 ? "scale(1) rotate(8deg)" : "scale(0.94) rotate(8deg)" }} transition={pop} />
-  );
   return (
     <>
-      <Split n={steps.length} done={done} play={play} before={<Photo src="/photos/tx-aer.jpg" style={RAW} />} after={<Photo src="/photos/tx-aer.jpg" />} overlay={lines} />
+      <Split n={steps.length} done={done} play={play} before={<Photo src="/photos/hero/drone-before.webp" />} after={<Photo src="/photos/hero/drone-after.webp" />} />
       <Tag side="l">Edited</Tag><Tag side="r">Raw aerial</Tag>
       <Steps items={steps} done={done} />
     </>

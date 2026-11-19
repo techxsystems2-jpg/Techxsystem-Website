@@ -11,7 +11,7 @@ export async function GET() {
 
 > ${site.description}
 
-${site.name} is a real estate photo editing studio in ${site.contact.studio}, working since 2016 for photographers in the US, Australia and the UK. Every photo is edited by hand and checked by a second editor. Prices are starting prices; the final rate depends on the type and volume of work and is confirmed before work starts.
+${site.name} is a real estate photo editing studio in ${site.contact.studio}, working since 2012 for photographers in the US, Australia and the UK. Every photo is edited by hand and checked by a second editor. Prices are starting prices; the final rate depends on the type and volume of work and is confirmed before work starts.
 
 ## Services
 ${services.map((s) => `- [${s.name}](${u(`/services/${s.slug}`)}): ${s.line} ${s.from}.`).join("\n")}

@@ -11,7 +11,7 @@ import { ServiceTabs } from "./ServiceTabs";
    word, lede, two actions, From · Turnaround · Revisions, then the service's own before/after film below, wide. It sits
    in the right column of the service page; the services list is the left column (ServiceTabs). On phones the tabs
    row follows the hero instead. "See prices" jumps to the levels on this page when it has them, else to /pricing. */
-export function ServiceHero({ service: s, lead, rest, lede, turnaround, pricesHref }: { service: Service; lead: string; rest: string; lede: string; turnaround: string; pricesHref: string }) {
+export function ServiceHero({ service: s, option, lead, rest, lede, turnaround, pricesHref, workHref }: { service: Service; option?: string; lead: string; rest: string; lede: string; turnaround: string; pricesHref: string; workHref: string }) {
   const slug = s.slug as Slug;
   const leadWords = lead.split(" ").length;
   return (
@@ -20,7 +20,13 @@ export function ServiceHero({ service: s, lead, rest, lede, turnaround, pricesHr
         <ol className="flex items-center justify-center gap-2 font-mono text-label uppercase text-ink-2 [--i:0]">
           <li><Link href="/services" className="tap hover:text-ink">Services</Link></li>
           <li aria-hidden="true">/</li>
-          <li aria-current="page" className="text-ink">{s.name}</li>
+          {option ? (
+            <>
+              <li><Link href={`/services/${s.slug}`} className="tap hover:text-ink">{s.short}</Link></li>
+              <li aria-hidden="true">/</li>
+              <li aria-current="page" className="text-ink">{option}</li>
+            </>
+          ) : <li aria-current="page" className="text-ink">{s.name}</li>}
         </ol>
       </nav>
       <h1 className="mx-auto mt-5 max-w-[820px] text-h1">
@@ -31,6 +37,7 @@ export function ServiceHero({ service: s, lead, rest, lede, turnaround, pricesHr
         <p className="mx-auto mt-5 max-w-[560px] text-[17px] leading-[1.6] text-ink-2 md:text-[18px] [--i:2]">{lede}</p>
         <div className="mt-7 flex flex-wrap justify-center gap-2.5 [--i:3]">
           <Link href="/free-trial" className={buttonClass("primary")}>Try 10 photos free <ArrowIcon className="transition-transform duration-200 group-hover:translate-x-0.5" /></Link>
+          <Link href={workHref} className={buttonClass("secondary")}>See our work</Link>
           <Link href={pricesHref} className={buttonClass("secondary")}>See prices</Link>
         </div>
         <dl className="mx-auto mt-9 grid max-w-[460px] grid-cols-3 gap-4 border-t border-line pt-5 [--i:4]">

@@ -1,4 +1,4 @@
-import { COUNTRIES, DEFAULTS, SEO_PAGES, WORK_CATEGORIES, type ContentKey } from "./types";
+import { COUNTRIES, SEO_PAGES, WORK_CATEGORIES, type ContentKey } from "./types";
 
 /* What the admin panel shows for each content key, and the rules a save must pass. One description drives both the
    form (features/admin/Editor.tsx) and the server-side clean-up (`coerce`, run by the save action), so the panel can
@@ -41,11 +41,17 @@ export const SECTIONS: Section[] = [
         { key: "rating", label: "Rating out of 5", field: { type: "number", min: 0, max: 5, step: 0.1 } },
       ] } },
       { key: "contact", label: "Contact", field: { type: "object", fields: [
-        { key: "whatsapp", label: "WhatsApp number", help: "In international form, e.g. +91 74176 20537. The chat link is made from it.", field: t(30) },
+        { key: "whatsapp", label: "WhatsApp number", help: "In international form, e.g. +91 73034 43810. The chat link is made from it.", field: t(30) },
         { key: "email", label: "Email", field: t(120) },
         { key: "phone", label: "Phone", help: "International form, e.g. +91 571 297 6655.", field: t(30) },
         { key: "studio", label: "Studio location (as shown)", field: t(60) },
         { key: "hours", label: "Studio hours", field: t(60) },
+      ] } },
+      { key: "social", label: "Social media (footer)", help: "Paste each profile's full link, starting https://. A blank one stays hidden.", field: { type: "object", fields: [
+        { key: "facebook", label: "Facebook", field: t(200) },
+        { key: "instagram", label: "Instagram", field: t(200) },
+        { key: "linkedin", label: "LinkedIn", field: t(200) },
+        { key: "youtube", label: "YouTube", field: t(200) },
       ] } },
       { key: "offices", label: "Offices (Contact page)", field: { type: "list", max: 6, add: "Add an office", title: (r) => String(r.city || "New office"), meta: (r) => String(r.label || ""), item: { type: "object", fields: [
         { key: "label", label: "Label", help: "e.g. Head office, Branch office.", field: t(40) },

@@ -27,7 +27,7 @@ export function BeforeAfter({ scene, className = "", labels = true, photo, befor
     if (!inView || reduce || touched.current) return;
     run.current = animate(pos, [pos.get(), 18, 72, 35], { duration: 2.6, ease: [0.45, 0, 0.2, 1], times: [0, 0.35, 0.75, 1], delay: 0.5 });
     return () => run.current?.stop();
-  }, [scene, inView, reduce, pos]);
+  }, [scene, photo, inView, reduce, pos]);
 
   function grab() {
     touched.current = true;
@@ -44,8 +44,10 @@ export function BeforeAfter({ scene, className = "", labels = true, photo, befor
 
   return (
     <div ref={box} className={`group relative select-none overflow-hidden bg-[#dfe5ec] ${className}`}>
+      {/* shown until the photo paints over it, and again while a newly picked tab's photo loads */}
+      {photo && <div aria-hidden="true" className="shimmer absolute inset-0" />}
       <AnimatePresence initial={false}>
-        <motion.div key={scene} className="absolute inset-0" initial={{ opacity: 0, scale: 1.04 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
+        <motion.div key={photo ?? scene} className="absolute inset-0" initial={{ opacity: 0, scale: 1.04 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
           {photo ? <Image src={photo} alt={alt} fill loading="eager" fetchPriority="high" sizes="(min-width: 1200px) 1180px, 100vw" className="object-cover" /> : <Scene name={scene} uid={`ba-a-${scene}`} />}
           <motion.div className="absolute inset-0" style={{ clipPath: clip }}>
             {/* eager too: it covers half the hero photo, so the browser can report it as the LCP; with no `before` it is

@@ -97,5 +97,11 @@ export async function completeSubmission(token: string, done: string[], failed: 
   ].join("\n");
   const store = await openStore(t.dest);
   await store.writeText(t.ref, "Upload report.txt", report);
+  // owner, 2026-11-19: the studio also gets the report by email once the upload finishes (and again after a retry)
+  after(() => sendAlert({
+    kind: "trial", subject: `Free trial upload finished: ${t.email}, ${ok.length} of ${t.files.length} received`,
+    replyTo: t.email, body: report,
+    lines: [["Email", t.email], ["Received", `${ok.length} of ${t.files.length}`], ["Failed", bad.length ? String(bad.length) : "None"]],
+  }));
   return { received: ok.length, total: t.files.length };
 }

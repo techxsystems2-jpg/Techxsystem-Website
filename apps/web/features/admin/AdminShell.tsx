@@ -110,7 +110,7 @@ function SidebarBody({ collapsed, path, email, onNavigate }: { collapsed: boolea
       {/* header: the workspace */}
       <div className="flex flex-col gap-2 p-2">
         <Link href="/admin" onClick={onNavigate} data-slot="sidebar-menu-button" className={cn("flex items-center gap-2 overflow-hidden rounded-md p-1 outline-none hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-sidebar-ring", collapsed && "size-8 p-0")}>
-          <span className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-white shadow-[0_0_0_1px_rgb(10_10_11/0.06)]"><Mark /></span>
+          <span className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-white shadow-[0_0_0_1px_rgb(10_10_11/0.06)]"><Mark height={16} /></span>
           <span className={cn("grid flex-1 text-left text-sm leading-tight", collapsed && "sr-only")}>
             <span className="truncate font-semibold">TechX Systems</span>
             <span className="truncate text-xs text-muted-foreground">Website admin</span>

@@ -14,10 +14,9 @@ import { getSite } from "@/lib/content";
    2026-11-15: "optimise for mobile, icons on the mails"): one compact list of tap-to-contact rows, each with its icon,
    instead of the Contact page's illustrated cards; then the message form, studio hours (desktop) and the offices.
    Copy via marketing-skills:copywriting. */
-// owner, 2026-11-15: this page lists the support email, this email and this WhatsApp only (not the Site facts
-// WhatsApp or phone); the support email and hours come from Site facts
+// owner, 2026-11-15: this page lists the support email, this email and the WhatsApp only (not the phone).
+// owner, 2026-11-19: one WhatsApp number everywhere, so it comes from Site facts with the support email and hours
 const OWNER_EMAIL = "mazhar.khan53@yahoo.in";
-const OWNER_WHATSAPP = { number: "+91 96530 59304", href: "https://wa.me/919653059304" };
 
 export const metadata: Metadata = { title: "Back soon", robots: { index: false } };
 
@@ -26,10 +25,10 @@ const icon = "size-[18px] shrink-0";
 export default async function Maintenance() {
   const { contact, offices } = await getSite();
   const rows: { icon: ReactNode; label: string; value: string; href?: string }[] = [
-    { icon: <WhatsAppIcon className={icon} />, label: "WhatsApp", value: OWNER_WHATSAPP.number, href: OWNER_WHATSAPP.href },
+    { icon: <WhatsAppIcon className={icon} />, label: "WhatsApp", value: contact.whatsapp, href: contact.whatsappUrl },
     { icon: <Mail strokeWidth={1.75} className={icon} />, label: "Email", value: contact.email, href: `mailto:${contact.email}` },
     { icon: <Mail strokeWidth={1.75} className={icon} />, label: "Email", value: OWNER_EMAIL, href: `mailto:${OWNER_EMAIL}` },
-    { icon: <Clock strokeWidth={1.75} className={icon} />, label: "Studio hours", value: `Weekdays ${contact.hours}` },
+    { icon: <Clock strokeWidth={1.75} className={icon} />, label: "Studio hours", value: contact.hours },
   ];
   return (
     <div data-maintenance className="pb-20 md:pb-40">

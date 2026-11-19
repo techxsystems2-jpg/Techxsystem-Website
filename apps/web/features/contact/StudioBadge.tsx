@@ -16,7 +16,7 @@ export function StudioBadge() {
         <motion.span key={clock ? (clock.open ? "open" : "closed") : "label"} initial={{ opacity: 0, filter: "blur(3px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
           {!clock ? "Contact the studio" : (
             <>
-              {clock.open ? "Studio open now" : "Studio closed, WhatsApp still answered"}
+              {clock.open ? "Studio open now" : "Studio closed · support still 24/7"}
               <span className="font-normal text-ink-2 max-sm:hidden"> · <span className="tabular-nums">{clock.indiaTime}</span> in India</span>
             </>
           )}

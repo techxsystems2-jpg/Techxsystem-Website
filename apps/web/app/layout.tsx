@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import { SiteHeader, SiteHeaderShell } from "@/features/site-shell/SiteHeader";
 import { SiteFooter } from "@/features/site-shell/SiteFooter";
 import { StickyTrialBar } from "@/features/site-shell/StickyTrialBar";
@@ -41,7 +42,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   // admin-managed facts and services, cached until the admin saves (lib/content)
   const [live, services] = await Promise.all([getSite(), getContent("services")]);
   return (
-    <html lang={site.lang} className={`${geist.variable} ${geistMono.variable}`}>
+    <html lang={site.lang} data-scroll-behavior="smooth" className={`${geist.variable} ${geistMono.variable}`}>
       <body className="bg-page font-sans text-body text-ink antialiased">
         <JsonLd data={siteSchema(live)} />
         <a href="#main" className="fixed left-3 top-3 z-50 -translate-y-[120px] rounded-[10px] bg-ink px-4 py-3 text-small text-white focus:translate-y-0">
@@ -61,6 +62,12 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <div data-site-chrome><Suspense fallback={null}><StickyTrialBar /></Suspense></div>
         </MotionRoot>
         </ContentProvider>
+        {/* Google Tag Manager for analytics (owner, 2026-11-19). Loaded after the page is interactive, so it never
+            delays the first paint (AGENTS §3 rule 5); the gtm.start event is what makes GTM run its tags. */}
+        <Script id="gtm" strategy="afterInteractive">
+          {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());dataLayer.push({'gtm.start':Date.now(),event:'gtm.js'});`}
+        </Script>
+        <Script src="https://www.googletagmanager.com/gtm.js?id=GTM-PH69GKXH" strategy="afterInteractive" />
       </body>
     </html>
   );

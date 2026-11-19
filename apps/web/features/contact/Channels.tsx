@@ -26,7 +26,7 @@ export function Channels() {
         For quotes, invoices and anything with attachments.
       </Channel>
       <Channel n="03" label="Call" art={<CallScene />} value={contact.phone} valueHref={contact.phoneUrl} href={BOOK} more="Book a call" className="md:col-span-2 lg:col-span-1">
-        Weekdays {contact.hours}. Book a call for US hours.
+        {contact.hours}. Book a call for US hours.
       </Channel>
     </RevealGroup>
   );

@@ -6,7 +6,6 @@ import { SectionHead } from "@/features/home/SectionHead";
 import { RevealGroup, RevealItem } from "@/features/motion/Reveal";
 import { shotsFor, toShots } from "@/features/work/portfolio";
 import { getContent } from "@/lib/content";
-import type { WorkCat } from "./data";
 
 /** "What's included" (Figma 28:155): numbered fixes in a hairline grid, four across on desktop (three when the count is six), so no row ends early. */
 export function Fixes({ lead, rest, items, note }: { lead: string; rest: string; items: { title: string; text: string }[]; note?: string }) {
@@ -32,7 +31,7 @@ export async function RecentWork({ cats }: { cats: string[] }) {
   const [work, all] = await Promise.all([getContent("work"), getContent("categories")]);
   const shots = shotsFor(cats, 3, toShots(work, all));
   return (
-    <section className="wrap pt-24 md:pt-32">
+    <section id="work" className="wrap scroll-mt-16 pt-24 md:pt-32">
       <SectionHead
         label="Recent work"
         lead="From our studio."
